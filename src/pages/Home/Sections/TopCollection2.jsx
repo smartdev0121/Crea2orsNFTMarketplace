@@ -13,7 +13,7 @@ import "swiper/modules/effect-coverflow/effect-coverflow.scss";
 import "swiper/modules/pagination/pagination.scss";
 import "./FeaturedArtist.scss";
 
-const TopCollection2 = () => {
+const TopCollection2 = ({ mainCollection2, history }) => {
   const [smallNFTs, setSmallNFTs] = useState([]);
   useEffect(() => {
     (async () => {
@@ -30,8 +30,20 @@ const TopCollection2 = () => {
     <div>
       <div className="welcome-image collection-1">
         <div className="top-collection pulse" key={1}>
-          <img src="/images/home/visual.png" alt="Visual" />
-          <MViewCollection />
+          <img
+            src={
+              mainCollection2?.Collections.image_url ||
+              "/images/home/visual.png"
+            }
+            alt="Visual"
+          />
+          <MViewCollection
+            category={mainCollection2?.Collections.category}
+            name={mainCollection2?.Collections.name}
+            contractAddress={mainCollection2?.Collections.contract_address}
+            id={mainCollection2?.Collections.id}
+            history={history}
+          />
         </div>
 
         <Swiper

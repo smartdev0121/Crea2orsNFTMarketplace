@@ -22,6 +22,11 @@ export default (appState = initialState, { type, payload }) => {
           [payload]: false,
         },
       };
+    case types.HOMEPAGE_CONTENT_FETCHED:
+      return {
+        ...appState,
+        contents: [...payload],
+      };
     default:
       return appState;
   }
