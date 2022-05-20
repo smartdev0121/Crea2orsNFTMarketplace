@@ -19,8 +19,6 @@ import "./App.css";
 import "./styles/styles.css";
 
 const App = () => {
-  const [whitelisted, setWhitelisted] = useState(false);
-  const dispatch = useDispatch();
   const user = useSelector((state) => getProfileReducer(state));
   const isLoading = useSelector((state) => getSpinner(state, "PROFILE_INFO"));
   let routes;

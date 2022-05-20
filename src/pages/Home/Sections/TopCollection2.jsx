@@ -27,7 +27,7 @@ const TopCollection2 = () => {
     })();
   }, []);
   return (
-    <Box className="medium-collection">
+    <div>
       <div className="welcome-image collection-1">
         <div className="top-collection pulse" key={1}>
           <img src="/images/home/visual.png" alt="Visual" />
@@ -61,7 +61,7 @@ const TopCollection2 = () => {
           })}
         </Swiper>
       </div>
-    </Box>
+    </div>
   );
 };
 

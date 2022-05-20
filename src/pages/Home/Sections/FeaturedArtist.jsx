@@ -1,6 +1,7 @@
 import React from "react";
 import { EffectCoverflow, Pagination } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react/swiper-react";
+import { Box } from "@mui/material";
 // Import Swiper styles
 import "swiper/swiper.scss";
 import "swiper/modules/effect-coverflow/effect-coverflow.scss";

@@ -1,9 +1,0 @@
-{
-    "version": 3,
-    "mappings": "AAAA,AAAA,cAAc,CAAC,OAAO,CAAC;EACrB,gBAAgB,EAAE,iCAAiC,CAAC,UAAU;CAI/D;;AALD,AAEE,cAFY,CAAC,OAAO,CAEpB,GAAG,CAAC;EACF,MAAM,EAAE,aAAa,CAAC,SAAS;CAChC",
-    "sources": [
-        "MAccordion.module.scss"
-    ],
-    "names": [],
-    "file": "MAccordion.module.css"
-}

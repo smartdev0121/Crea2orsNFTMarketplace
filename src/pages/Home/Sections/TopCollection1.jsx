@@ -17,18 +17,13 @@ const TopCollection1 = () => {
   useEffect(() => {
     (async () => {
       try {
-        // const res = await apiGetAssets();
-        // res.splice(5);
-        // console.log(res);
-        // setSmallNFTs(res);
-        // console.log("small", smallNFTs);
       } catch {
         ((err) => {})();
       }
     })();
   }, []);
   return (
-    <Box className="medium-collection">
+    <div className="top-collection">
       <div className="welcome-image collection-1">
         <div className="top-collection pulse" key={2}>
           <img src="/images/home/visual.png" alt="Visual" />
@@ -61,7 +56,7 @@ const TopCollection1 = () => {
           })}
         </Swiper>
       </div>
-    </Box>
+    </div>
   );
 };
 

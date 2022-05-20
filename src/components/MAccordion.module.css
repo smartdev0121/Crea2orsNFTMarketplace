@@ -1,9 +1,0 @@
-.accordionItem :global {
-  background-color: var(--secondary-background-color) !important;
-}
-
-.accordionItem :global svg {
-  -webkit-filter: brightness(0) invert(1);
-          filter: brightness(0) invert(1);
-}
-/*# sourceMappingURL=MAccordion.module.css.map */
