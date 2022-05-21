@@ -6,7 +6,7 @@ import qs from "qs";
 import { getToken, clearInfo } from "./storage";
 
 export const SITE_URL = "http://localhost:8080/";
-export const API_URL = "http://localhost:8080";
+export const API_URL = "http://localhost:8080/cr2_apis/";
 
 const requestConfig = {
   headers: {
