@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { EffectCoverflow, Pagination } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react/swiper-react";
-import { apiGetAssets } from "src/utils/api";
 import MNFTItem from "../../../components/MNFTItem";
 import MViewCollection from "../../../components/MViewCollection";
 import Box from "@mui/material/Box";
