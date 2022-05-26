@@ -66,7 +66,7 @@ const SignUp = (props) => {
               <Stack className="input-part" spacing={2}>
                 <Field
                   type="text"
-                  label="Nickname"
+                  label="Crea2or Name to show"
                   name="nick_name"
                   component={MTextField}
                 />

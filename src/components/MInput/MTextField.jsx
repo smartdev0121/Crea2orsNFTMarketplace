@@ -66,6 +66,7 @@ const MTextField = (props) => {
     label,
     meta: { asyncValidating, touched, error },
     required,
+    ref,
     placeholder,
     multiline,
     helperText,
@@ -98,6 +99,7 @@ const MTextField = (props) => {
         helperText={helperText}
         max={max}
         min={min}
+        ref={ref}
         inputProps={{
           ...inputProps,
         }}

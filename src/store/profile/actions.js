@@ -12,10 +12,10 @@ export const updateProfile = (newProfile) => ({
   payload: newProfile,
 });
 
-export const getProfile = () => (dispatch) => {
+export const getProfile = (walletAddress) => (dispatch) => {
   dispatch(appActions.showSpinner("PROFILE_INFO"));
   return api
-    .get("/profile/info")
+    .get(`/profile/info/${walletAddress}`)
     .then((res) => {
       dispatch({
         type: types.PROFILE_INFO,

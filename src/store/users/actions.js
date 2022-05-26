@@ -63,7 +63,7 @@ export const profileBackgroundUpdate = (imageFileData) => {
   };
 };
 
-export const setUserInfo = (data) => {
+export const setUserInfo = (data, history) => {
   const config = {
     headers: {
       "content-type": `multipart/form-data; boundary=${data._boundary}`,
@@ -76,6 +76,7 @@ export const setUserInfo = (data) => {
         dispatch({ type: types.SET_USER_INFO, payload: res });
         dispatch(updateProfile(res));
         showNotify("Profile information is successfully updated");
+        history.push("/my-profile");
       })
       .catch((res) => {
         if (res.email)

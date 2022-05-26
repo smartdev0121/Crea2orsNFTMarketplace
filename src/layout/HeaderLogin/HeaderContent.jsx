@@ -42,13 +42,16 @@ const HeaderContent = () => {
   const [walletAddress, setWalletAddress] = useState(null);
   const dispatch = useDispatch();
   const toggleMenu = () => {
+    alert();
     setMenuOpened(!menuOpened);
   };
 
   const connectWallet = async () => {
     try {
+      await disconnectWallet();
       await showWeb3WalletModal();
       const curAddress = await getCurrentWalletAddress();
+      console.log(curAddress);
       if (curAddress) {
         dispatch(connectedWallet(curAddress));
       }

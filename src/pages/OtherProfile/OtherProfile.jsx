@@ -11,14 +11,12 @@ import {
   MoreHoriz,
 } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { Link, useParams } from "react-router-dom";
 import MBorderButton from "src/components/MButtons/MBorderButton";
 import { useDispatch, useSelector } from "react-redux";
 import ProfileTab from "./ProfileTab";
-import "dotenv/config";
 import { getOtherProfile, follow, unFollow } from "../../store/users/actions";
-import { getProfile } from "../../store/profile/actions";
 import { getCurrentWalletAddress } from "src/utils/wallet";
+import "dotenv/config";
 
 const OtherProfile = (props) => {
   const [connectBtnTxt, setConnectBtnTxt] = useState("Connect");

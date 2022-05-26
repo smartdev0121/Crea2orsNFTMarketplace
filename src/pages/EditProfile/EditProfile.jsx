@@ -10,6 +10,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import { Edit } from "@mui/icons-material";
 import { getUserInfo, setUserInfo } from "../../store/users/actions";
 import MImageCropper from "src/components/MImageCropper";
+import { verify } from "src/store/auth/actions";
 import "dotenv/config";
 import "./EditProfile.scss";
 
@@ -26,11 +27,12 @@ const FileField = ({ name, ...props }) => (
   </Field>
 );
 
-const EditProfile = () => {
+const EditProfile = (props) => {
   const dispatch = useDispatch();
   const [sidebarWidth, setSidebarWidth] = useState(undefined);
   const [file, setFile] = useState(null);
   const [sidebarTop, setSidebarTop] = useState(undefined);
+  const [email, setEmail] = useState();
   const [boxBottom, setBoxBottom] = useState(undefined);
   const [resizedImage, setResizedImage] = useState(null);
   const userInfo = useSelector((state) => state.users.userInfo);
@@ -81,12 +83,16 @@ const EditProfile = () => {
 
     dispatch(getUserInfo(dispatch));
   }, []);
+  console.log(email);
 
   useEffect(() => {
     if (!sidebarTop) return;
-    userInfo.verified ? setVerified("verified") : setVerified("unverified");
+    userInfo.verified == 1
+      ? setVerified("verified")
+      : setVerified("unverified");
     window.addEventListener("scroll", isSticky);
 
+    setEmail(userInfo.email);
     return () => {
       window.removeEventListener("scroll", isSticky);
     };
@@ -109,6 +115,7 @@ const EditProfile = () => {
   const onSubmit = (values) => {
     const data = new FormData();
     data.append("name", "Image Upload");
+    data.append("nick_name", values.nickName);
     data.append("file_attachment", confirmedFile);
     data.append("email", values.email);
     data.append("handled", handled);
@@ -116,7 +123,15 @@ const EditProfile = () => {
     data.append("customUrl", values.customUrl);
     data.append("personalSite", values.personalSite);
 
-    dispatch(setUserInfo(data));
+    dispatch(setUserInfo(data, props.history));
+  };
+
+  const onEmailChange = (eve) => {
+    setEmail(eve.target.value);
+  };
+
+  const getVerify = () => {
+    dispatch(verify(email));
   };
 
   const { result, uploader } = useDisplayImage();
@@ -163,7 +178,7 @@ const EditProfile = () => {
                 <Stack className="input-part" spacing={2}>
                   <Field
                     type="text"
-                    name="displayName"
+                    name="nickName"
                     label="Display name"
                     placeholder="Enter your display name"
                     InputLabelProps={{ shrink: true }}
@@ -251,6 +266,8 @@ const EditProfile = () => {
                     type="email"
                     name="email"
                     label="Email"
+                    onChange={onEmailChange}
+                    initialValue={email}
                     variant="standard"
                     placeholder="Enter your email address"
                     InputLabelProps={{ shrink: true }}
@@ -262,9 +279,8 @@ const EditProfile = () => {
                         </InputAdornment>
                       ),
                     }}
-                    initialValue={userInfo?.email || ""}
                   />
-                  {/* <section className="veri-part">
+                  <section className="veri-part">
                     <div>
                       <h3>Verification</h3>
                       <p className="grey-txt">
@@ -275,9 +291,11 @@ const EditProfile = () => {
                     </div>
 
                     <div>
-                      <Button className="blue-btn">Get verified</Button>
+                      <Button className="blue-btn" onClick={getVerify}>
+                        Get verified
+                      </Button>
                     </div>
-                  </section> */}
+                  </section>
 
                   <MColorButtonView type="submit" disabled={submitting}>
                     Update Profile
@@ -300,6 +318,7 @@ const EditProfile = () => {
                         setResizedImage(
                           window.URL.createObjectURL(croppedFile)
                         );
+
                         setConfirmedFile(croppedFile);
                       }}
                       onCompleted={() => setFile(null)}
@@ -308,9 +327,10 @@ const EditProfile = () => {
                       <img
                         src={
                           resizedImage ||
-                          process.env.REACT_APP_BACKEND_URL +
-                            userInfo.avatar_url ||
-                          "/images/profile-images/profile-empty.png"
+                          (userInfo.avatar_url
+                            ? process.env.REACT_APP_BACKEND_URL +
+                              userInfo.avatar_url
+                            : "/images/profile-images/profile-empty.png")
                         }
                       />
                     </div>

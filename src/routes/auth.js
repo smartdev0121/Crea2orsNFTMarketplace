@@ -11,6 +11,7 @@ import OtherProfile from "../pages/OtherProfile";
 import MyCollections from "../pages/MyCollections";
 import AllCollections from "../pages/AllCollections";
 import MyNFTs from "../pages/MyNFTs";
+import EmailConfirmed from "../pages/EmailConfirmed";
 
 const routes = [
   {
@@ -55,6 +56,11 @@ const routes = [
   {
     path: "/create-nft/:contractAddress/:contractId",
     component: CreateNFTPage,
+    exact: true,
+  },
+  {
+    path: "/email-confirm/:token/:email",
+    component: EmailConfirmed,
     exact: true,
   },
   {

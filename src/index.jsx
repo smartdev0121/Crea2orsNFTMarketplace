@@ -10,8 +10,6 @@ import "./index.css";
 import "antd/dist/antd.css";
 import "react-multi-carousel/lib/styles.css";
 import buildStore from "./store";
-import { getItem, getToken } from "./utils/storage";
-import { getProfile } from "./store/profile/actions";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { connectedWallet } from "./store/wallet/actions";
 import { ToastContainer } from "react-toastify";
@@ -23,15 +21,10 @@ const history = createBrowserHistory({});
 const store = buildStore(history, {});
 
 (async () => {
-  if (getToken()) {
-    store.dispatch(getProfile());
-    if (getCachedProvider()) {
-      let curAddress = "";
-      curAddress = await getCurrentWalletAddress();
-      console.log("CACHED", curAddress);
-
-      store.dispatch(connectedWallet(curAddress));
-    }
+  if (getCachedProvider()) {
+    let curAddress = "";
+    curAddress = await getCurrentWalletAddress();
+    store.dispatch(connectedWallet(curAddress));
   }
 })();
 

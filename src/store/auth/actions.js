@@ -11,6 +11,12 @@ export const types = {
   AUTH_LOGUT: "AUTH_LOGUT",
 };
 
+export const verify = (email) => (dispatch) => {
+  return api
+    .get(`/email-verify/${email}`)
+    .then((res) => {})
+    .catch((err) => {});
+};
 export const login = (values) => (dispatch) => {
   dispatch(appActions.showSpinner("login"));
   return api

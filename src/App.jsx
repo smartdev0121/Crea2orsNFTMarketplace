@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Switch,
-  Route,
-  Redirect,
-  withRouter,
-  BrowserRouter,
-} from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import MainLayout from "./layout/MainLayout";
 import reduce from "lodash/reduce";
@@ -21,13 +15,7 @@ import "./styles/styles.css";
 const App = () => {
   const user = useSelector((state) => getProfileReducer(state));
   const isLoading = useSelector((state) => getSpinner(state, "PROFILE_INFO"));
-  let routes;
-
-  if (!user) {
-    routes = guestRoutes;
-  } else {
-    routes = authRoutes;
-  }
+  let routes = authRoutes;
   const spreadRoutes = reduce(
     routes,
     (result, value) => {

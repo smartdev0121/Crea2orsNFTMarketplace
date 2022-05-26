@@ -8,10 +8,9 @@ import Footer from "./Footer";
 import styled from "styled-components";
 
 const MainLayout = ({ children }) => {
-  const user = useSelector((state) => state.profile);
   return (
     <>
-      {user ? <HeaderLogin /> : <HeaderLogout />}
+      <HeaderLogin />
       <MBody>{children}</MBody>
       <Footer />
     </>

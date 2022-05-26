@@ -11,7 +11,6 @@
 .profile-info-bar {
   text-align: center;
   position: relative;
-  margin-top: 15%;
   .profile-background {
     width: 100%;
     top: -75%;
@@ -128,10 +127,15 @@
 
 .bio-text {
   text-align: center;
+  margin: 0 5%;
   margin-top: 10px;
   p {
     color: #999 !important;
   }
+}
+
+.nick_name {
+  margin-top: 8px;
 }
 
 .personal {

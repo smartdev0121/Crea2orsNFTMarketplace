@@ -19,21 +19,23 @@ import { profileBackgroundUpdate } from "src/store/users/actions";
 import { getUserInfo } from "../../store/users/actions";
 import { getCurrentWalletAddress } from "src/utils/wallet";
 import { connectedWallet, rejectConnectWallet } from "src/store/wallet/actions";
+import { showNotify } from "src/utils/notify";
 import "./MyProfile.scss";
 import "dotenv/config";
 
 const MyProfile = (props) => {
-  const [connectBtnTxt, setConnectBtnTxt] = useState("Connect");
-  const [account, setAccount] = useState("");
-  const [value, setValue] = React.useState("1");
-  const userInfo = useSelector((state) => state.profile);
   const hiddenBackImageFile = React.useRef(null);
+  const [connectBtnTxt, setConnectBtnTxt] = useState("Connect");
   const [resizedImage, setResizedImage] = useState(null);
+  const [confirmedFile, setConfirmedFile] = useState(undefined);
+  const [file, setFile] = useState(null);
+  const [walletAddress, setWalletAddress] = useState(undefined);
+  const [account, setAccount] = useState("");
+  const [value, setValue] = useState("1");
+  const userInfo = useSelector((state) => state.profile);
   const followInfo = useSelector((state) => state.users.userFollow);
   const active = useSelector((state) => state.wallet.active);
   const dispatch = useDispatch();
-  const [confirmedFile, setConfirmedFile] = useState(undefined);
-  const [file, setFile] = useState(null);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -42,6 +44,7 @@ const MyProfile = (props) => {
     let tempWalAddress = "Addr";
     if (active) {
       tempWalAddress = await getCurrentWalletAddress();
+      setWalletAddress(tempWalAddress);
       if (!tempWalAddress) {
         dispatch(rejectConnectWallet());
         return;
@@ -61,14 +64,17 @@ const MyProfile = (props) => {
     try {
       const curAddress = await getCurrentWalletAddress();
       if (curAddress) {
-        dispatch(connectedWallet());
+        dispatch(connectedWallet(curAddress));
       }
+      setWalletAddress(curAddress);
     } catch (err) {
       console.log(err);
     }
   };
 
-  const onImageClicked = () => {};
+  const onImageClicked = () => {
+    props.history.push("/edit-profile");
+  };
 
   const onEditProfile = () => {
     props.history.push("/edit-profile");
@@ -87,10 +93,10 @@ const MyProfile = (props) => {
         <div
           style={{
             width: "100%",
-            top: "-75%",
+            top: "-33px",
             position: "absolute",
-            height: "300px",
-            backgroundImage: `url(${process.env.REACT_APP_BACKEND_URL}${userInfo.backgroundImageUrl})`,
+            height: "100px",
+            backgroundImage: `url(${process.env.REACT_APP_BACKEND_URL}${userInfo?.backgroundImageUrl})`,
             backgroundSize: "cover",
           }}
         >
@@ -125,6 +131,14 @@ const MyProfile = (props) => {
                 setConfirmedFile(croppedFile);
                 let data = new FormData();
                 data.append("file_back", croppedFile);
+                data.append("walletAddress", walletAddress);
+                if (!walletAddress) {
+                  showNotify(
+                    "Wallet is not connected! Please connect wallet!",
+                    "error"
+                  );
+                  return;
+                }
                 dispatch(profileBackgroundUpdate(data));
               }}
               onCompleted={() => setFile(null)}
@@ -136,8 +150,8 @@ const MyProfile = (props) => {
           <Button className="profile-image" onClick={onImageClicked}>
             <img
               src={
-                (userInfo.avatar_url &&
-                  process.env.REACT_APP_BACKEND_URL + userInfo.avatar_url) ||
+                (userInfo?.avatar_url &&
+                  process.env.REACT_APP_BACKEND_URL + userInfo?.avatar_url) ||
                 "/images/profile-images/profile-empty.png"
               }
             />
@@ -167,28 +181,29 @@ const MyProfile = (props) => {
             }
           </MClipboard>
         </div>
+        <p className="nick_name">@{userInfo?.nickName}</p>
         <div className="bio-text">
-          <p>{userInfo.bio || ""}</p>
+          <p>{userInfo?.bio || ""}</p>
         </div>
         <div className="personal">
           <a
-            href={`https://${userInfo.personalSite}`}
+            href={`https://${userInfo?.personalSite}`}
             target="_blank"
             style={{ color: "#999" }}
           >
-            <b>@{userInfo.personalSite || ""}</b>
+            <b>{userInfo?.personalSite || ""}</b>
           </a>
         </div>
         <div className="following-bar">
           <label>
             <span className="count">
-              {Object.keys(followInfo.followers).length}
+              {Object.keys(followInfo?.followers).length}
             </span>
             <span className="static-string">followers</span>
           </label>
           <label>
             <span className="count">
-              {Object.keys(followInfo.followings).length}
+              {Object.keys(followInfo?.followings).length}
             </span>
             <span className="static-string">following</span>
           </label>

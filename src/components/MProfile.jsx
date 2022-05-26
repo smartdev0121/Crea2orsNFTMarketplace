@@ -28,7 +28,7 @@ const AccountMenu = (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const dispatch = useDispatch();
-  const avatarUrl = useSelector((state) => state.profile.avatar_url);
+  const avatarUrl = useSelector((state) => state.profile?.avatar_url);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
