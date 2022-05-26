@@ -5,8 +5,8 @@ import qs from "qs";
 
 import { getToken, clearInfo } from "./storage";
 
-export const SITE_URL = "http://crea2ors.io/";
-export const API_URL = "http://crea2ors.io/cr2_apis";
+export const SITE_URL = "https://crea2ors.io/";
+export const API_URL = "https://crea2ors.io/cr2_apis";
 
 const requestConfig = {
   headers: {
