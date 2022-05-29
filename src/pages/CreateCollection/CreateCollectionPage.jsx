@@ -365,9 +365,8 @@ const CreateCollectionPage = (props) => {
                         <img
                           src={
                             result ||
-                            (collectionPreview
-                              ? collectionPreview.image
-                              : "/images/img_empty.png")
+                            collectionPreview.image ||
+                            "/images/img_empty.png"
                           }
                           style={{ width: 300, height: "auto" }}
                           alt="collection"
