@@ -103,9 +103,11 @@ const HeaderContent = () => {
     dispatch(logout());
   };
 
-  const onDisconnect = () => {
+  const onDisconnect = async () => {
     try {
+      await disconnectWallet();
       deleteItem("walletStatus");
+      dispatch(rejectConnectWallet());
     } catch (err) {
       console.log(err);
     }

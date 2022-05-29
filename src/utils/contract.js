@@ -78,7 +78,7 @@ export const getValuefromEvent = async (eventData, myAccount) => {
 export const deployContract = (contract_type, contract_metadata) =>
   new Promise(async (resolve, reject) => {
     try {
-      const { name, tokenLimit } = contract_metadata;
+      const { name, tokenLimit, symbol } = contract_metadata;
 
       if (tokenLimit > process.env.REACT_APP_TOKEN_LIMI)
         return reject("Can't mint more than 10");
@@ -103,7 +103,7 @@ export const deployContract = (contract_type, contract_metadata) =>
 
       console.log(
         name,
-        "CREATOR",
+        symbol,
         contract_uri,
         process.env.REACT_APP_BATCH_SIZE,
         tokenLimit
@@ -113,7 +113,7 @@ export const deployContract = (contract_type, contract_metadata) =>
           data: bytecode,
           arguments: [
             name,
-            "CREATOR",
+            symbol,
             contract_uri,
             process.env.REACT_APP_BATCH_SIZE,
             tokenLimit,

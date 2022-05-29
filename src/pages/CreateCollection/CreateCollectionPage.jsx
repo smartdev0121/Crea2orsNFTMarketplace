@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CONTRACT_TYPE } from "src/config/global";
-import { deployContract, holdEvent, getValuefromEvent } from "src/utils/contract";
+import {
+  deployContract,
+  holdEvent,
+  getValuefromEvent,
+} from "src/utils/contract";
 import {
   Button,
   Box,
@@ -22,7 +26,10 @@ import { showSpinner, hideSpinner } from "src/store/app/actions";
 import MSpinner from "src/components/MSpinner";
 import { getSpinner } from "src/store/app/reducer";
 import { showNotify } from "src/utils/notify";
-import { saveCollection } from "../../store/contract/actions";
+import {
+  saveCollection,
+  submitCollectionPreview,
+} from "../../store/contract/actions";
 import "./CreateCollectionPage.scss";
 
 const Paragraph = styled("p")(
@@ -36,6 +43,13 @@ const Paragraph = styled("p")(
   `
 );
 
+const PreviewBtn = styled(Button)(
+  ({}) => `
+  background-color: #383838;
+  color: white;
+  `
+);
+
 const CreateCollectionPage = (props) => {
   const categories = [
     "Art",
@@ -46,19 +60,40 @@ const CreateCollectionPage = (props) => {
     "Asset",
   ];
   const [contractType, setContractType] = useState(0);
+  const collectionPreview = useSelector(
+    (state) => state.contract.collectionPreview
+  );
+  const [inputValues, setInputValues] = useState(
+    collectionPreview || {
+      collectionName: "",
+      symbol: "",
+      description: "",
+      vidUrl: "",
+      intro: "",
+      type: "",
+      subCategory: "",
+      tokenLimit: "",
+      image: "",
+    }
+  );
   const [file, setFile] = useState();
   const [metadata, setMetadata] = useState({});
   const [vidStatus, setVidStatus] = useState(false);
   const hiddenFileInput = React.useRef(null);
-  const [type, setType] = useState(categories[0]);
+  const [type, setType] = useState();
   const isDeploying = useSelector((state) =>
     getSpinner(state, "DEPLOY_CONTRACT")
   );
+  const [result, setResult] = React.useState("");
+
+  useEffect(() => {
+    setType(collectionPreview ? categories.indexOf(collectionPreview.type) : 0);
+    console.log(typeof categories.indexOf(collectionPreview?.type));
+    setResult(collectionPreview ? collectionPreview.image : null);
+  }, []);
   const dispatch = useDispatch();
 
   const useDisplayImage = () => {
-    const [result, setResult] = React.useState("");
-
     const uploader = (e) => {
       const imageFile = e.target.files[0];
 
@@ -66,15 +101,14 @@ const CreateCollectionPage = (props) => {
       reader.addEventListener("load", (e) => {
         setResult(e.target.result);
       });
-
       reader.readAsDataURL(imageFile);
     };
 
-    return { result, uploader };
+    return { uploader };
   };
 
-  const handleInputChange = (e, key) => {
-    setMetadata((prev) => ({ ...prev, [key]: e.target.value }));
+  const handleInputChange = (e) => {
+    setInputValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleFileChange = (e) => {
@@ -90,9 +124,20 @@ const CreateCollectionPage = (props) => {
     setVidStatus(e.target.checked);
   };
 
+  const onPreview = () => {
+    const newCollectionInfo = {
+      ...inputValues,
+      type: categories[type],
+      image: result,
+    };
+    dispatch(submitCollectionPreview(newCollectionInfo));
+    props.history.push("/collection-preview");
+  };
+
   const onSubmit = async (values) => {
     const metadata = {
       name: values.collectionName,
+      symbol: values.symbol,
       description: values.description,
       videoUrl: values.vidUrl,
       highLight: values.intro,
@@ -133,10 +178,10 @@ const CreateCollectionPage = (props) => {
     }
   };
 
-  const { result, uploader } = useDisplayImage();
+  const { uploader } = useDisplayImage();
 
   const valueChanged = (value) => {
-    setType(categories[value]);
+    setType(value);
   };
 
   return (
@@ -182,7 +227,31 @@ const CreateCollectionPage = (props) => {
                         name="collectionName"
                         label="Collection name"
                         component={MTextField}
-                        variant="standard"
+                        autoComplete="off"
+                        onChange={handleInputChange}
+                        initialValue={inputValues.collectionName}
+                        variant="outlined"
+                      />
+
+                      <Field
+                        type="text"
+                        name="symbol"
+                        label="Symbol"
+                        onChange={handleInputChange}
+                        initialValue={inputValues.symbol}
+                        component={MTextField}
+                        variant="outlined"
+                      />
+
+                      <Field
+                        type="text"
+                        name="intro"
+                        multiline
+                        label="Highlight Intro"
+                        onChange={handleInputChange}
+                        initialValue={inputValues.intro}
+                        component={MTextField}
+                        variant="outlined"
                       />
 
                       <Field
@@ -190,8 +259,10 @@ const CreateCollectionPage = (props) => {
                         placeholder="Description"
                         label="Collection details and information"
                         name="description"
+                        onChange={handleInputChange}
+                        initialValue={inputValues.description}
                         component={MTextField}
-                        variant="standard"
+                        variant="outlined"
                         multiline
                       />
                       <Stack direction="row" alignItems="center">
@@ -207,24 +278,17 @@ const CreateCollectionPage = (props) => {
                         <Field
                           type="text"
                           label="URL"
+                          onChange={handleInputChange}
+                          initialValue={inputValues.vidUrl}
                           name="vidUrl"
                           component={MTextField}
                           disabled={!vidStatus}
                         />
                       </Stack>
-
-                      <Field
-                        type="text"
-                        name="intro"
-                        multiline
-                        label="Highlight Intro"
-                        component={MTextField}
-                        variant="standard"
-                      />
                       <Field
                         name="type"
                         values={categories}
-                        initialValue={type}
+                        selectValue={type}
                         label="Category"
                         component={MSelectBox}
                         onChangeValue={valueChanged}
@@ -236,10 +300,13 @@ const CreateCollectionPage = (props) => {
                       <Field
                         type="text"
                         name="subCategory"
+                        label="Subcategory"
                         multiline
                         component={MTextField}
+                        onChange={handleInputChange}
+                        initialValue={inputValues.subCategory}
                         placeholder="#Weapon"
-                        variant="standard"
+                        variant="outlined"
                       />
                       <Stack
                         direction="row"
@@ -258,8 +325,11 @@ const CreateCollectionPage = (props) => {
                             ),
                           }}
                           name="tokenLimit"
+                          label="Quantity"
                           sx={{ maxWidth: "100px" }}
-                          variant="standard"
+                          variant="outlined"
+                          onChange={handleInputChange}
+                          initialValue={inputValues.tokenLimit}
                           component={MTextField}
                           inputProps={{
                             min: 1,
@@ -268,6 +338,7 @@ const CreateCollectionPage = (props) => {
                           }}
                         />
                       </Stack>
+                      <PreviewBtn onClick={onPreview}>Preview</PreviewBtn>
 
                       <Paragraph className="grey-txt">
                         All our collections are Free or Lazy minted. This means
@@ -294,8 +365,9 @@ const CreateCollectionPage = (props) => {
                         <img
                           src={
                             result ||
-                            metadata.ImageUrl ||
-                            "/images/img_empty.png"
+                            (collectionPreview
+                              ? collectionPreview.image
+                              : "/images/img_empty.png")
                           }
                           style={{ width: 300, height: "auto" }}
                           alt="collection"

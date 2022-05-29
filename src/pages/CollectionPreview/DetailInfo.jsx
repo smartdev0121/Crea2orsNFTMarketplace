@@ -5,6 +5,7 @@ import { ContentCopy, PlayArrow } from "@mui/icons-material";
 import MClipboard from "src/components/MClipboard";
 
 const DetailInfo = (props) => {
+  console.log(props.url, props.desc);
   return (
     <Box>
       <div className="image-part">

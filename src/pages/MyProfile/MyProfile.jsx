@@ -95,7 +95,7 @@ const MyProfile = (props) => {
             width: "100%",
             top: "-33px",
             position: "absolute",
-            height: "100px",
+            height: "200px",
             backgroundImage: `url(${process.env.REACT_APP_BACKEND_URL}${userInfo?.backgroundImageUrl})`,
             backgroundSize: "cover",
           }}

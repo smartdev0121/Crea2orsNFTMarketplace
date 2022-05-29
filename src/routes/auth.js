@@ -11,12 +11,18 @@ import OtherProfile from "../pages/OtherProfile";
 import MyCollections from "../pages/MyCollections";
 import AllCollections from "../pages/AllCollections";
 import MyNFTs from "../pages/MyNFTs";
+import CollectionPreview from "../pages/CollectionPreview";
 import EmailConfirmed from "../pages/EmailConfirmed";
 
 const routes = [
   {
     path: "/",
     component: HomePage,
+    exact: true,
+  },
+  {
+    path: "/collection-preview",
+    component: CollectionPreview,
     exact: true,
   },
   {

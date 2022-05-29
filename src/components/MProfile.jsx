@@ -144,12 +144,6 @@ const AccountMenu = (props) => {
           </ListItemIcon>
           Disconnect Wallet
         </MenuItem>
-        <MenuItem onClick={props.onLogout}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          Logout
-        </MenuItem>
       </Menu>
     </React.Fragment>
   );

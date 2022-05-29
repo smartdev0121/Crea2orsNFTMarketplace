@@ -8,6 +8,7 @@ export const types = {
   COLLECTIONS_FETCHED: "COLLECTIONS_FETCHED",
   COLLECTIONS_ALL_FETCHED: "COLLECTIONS_ALL_FETCHED",
   USER_NFTS_FETCHED: "USER_NFTS_FETCHED",
+  COLLECTION_PREVIEW: "COLLECTION_PREVIEW",
 };
 
 export const getUserNFTs = () => (dispatch) => {
@@ -17,7 +18,7 @@ export const getUserNFTs = () => (dispatch) => {
     .then((res) => {
       if (res.userNfts)
         dispatch({ type: types.USER_NFTS_FETCHED, payload: res.userNfts });
-        hideSpinner("USER_NFTS_LOADING");
+      hideSpinner("USER_NFTS_LOADING");
     })
     .catch((err) => {
       console.log(err);
@@ -138,4 +139,8 @@ export const getAllCollections = () => (dispatch) => {
     .catch((err) => {
       dispatch(hideSpinner("ALL_COLLECTIONS"));
     });
+};
+
+export const submitCollectionPreview = (collectionInfo) => {
+  return { type: types.COLLECTION_PREVIEW, payload: collectionInfo };
 };
