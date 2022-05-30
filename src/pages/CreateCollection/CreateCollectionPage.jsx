@@ -50,15 +50,16 @@ const PreviewBtn = styled(Button)(
   `
 );
 
+export const categories = [
+  "Art",
+  "Music",
+  "Ticket",
+  "Community",
+  "Moments",
+  "Asset",
+];
+
 const CreateCollectionPage = (props) => {
-  const categories = [
-    "Art",
-    "Music",
-    "Ticket",
-    "Community",
-    "Moments",
-    "Asset",
-  ];
   const [contractType, setContractType] = useState(0);
   const collectionPreview = useSelector(
     (state) => state.contract.collectionPreview
@@ -77,7 +78,6 @@ const CreateCollectionPage = (props) => {
     }
   );
   const [file, setFile] = useState();
-  const [metadata, setMetadata] = useState({});
   const [vidStatus, setVidStatus] = useState(false);
   const hiddenFileInput = React.useRef(null);
   const [type, setType] = useState();
@@ -90,6 +90,7 @@ const CreateCollectionPage = (props) => {
     setType(collectionPreview ? categories.indexOf(collectionPreview.type) : 0);
     console.log(typeof categories.indexOf(collectionPreview?.type));
     setResult(collectionPreview ? collectionPreview.image : null);
+    setFile(collectionPreview ? collectionPreview.file : null);
   }, []);
   const dispatch = useDispatch();
 
@@ -129,6 +130,7 @@ const CreateCollectionPage = (props) => {
       ...inputValues,
       type: categories[type],
       image: result,
+      file: file,
     };
     dispatch(submitCollectionPreview(newCollectionInfo));
     props.history.push("/collection-preview");
@@ -141,11 +143,12 @@ const CreateCollectionPage = (props) => {
       description: values.description,
       videoUrl: values.vidUrl,
       highLight: values.intro,
-      category: values.type,
+      category: type,
       subCategory: values.subCategory,
       tokenLimit: values.tokenLimit,
       file: file,
     };
+    console.log(metadata);
     try {
       dispatch(showSpinner("DEPLOY_CONTRACT"));
 
@@ -155,7 +158,7 @@ const CreateCollectionPage = (props) => {
       );
 
       const events = await holdEvent("ContractDeployed", contractAddress);
-      console.log("Collection Event", events);
+      console.log("Collection Event", metadata, imageUri);
       dispatch(
         saveCollection(
           contractUri,

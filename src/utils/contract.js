@@ -101,13 +101,6 @@ export const deployContract = (contract_type, contract_metadata) =>
 
       const contract = new web3.eth.Contract(contract_data);
 
-      console.log(
-        name,
-        symbol,
-        contract_uri,
-        process.env.REACT_APP_BATCH_SIZE,
-        tokenLimit
-      );
       contract
         .deploy({
           data: bytecode,

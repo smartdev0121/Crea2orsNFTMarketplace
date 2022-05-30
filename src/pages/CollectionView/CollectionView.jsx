@@ -12,6 +12,7 @@ import MNFTCard from "src/components/MCards/MNFTCard";
 import { MTopRadiusImg } from "src/components/MImages";
 import styled from "styled-components";
 import "./CollectionView.scss";
+import { categories } from "../CreateCollection/CreateCollectionPage";
 
 const CollectionView = (props) => {
   const newCollectionInfo = useSelector(
@@ -56,7 +57,7 @@ const CollectionView = (props) => {
             <div className="image-info-part">
               <h2 className="pretty-text">{metaData?.name}</h2>
               <p className="category">
-                {metaData?.category + "/" + metaData?.subCategory}
+                {categories[metaData?.category] + "/" + metaData?.subCategory}
               </p>
               <p>Colleciton Token Limit: {metaData?.tokenLimit}</p>
             </div>

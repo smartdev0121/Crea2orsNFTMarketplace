@@ -27,7 +27,7 @@ const DetailInfo = (props) => {
                     props.userProfile?.avatar_url || "/images/avatar.png"
                 }
               />
-              &nbsp;{props.userProfile.nickName}
+              &nbsp;{props.userProfile?.nickName}
             </div>
             <div className="content-copy">
               <MClipboard>
