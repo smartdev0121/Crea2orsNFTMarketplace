@@ -44,7 +44,7 @@ const App = () => {
               />
             );
           })}
-          {user ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+          {<Redirect to="/" />}
         </Switch>
       )}
     </MainLayout>
