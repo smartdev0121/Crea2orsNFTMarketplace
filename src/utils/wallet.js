@@ -1,7 +1,6 @@
 import Web3 from "web3";
 import Web3Modal, { injected } from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-
 import networks from "src/config/network";
 
 let web3Modal;
@@ -27,6 +26,30 @@ web3Modal = new Web3Modal({
 export const getCachedProvider = () => {
   return web3Modal.cachedProvider;
 };
+
+export const signMsg = (msg, from) => new Promise((resolve,reject) => {
+  const web3 = new Web3(provider);
+  
+  web3.currentProvider.sendAsync({
+    method: 'eth_signTypedData',
+    params: [msg, from],
+    from: from,
+  }, (err, result) => {
+    if (err) return reject(err);
+    if (result.error) {
+      return reject(result.error.message);
+    }
+    // const recovered = sigUtil.recoverTypedSignature({
+    //   data: msgParam,
+    //   sig: result.result,
+    // })
+
+    // console.log("recovered", recovered);
+    return resolve(result.result);
+  } )
+}) 
+ 
+
 
 export const disconnectWallet = async () => {
   try {

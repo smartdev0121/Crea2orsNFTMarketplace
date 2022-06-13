@@ -2,7 +2,7 @@ import Web3 from "web3";
 
 import { CONTRACT_TYPE } from "src/config/global";
 import { uploadContractMetadata, uploadAssetMetaData } from "./pinata";
-import web3Modal, { getCurrentWalletAddress, switchNetwork } from "./wallet";
+import web3Modal, { getCurrentWalletAddress, switchNetwork, signMsg } from "./wallet";
 import { showNotify } from "./notify";
 import "dotenv/config";
 const contract_source_arr = [
@@ -130,6 +130,45 @@ export const deployContract = (contract_type, contract_metadata) =>
     }
   });
 
+export const createVoucher = (metaDataUri, fileUri, price = -1, royaltyFee,batchSize, from) => 
+  new Promise(async(resolve, reject) => {
+  const voucher = {metaDataUri, price, royaltyFee, batchSize};
+  const msgParams = [
+    {
+      type: "string",
+      name: 'metaDataUri',
+      value: metaDataUri,
+    },
+    {
+      type: "uint32",
+      name: 'price',
+      value: price,
+    },{
+      type: "uint32",
+      name: "fee",
+      value: royaltyFee
+    }, {
+      type: "uint32",
+      name: "batchSize",
+      value: batchSize,
+    }
+  ]
+  const signature = await signMsg(msgParams, from);
+  console.log("signature", signature);
+  return signature ? resolve(signature) : reject();
+});
+
+export const createNFT = (metadata) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const { metadata_uri, file_uri } = await uploadAssetMetaData(metadata);
+      return resolve({ metaDataUri: metadata_uri, fileUri: file_uri });
+    } catch (e) {
+      console.log(e);
+      return reject();
+    }
+  });
+
 export const mintAsset = (contract_type, contract_address, metadata) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -141,8 +180,6 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
       }
 
       const web3 = new Web3(provider);
-
-      showNotify("Waiting", "Waiting ...", "waiting");
 
       const { metadata_uri, file_uri } = await uploadAssetMetaData(metadata);
 

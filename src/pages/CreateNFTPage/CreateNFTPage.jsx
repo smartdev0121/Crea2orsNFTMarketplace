@@ -37,7 +37,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { showSpinner, hideSpinner } from "src/store/app/actions";
 import { getSpinner } from "src/store/app/reducer";
 import { saveNFT } from "src/store/contract/actions";
-import { mintAsset, holdEvent, getValuefromEvent } from "src/utils/contract";
+import { createNFT, createVoucher } from "src/utils/contract";
 import { getCurrentWalletAddress } from "../../utils/wallet";
 import styled from "styled-components";
 import "./CreateNFTPage.scss";
@@ -51,6 +51,7 @@ export default function CreateNFTPage(props) {
   const [value, setValue] = React.useState(new Date());
   const [show, setShow] = React.useState(false);
   const [property, setProperty] = React.useState([0]);
+  const [isPut, setIsPut] = React.useState(true);
   const hiddenFileInput = React.useRef(null);
   const dispatch = useDispatch();
   const isMinting = useSelector((state) => getSpinner(state, "NFT_MINTING"));
@@ -91,6 +92,10 @@ export default function CreateNFTPage(props) {
     setProperty(newPropArray);
   };
 
+  const onPutonChange = (e) => {
+    setIsPut(e.target.checked);
+  }
+
   const onSubmit = async (values) => {
     let traits = [];
 
@@ -114,16 +119,19 @@ export default function CreateNFTPage(props) {
     try {
       dispatch(showSpinner("NFT_MINTING"));
 
-      const { metaDataUri, fileUri } = await mintAsset(
-        CONTRACT_TYPE.ERC1155,
-        contractAddress,
-        metaData
-      );
+      // const { metaDataUri, fileUri } = await mintAsset(
+      //   CONTRACT_TYPE.ERC1155,
+      //   contractAddress,
+      //   metaData
+      // );
 
-      const event = await holdEvent("TransferSingle", contractAddress);
+      const { metaDataUri, fileUri } = await createNFT(metaData);
+
+      // const event = await holdEvent("TransferSingle", contractAddress);
       const curWalletAddress = await getCurrentWalletAddress();
-      const returnValues = await getValuefromEvent(event, curWalletAddress);
-
+      // const returnValues = await getValuefromEvent(event, curWalletAddress);
+      const signature = await createVoucher(metaDataUri, fileUri, values?.price, values.royaltyFee, values.batchSize, curWalletAddress);
+      console.log(signature);
       if (metaDataUri) {
         showNotify("NFT is minted successfully!");
         dispatch(
@@ -133,7 +141,9 @@ export default function CreateNFTPage(props) {
             metaDataUri,
             fileUri,
             props.history,
-            returnValues.id,
+            values?.price ? values.price : -1,
+            // returnValues.id,
+            signature,
             curWalletAddress
           )
         );
@@ -210,7 +220,32 @@ export default function CreateNFTPage(props) {
                           </>
                         )}
                       </div>
+                      <div className="put-on">
+                        <label>Put on marketplace</label>
+                        <Switch onChange={onPutonChange} defaultChecked="true"></Switch>
+                      </div>
                       <div>
+                        {isPut && <Field
+                          type="number"
+                          label="Price"
+                          name="price"
+                          placeholder='Price on marketplace'
+                          component={MTextField}
+                          inputProps={{
+                            min: 0,
+                            type: "number",
+                          }}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                CR2
+                              </InputAdornment>
+                            ),
+                          }}
+                        />}
                         <Field
                           type="text"
                           label="Name"

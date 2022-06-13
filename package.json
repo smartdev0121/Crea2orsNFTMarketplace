@@ -33,6 +33,7 @@
     "connected-react-router": "^6.9.2",
     "copy-to-clipboard": "^3.3.1",
     "es6-promise": "^4.2.8",
+    "eth-sig-util": "^3.0.1",
     "ethereumjs-tx": "^2.1.2",
     "final-form": "^4.20.6",
     "fs": "^0.0.1-security",

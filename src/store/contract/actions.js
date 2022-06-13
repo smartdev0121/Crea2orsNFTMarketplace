@@ -74,7 +74,9 @@ export const saveNFT =
     metaDataUri,
     fileUri,
     history,
-    nftId,
+    price,
+    signature,
+    // nftId,
     curWalletAddress
   ) =>
   (dispatch) => {
@@ -85,12 +87,17 @@ export const saveNFT =
         metaData,
         metaDataUri,
         fileUri,
-        nftId,
+        price,
+        // nftId,
+        signature,
         curWalletAddress,
       })
       .then((res) => {
         if (res.name) {
           showNotify(`${res.name} is stored successfully!`);
+        }
+        if (res.over) {
+          showNotify(`You can't create more that ${res.over} in this collection`, "warning");
         }
       })
       .catch((err) => {
