@@ -94,7 +94,7 @@ export default function CreateNFTPage(props) {
 
   const onPutonChange = (e) => {
     setIsPut(e.target.checked);
-  }
+  };
 
   const onSubmit = async (values) => {
     let traits = [];
@@ -130,8 +130,14 @@ export default function CreateNFTPage(props) {
       // const event = await holdEvent("TransferSingle", contractAddress);
       const curWalletAddress = await getCurrentWalletAddress();
       // const returnValues = await getValuefromEvent(event, curWalletAddress);
-      const signature = await createVoucher(metaDataUri, fileUri, values?.price, values.royaltyFee, values.batchSize, curWalletAddress);
-      console.log(signature);
+      const signature = await createVoucher(
+        metaDataUri,
+        fileUri,
+        values?.price,
+        values.royaltyFee,
+        values.batchSize,
+        curWalletAddress
+      );
       if (metaDataUri) {
         showNotify("NFT is minted successfully!");
         dispatch(
@@ -222,30 +228,35 @@ export default function CreateNFTPage(props) {
                       </div>
                       <div className="put-on">
                         <label>Put on marketplace</label>
-                        <Switch onChange={onPutonChange} defaultChecked="true"></Switch>
+                        <Switch
+                          onChange={onPutonChange}
+                          defaultChecked="true"
+                        ></Switch>
                       </div>
                       <div>
-                        {isPut && <Field
-                          type="number"
-                          label="Price"
-                          name="price"
-                          placeholder='Price on marketplace'
-                          component={MTextField}
-                          inputProps={{
-                            min: 0,
-                            type: "number",
-                          }}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                CR2
-                              </InputAdornment>
-                            ),
-                          }}
-                        />}
+                        {isPut && (
+                          <Field
+                            type="number"
+                            label="Price"
+                            name="price"
+                            placeholder="Price on marketplace"
+                            component={MTextField}
+                            inputProps={{
+                              min: 0,
+                              type: "number",
+                            }}
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  CR2
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        )}
                         <Field
                           type="text"
                           label="Name"
