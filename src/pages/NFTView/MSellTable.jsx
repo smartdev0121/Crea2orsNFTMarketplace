@@ -126,9 +126,7 @@ export default function CustomizedTables(props) {
           <TableRow>
             <StyledTableCell>Price</StyledTableCell>
             <StyledTableCell>Quantity</StyledTableCell>
-            <StyledTableCell>Max bid Price</StyledTableCell>
             <StyledTableCell>Creator</StyledTableCell>
-            <StyledTableCell>Timed Limit</StyledTableCell>
             <StyledTableCell>Action</StyledTableCell>
           </TableRow>
         </TableHead>
