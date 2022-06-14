@@ -88,7 +88,6 @@ const CreateCollectionPage = (props) => {
 
   useEffect(() => {
     setType(collectionPreview ? categories.indexOf(collectionPreview.type) : 0);
-    console.log(typeof categories.indexOf(collectionPreview?.type));
     setResult(collectionPreview ? collectionPreview.image : null);
     setFile(collectionPreview ? collectionPreview.file : null);
   }, []);
@@ -169,6 +168,7 @@ const CreateCollectionPage = (props) => {
         )
       );
       showNotify(`Collection is successfully created: ${contractAddress}`);
+
       dispatch(hideSpinner("DEPLOY_CONTRACT"));
     } catch (err) {
       console.log(err);

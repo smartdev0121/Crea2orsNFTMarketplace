@@ -153,7 +153,7 @@ export default function CreateNFTPage(props) {
             curWalletAddress
           )
         );
-        setFormInitialValues({});
+        window.location.reload(false);
       } else {
         showNotify("Error is occured on minting!", "error");
       }
@@ -180,7 +180,8 @@ export default function CreateNFTPage(props) {
           </div>
           <Form
             onSubmit={onSubmit}
-            initialValues={formInitialValues}
+            initialValues={{ formInitialValues }}
+            initialValuesEqual={() => true}
             validate={(values) => {
               const errors = {};
             }}
