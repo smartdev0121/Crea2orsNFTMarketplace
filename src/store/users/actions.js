@@ -73,6 +73,10 @@ export const setUserInfo = (data, history) => {
     api
       .post("/set-user-info", data, config)
       .then((res) => {
+        if (res.result == "email") {
+          showNotify("This email is already registered!", "warning");
+          return;
+        }
         dispatch({ type: types.SET_USER_INFO, payload: res });
         dispatch(updateProfile(res));
         showNotify("Profile information is successfully updated");
