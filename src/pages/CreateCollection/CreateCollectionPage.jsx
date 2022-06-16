@@ -172,10 +172,7 @@ const CreateCollectionPage = (props) => {
       dispatch(hideSpinner("DEPLOY_CONTRACT"));
     } catch (err) {
       console.log(err);
-      showNotify(
-        `Unfortunately, can't create collection for an network error`,
-        "error"
-      );
+      showNotify(`Unfortunately, network connection problem occured`, "error");
 
       dispatch(hideSpinner("DEPLOY_CONTRACT"));
     }
