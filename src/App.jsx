@@ -8,13 +8,23 @@ import authRoutes from "./routes/auth";
 import MSpinner from "./components/MSpinner";
 import { getProfile as getProfileReducer } from "./store/profile/reducer";
 import { getSpinner } from "./store/app/reducer";
-
+import AOS from "aos";
+import "aos/dist/aos.css";
 import "./App.css";
 import "./styles/styles.css";
 
 const App = () => {
   const user = useSelector((state) => getProfileReducer(state));
   const isLoading = useSelector((state) => getSpinner(state, "PROFILE_INFO"));
+
+  useEffect(() => {
+    AOS.init({
+      offset: 200,
+      duration: 500,
+      easing: "ease-in-sine",
+    });
+  }, []);
+
   let routes = authRoutes;
   const spreadRoutes = reduce(
     routes,

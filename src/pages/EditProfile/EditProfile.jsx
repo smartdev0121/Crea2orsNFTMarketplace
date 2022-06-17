@@ -40,7 +40,7 @@ const EditProfile = (props) => {
   const [confirmedFile, setConfirmedFile] = useState(undefined);
   const [handled, setHandled] = useState(false);
   const [verified, setVerified] = useState("unverified");
-
+  const [mailSent, setMailSent] = useState(false);
   const handleFileChange = (e) => {
     uploader(e);
     setFile(e.target.files[0]);
@@ -132,6 +132,7 @@ const EditProfile = (props) => {
 
   const getVerify = () => {
     dispatch(verify(email));
+    setMailSent(true);
   };
 
   const { result, uploader } = useDisplayImage();
@@ -292,7 +293,7 @@ const EditProfile = (props) => {
 
                     <div>
                       <Button className="blue-btn" onClick={getVerify}>
-                        Get verified
+                        {mailSent ? "Resend" : "Get verified"}
                       </Button>
                     </div>
                   </section>

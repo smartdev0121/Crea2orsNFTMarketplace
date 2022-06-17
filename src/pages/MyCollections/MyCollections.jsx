@@ -31,10 +31,9 @@ const MyCollections = (props) => {
       <MFlexBox>
         {myCollections.map((item, index) => {
           return (
-            <MCollectionCard
-              data={item}
-              key={item.id + index}
-            ></MCollectionCard>
+            <div data-aos="fade-up">
+              <MCollectionCard data={item} key={item.id + index} />
+            </div>
           );
         })}
       </MFlexBox>

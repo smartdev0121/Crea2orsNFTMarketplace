@@ -87,7 +87,7 @@ const MTitle = styled.h6`
 `;
 const CardContainer = styled(Paper)`
   background-color: rgb(30, 32, 38) !important;
-  width: 100%;
+  width: 90%;
   padding: 10px 10px;
   border-radius: 5px;
   border: 1px solid #333;

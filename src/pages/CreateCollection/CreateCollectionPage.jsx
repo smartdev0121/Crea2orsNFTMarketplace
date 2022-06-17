@@ -348,35 +348,39 @@ const CreateCollectionPage = (props) => {
                         Create a collection
                       </MColorButtonView>
                     </Stack>
-                    <Stack spacing={1} flex="1 1">
-                      <label className="choose-image-text">Choose Image:</label>
-                      <input
-                        ref={hiddenFileInput}
-                        type="file"
-                        id="image-file"
-                        accept=".jpg, .png, .jpeg, .bmp"
-                        onChange={handleFileChange}
-                        className="file-input"
-                      />
-                      <div
-                        onClick={handleImageClick}
-                        className="img-click-part"
-                      >
-                        <img
-                          src={
-                            result ||
-                            (collectionPreview?.image
-                              ? collectionPreview?.image
-                              : "/images/img_empty.png")
-                          }
-                          style={{ width: 300, height: "auto" }}
-                          alt="collection"
+                    <div data-aos="flip-up">
+                      <Stack spacing={1} flex="1 1">
+                        <label className="choose-image-text">
+                          Choose Image:
+                        </label>
+                        <input
+                          ref={hiddenFileInput}
+                          type="file"
+                          id="image-file"
+                          accept=".jpg, .png, .jpeg, .bmp"
+                          onChange={handleFileChange}
+                          className="file-input"
                         />
-                        <p className="grey-txt">
-                          Upload file jpg, jpeg, png 900x400px max: 100MB
-                        </p>
-                      </div>
-                    </Stack>
+                        <div
+                          onClick={handleImageClick}
+                          className="img-click-part"
+                        >
+                          <img
+                            src={
+                              result ||
+                              (collectionPreview?.image
+                                ? collectionPreview?.image
+                                : "/images/img_empty.png")
+                            }
+                            style={{ width: 300, height: "auto" }}
+                            alt="collection"
+                          />
+                          <p className="grey-txt">
+                            Upload file jpg, jpeg, png 900x400px max: 100MB
+                          </p>
+                        </div>
+                      </Stack>
+                    </div>
                   </Stack>
                 </form>
               );

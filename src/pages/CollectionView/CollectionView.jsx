@@ -1,4 +1,4 @@
-import { Container, Box, Skeleton } from "@mui/material";
+import { Container, Box, Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import MColorButtonView from "../../components/MInput/MColorButtonView";
@@ -6,13 +6,11 @@ import { MFlexBox } from "src/components/MLayout";
 import { fetchMetaData } from "src/utils/pinata";
 import CollectionInfoTab from "./CollectionInfoTab1";
 import { getContractUri } from "src/store/contract/actions";
-import { Swiper, SwiperSlide } from "swiper/react/swiper-react";
-import { EffectCoverflow, Pagination } from "swiper";
-import MNFTCard from "src/components/MCards/MNFTCard";
 import { MTopRadiusImg } from "src/components/MImages";
 import styled from "styled-components";
 import "./CollectionView.scss";
 import { categories } from "../CreateCollection/CreateCollectionPage";
+import Slider from "./Slider";
 
 const CollectionView = (props) => {
   const newCollectionInfo = useSelector(
@@ -22,6 +20,14 @@ const CollectionView = (props) => {
   const dispatch = useDispatch();
   const [metaData, setMetaData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
 
   useEffect(async () => {
     dispatch(getContractUri(contractAddress));
@@ -66,12 +72,21 @@ const CollectionView = (props) => {
 
         <section className="info-section">
           {isLoading ? (
-            <Skeleton animation="wave" width="280px" height="100px" />
+            <Skeleton animation="wave" width="35%" height="400px" />
           ) : (
             <div className="description">{metaData?.highLight}</div>
           )}
           {isLoading ? (
-            <Skeleton animation="wave" width="547px" height="450px" />
+            <>
+              <Stack width={"95%"} sx={{ marginLeft: "10px" }}>
+                <Stack direction={"row"} spacing={2}>
+                  <Skeleton animation="wave" width="100px" height="50px" />
+                  <Skeleton animation="wave" width="100px" height="50px" />
+                </Stack>
+                <Skeleton animation="wave" width="100%" height="50px" />
+                <Skeleton animation="wave" width="100%" height="450px" />
+              </Stack>
+            </>
           ) : (
             <div className="info-tab">
               <CollectionInfoTab metaData={metaData} />
@@ -80,36 +95,20 @@ const CollectionView = (props) => {
         </section>
       </MBox>
       <MFlexBox>
-        <Swiper
-          slidesPerView={2}
-          grabCursor={true}
-          spaceBetween={30}
-          centeredSlides={false}
-          pagination={{
-            clickable: true,
-          }}
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 0,
-            depth: 100,
-            modifier: 1,
-            slideShadows: true,
-          }}
-          modules={[EffectCoverflow, Pagination]}
-          className="mySwiper"
-        >
-          {isLoading ? (
-            <Skeleton animation="wave" width="100%" height="200px"></Skeleton>
-          ) : (
-            newCollectionInfo.nfts.map((item, index) => {
-              return (
-                <SwiperSlide key={item.name + index}>
-                  <MNFTCard data={item}></MNFTCard>
-                </SwiperSlide>
-              );
-            })
-          )}
-        </Swiper>
+        {/* <Slider {...settings}>
+          {newCollectionInfo.nfts.map((item, index) => {
+            return (
+              <SwiperSlide key={item.name + index}>
+                <MNFTCard data={item}></MNFTCard>
+              </SwiperSlide>
+            );
+          })}
+        </Slider> */}
+        {isLoading ? (
+          <Skeleton animation="wave" width="100%" height="200px"></Skeleton>
+        ) : (
+          <Slider images={newCollectionInfo.nfts} />
+        )}
       </MFlexBox>
       <section className="create-button-part">
         <MColorButtonView onClick={onCreateNFT}>

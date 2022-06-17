@@ -29,12 +29,24 @@ const MyNFTs = (props) => {
         <MDescription>This is all nfts you owned</MDescription>
       </MBox>
       <MFlexBox>
-        {isLoading ? 
-            [0, 1 ,2 ,3,4].map((item, index) => {
-              return <MUserNFTCard  isLoading={isLoading} key={"userNFT" + index}/>
-            }) : 
-            userNfts.map((item, index) => {
-              return <MUserNFTCard history={props.history} data={item}  isLoading={isLoading} key={"userNFT" + index}/>})}
+        {isLoading
+          ? [0, 1, 2, 3, 4].map((item, index) => {
+              return (
+                <MUserNFTCard isLoading={isLoading} key={"userNFT" + index} />
+              );
+            })
+          : userNfts.map((item, index) => {
+              return (
+                <div data-aos="fade-up">
+                  <MUserNFTCard
+                    history={props.history}
+                    data={item}
+                    isLoading={isLoading}
+                    key={"userNFT" + index}
+                  />
+                </div>
+              );
+            })}
       </MFlexBox>
     </MContainer>
   );
