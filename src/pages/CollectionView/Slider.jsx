@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
-import Fade from "react-reveal/Fade";
 import MNFTCard from "src/components/MCards/MNFTCard";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 
 const SimpleSlider = (props) => {
