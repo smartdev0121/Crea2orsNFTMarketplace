@@ -2,7 +2,7 @@ import axios from "axios";
 import showNotification from "src/config/notification";
 
 // const pinata_gateway_url = "https://nftymeta.mypinata.cloud/ipfs/";
-const pinata_gateway_url = "https://gateway.pinata.cloud/ipfs/";
+const pinata_gateway_url = "https://crea2ors.mypinata.cloud/ipfs/";
 
 export const uploadContractMetadata = async (mt) =>
   new Promise(async (resolve, reject) => {
