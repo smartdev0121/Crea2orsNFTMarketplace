@@ -24,7 +24,6 @@ import { currencyTokenAddress } from "src/config/contracts";
 import { orderFinialized, bidPlaced } from "src/store/order/actions";
 import MBidDialog from "./MBidDialog";
 import "dotenv/config";
-import "react-confirm-alert/src/react-confirm-alert.css";
 
 export default function CustomizedTables(props) {
   const dispatch = useDispatch();
