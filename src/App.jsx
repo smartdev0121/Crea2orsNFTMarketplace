@@ -25,7 +25,7 @@ const App = () => {
     });
   }, []);
 
-  let routes = authRoutes;
+  let routes = user ? authRoutes : guestRoutes;
   const spreadRoutes = reduce(
     routes,
     (result, value) => {

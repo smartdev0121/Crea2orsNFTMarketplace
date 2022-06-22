@@ -45,25 +45,35 @@ export default function IconLabelTabs(props) {
       </Tabs>
       <TabPanel value={value} index={1}>
         <List dense>
-          {owners?.map((item, index) => (
-            <ListItem
-              disablePadding
-              key={"Owner" + index}
-              secondaryAction={<Chip icon={<Diamond />} label={item.amount} />}
-            >
-              <ListItemButton>
-                <ListItemAvatar>
-                  <Avatar
-                    src={
-                      process.env.REACT_APP_BACKEND_URL +
-                        item.User.avatar_url || ""
-                    }
-                  />
-                </ListItemAvatar>
-                <ListItemText primary={item.User.nick_name} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {owners?.map((item, index) => {
+            const walAddr = String(item.user_wallet_address);
+            const addrLength = walAddr.length;
+            const displayAddr =
+              walAddr.substring(0, 8) +
+              "..." +
+              walAddr.substring(addrLength - 3, addrLength);
+            return (
+              <ListItem
+                disablePadding
+                key={"Owner" + index}
+                secondaryAction={
+                  <Chip icon={<Diamond />} label={item.amount} />
+                }
+              >
+                <ListItemButton>
+                  <ListItemAvatar>
+                    <Avatar
+                      src={
+                        process.env.REACT_APP_BACKEND_URL +
+                          item.User.avatar_url || ""
+                      }
+                    />
+                  </ListItemAvatar>
+                  <ListItemText primary={item.User.nick_name || displayAddr} />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
       </TabPanel>
       <TabPanel value={value} index={0}>

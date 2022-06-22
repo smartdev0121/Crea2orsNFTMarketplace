@@ -6,15 +6,22 @@ export const types = {
   ORDERS_FETCHED: "ORDERS_FETCHED",
 };
 
-export const orderCreated = (orderData, nftId) => async (dispatch) => {
+export const orderCreated = (orderData) => async (dispatch) => {
   try {
     const res = await api.post("/order-created", {
       orderData: { ...orderData },
-      nftId: nftId,
     });
+
+    if (res.result === "overflow") {
+      showNotify(
+        "You have been exceed the total amount of you owned",
+        "warning"
+      );
+      return;
+    }
     if (res.newOrder) {
       dispatch({ type: types.ORDER_CREATED, payload: { ...res.newOrder } });
-      dispatch(fetchOrderData(nftId));
+      dispatch(fetchOrderData(orderData.nftDbId));
     }
   } catch (err) {
     console.log(err);
@@ -38,7 +45,7 @@ export const canceledOrder = (id) => (dispatch) => {
     .post("/cancel-order", { id: id })
     .then((res) => {
       if (res.result) {
-        dispatch(fetchOrderData());
+        dispatch(fetchOrderData(Number(res.result)));
         showNotify("Order is successfully cancelled!");
       }
     })

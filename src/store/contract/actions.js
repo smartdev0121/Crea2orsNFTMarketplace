@@ -97,7 +97,10 @@ export const saveNFT =
           showNotify(`${res.name} is stored successfully!`);
         }
         if (res.over) {
-          showNotify(`You can't create more that ${res.over} in this collection`, "warning");
+          showNotify(
+            `You can't create more than ${res.over} in this collection`,
+            "warning"
+          );
         }
       })
       .catch((err) => {

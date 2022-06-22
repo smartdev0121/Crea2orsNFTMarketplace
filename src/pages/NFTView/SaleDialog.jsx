@@ -28,6 +28,7 @@ import { useDispatch } from "react-redux";
 import { showSpinner, hideSpinner } from "src/store/app/actions";
 import { orderCreated } from "src/store/order/actions";
 import { showNotify } from "../../utils/notify";
+import { useSelector } from "react-redux";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -49,7 +50,7 @@ const SaleDialog = (props) => {
   const [endTime, setEndTime] = React.useState(new Date());
   const [price, setPrice] = React.useState(0);
   const [quantity, setQuantity] = React.useState(0);
-
+  const userProfile = useSelector((state) => state.profile);
   const handleChange = (event) => {
     setValue(event.target.value);
   };
@@ -61,26 +62,36 @@ const SaleDialog = (props) => {
       dispatch(showSpinner("MAKING_ORDER"));
 
       if (value == 0) {
-        const { result, marketPlaceContractAddress } = await createOrder(
-          0,
-          props.contractAddress,
-          props.tokenId,
-          Number(values.quantity),
-          Number(values.price),
-          curTime,
-          curTime,
-          0,
-          9
-        );
-        if (result) {
-          showNotify("Your sell is successfully created!");
-          const event = await holdEvent(
-            "OrderCreated",
-            marketPlaceContractAddress
-          );
-          const orderData = await getValuefromEvent(event);
-          dispatch(orderCreated(orderData[0], props.nftId));
-        }
+        // const { result, marketPlaceContractAddress } = await createOrder(
+        //   0,
+        //   props.contractAddress,
+        //   props.tokenId,
+        //   Number(values.quantity),
+        //   Number(values.price),
+        //   curTime,
+        //   curTime,
+        //   0,
+        //   9
+        // );
+        // if (result) {
+        //   showNotify("Your sell is successfully created!");
+        //   const event = await holdEvent(
+        //     "OrderCreated",
+        //     marketPlaceContractAddress
+        //   );
+        //   const orderData = await getValuefromEvent(event);
+        //   dispatch(orderCreated(orderData[0], props.nftId));
+        // }
+        const orderData = {
+          maker_address: userProfile.walletAddress,
+          user_id: userProfile.id,
+          // nftTokenId: props.nftTokenId,
+          nftDbId: props.nftId,
+          amount: values.quantity,
+          price: values.price,
+        };
+        console.log(orderData);
+        dispatch(orderCreated(orderData));
       } else if (value == 1) {
         const { result, marketPlaceContractAddress } = await createOrder(
           0,
@@ -135,7 +146,7 @@ const SaleDialog = (props) => {
         validate={(values) => {
           const errors = {};
           if (values.quantity > 100) {
-            errors.quantity = "Quantity is not greater than 100";
+            errors.quantity = "Quantity can not exceed more than 100";
           }
           if (!values.quantity) errors.quantity = "this field is required!";
         }}
@@ -159,11 +170,11 @@ const SaleDialog = (props) => {
                       control={<Radio />}
                       label="Fixed price"
                     />
-                    <FormControlLabel
+                    {/* <FormControlLabel
                       value={1}
                       control={<Radio />}
                       label="Timed Auction"
-                    />
+                    /> */}
                   </RadioGroup>
                 </FormControl>
                 <TabPanel value={value} index={0}></TabPanel>

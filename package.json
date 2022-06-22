@@ -46,6 +46,7 @@
     "pusher-js": "^7.0.6",
     "react": "^17.0.2",
     "react-bootstrap": "^2.3.1",
+    "react-confirm-alert": "^3.0.2",
     "react-cookies": "^0.1.1",
     "react-cropper": "^2.1.8",
     "react-dom": "^17.0.2",

@@ -12,6 +12,7 @@ import { Cancel, ShoppingBasket } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderData, canceledOrder } from "src/store/order/actions";
 import { purple } from "@mui/material/colors";
+import MAlertDialog from "src/components/MAlertDialog";
 import {
   cancelListing,
   getMarketplaceContractAddress,
@@ -23,19 +24,23 @@ import { currencyTokenAddress } from "src/config/contracts";
 import { orderFinialized, bidPlaced } from "src/store/order/actions";
 import MBidDialog from "./MBidDialog";
 import "dotenv/config";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 export default function CustomizedTables(props) {
   const dispatch = useDispatch();
   const ordersData = useSelector((state) => state.orders);
+  console.log("This is orders data", ordersData);
   const profile = useSelector((state) => state.profile);
+  const [confirmStatus, setConfirmStatus] = React.useState(false);
   const contractAddress = props.contractAddress;
   const [bidDlgOpen, setBidDlgOpen] = React.useState(false);
   const [rowIndex, setRowIndex] = React.useState(0);
+  const [cancelOrderID, setCancelOrderID] = React.useState(undefined);
   useEffect(() => {
     dispatch(fetchOrderData(props.nftId));
   }, []);
 
-  const cancelOrder = async (event, id) => {
+  const cancelOrder = async (id) => {
     const OrderState = {
       Creator: ordersData[id].creatorAddress,
       NftAddress: contractAddress,
@@ -50,13 +55,23 @@ export default function CustomizedTables(props) {
       CurrencyTokenDecimals: 9,
     };
 
-    const result = await cancelListing(OrderState);
-    if (result) {
-      const mContractAddress = await getMarketplaceContractAddress();
-      const event = await holdEvent("OrderCancelled", mContractAddress);
-      const values = await getValuefromEvent(event);
-      dispatch(canceledOrder(ordersData[id].id));
-    }
+    // const result = await cancelListing(OrderState);
+    // if (result) {
+    //   const mContractAddress = await getMarketplaceContractAddress();
+    //   const event = await holdEvent("OrderCancelled", mContractAddress);
+    //   const values = await getValuefromEvent(event);
+    //   dispatch(canceledOrder(ordersData[id].id));
+    // }
+    dispatch(canceledOrder(ordersData[id].id));
+  };
+
+  const cancelOrderClicked = (eve, index) => {
+    setConfirmStatus(true);
+    setCancelOrderID(index);
+  };
+
+  const confirmDlgClosed = () => {
+    setConfirmStatus(false);
   };
 
   const buyOrder = async (event, id) => {
@@ -131,8 +146,19 @@ export default function CustomizedTables(props) {
           </TableRow>
         </TableHead>
         <TableBody>
+          <MAlertDialog
+            open={confirmStatus}
+            onOK={(index) => cancelOrder(index)}
+            onCancel={confirmDlgClosed}
+            cancelOrderID={cancelOrderID}
+          />
           {ordersData.map((row, index) => {
             let diff = row.endTime - row.startTime;
+            const addrLength = String(row.maker_address).length;
+            let addressAbbr =
+              String(row.maker_address).substring(0, 5) +
+              "..." +
+              String(row.maker_address).substring(addrLength - 2, addrLength);
             if (diff != 0) {
               const curTime = Math.round(Number(new Date().getTime()) / 1000);
               if (curTime > row.startTime) diff = row.endTime - curTime;
@@ -141,9 +167,6 @@ export default function CustomizedTables(props) {
               <StyledTableRow key={"Order_table" + index}>
                 <StyledTableCell>{row.price}CR2</StyledTableCell>
                 <StyledTableCell>{row.amount}</StyledTableCell>
-                <StyledTableCell>
-                  {row.orderType == 0 ? "#" : row.maxBidPrice + "CR2"}
-                </StyledTableCell>
                 <StyledTableCell>
                   <Chip
                     icon={
@@ -155,43 +178,46 @@ export default function CustomizedTables(props) {
                         }
                       />
                     }
-                    label={row.User?.nickName}
+                    label={row.user?.nickName || addressAbbr}
                   />
                 </StyledTableCell>
-                <StyledTableCell>
+                {/* <StyledTableCell>
                   {diff <= 0
                     ? "#"
                     : `${parseInt(diff / 86400)}d ${parseInt(
                         (diff % 86400) / 3600
                       )}h ${parseInt((diff % 3600) / 60)}m`}
-                </StyledTableCell>
+                </StyledTableCell> */}
                 <StyledTableCell>
-                  {row.User?.id == profile.id ? (
-                    <ColorButton
-                      variant="contained"
-                      startIcon={<Cancel />}
-                      onClick={(eve) => cancelOrder(eve, index)}
-                    >
-                      Cancel
-                    </ColorButton>
-                  ) : row.orderType == 0 ? (
-                    <BuyButton
-                      variant="contained"
-                      startIcon={<ShoppingBasket />}
-                      onClick={(eve) => buyOrder(eve, index)}
-                    >
-                      Buy Now
-                    </BuyButton>
-                  ) : (
-                    <BuyButton
-                      variant="contained"
-                      startIcon={<ShoppingBasket />}
-                      onClick={(eve) => placeBidClicked(eve, index)}
-                      disabled={diff <= 0}
-                    >
-                      {diff <= 0 ? "Sold out" : "Place Bid"}
-                    </BuyButton>
-                  )}
+                  {
+                    row.user?.id == profile?.id ? (
+                      <ColorButton
+                        variant="contained"
+                        startIcon={<Cancel />}
+                        onClick={(eve) => cancelOrderClicked(eve, index)}
+                      >
+                        Cancel
+                      </ColorButton>
+                    ) : (
+                      <BuyButton
+                        variant="contained"
+                        startIcon={<ShoppingBasket />}
+                        onClick={(eve) => buyOrder(eve, index)}
+                      >
+                        Buy Now
+                      </BuyButton>
+                    )
+                    // ) : (
+                    //   <BuyButton
+                    //     variant="contained"
+                    //     startIcon={<ShoppingBasket />}
+                    //     onClick={(eve) => placeBidClicked(eve, index)}
+                    //     disabled={diff <= 0}
+                    //   >
+                    //     {diff <= 0 ? "Sold out" : "Place Bid"}
+                    //   </BuyButton>
+                    // )
+                  }
                 </StyledTableCell>
               </StyledTableRow>
             );

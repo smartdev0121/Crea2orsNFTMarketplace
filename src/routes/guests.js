@@ -5,6 +5,7 @@ import HomePage from "../pages/Home";
 import ResetComponent from "../pages/PasswordReset/ResetComponent";
 import EmailConfirmed from "../pages/EmailConfirmed";
 import OtherProfile from "../pages/OtherProfile";
+import AllCollections from "../pages/AllCollections";
 
 const routes = [
   {
@@ -26,6 +27,11 @@ const routes = [
     path: "/reset-password/:token/:email",
     component: ResetComponent,
     exact: true,
+  },
+  {
+    path: "/all-collections",
+    exact: true,
+    component: AllCollections,
   },
   {
     path: "/email-confirm/:token/:email",
