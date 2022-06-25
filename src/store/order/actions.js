@@ -55,11 +55,24 @@ export const canceledOrder = (id) => (dispatch) => {
     });
 };
 
-export const orderFinialized = (orderData, orderId, nftId) => (dispatch) => {
+// export const orderFinialized = (orderData, orderId, nftId) => (dispatch) => {
+//   return api
+//     .post("/order-finalized", { orderData, orderId, nftId })
+//     .then((res) => {
+//       dispatch({ type: types.ORDERS_FETCHED, payload: [...res.ordersData] });
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+export const orderFinialized = (orderId, amount, userId) => (dispatch) => {
   return api
-    .post("/order-finalized", { orderData, orderId, nftId })
+    .post("/order-finalized", { orderId, userId, amount })
     .then((res) => {
+      console.log(res);
       dispatch({ type: types.ORDERS_FETCHED, payload: [...res.ordersData] });
+      dispatch({ type: "NFT_FETCHED", payload: res.nftInfo });
     })
     .catch((err) => {
       console.log(err);

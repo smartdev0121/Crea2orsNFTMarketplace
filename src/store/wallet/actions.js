@@ -8,7 +8,6 @@ export const types = {
 };
 
 export const connectedWallet = (walletAddress) => async (dispatch) => {
-  console.log("wallet__Address", walletAddress);
   return api
     .post("/wallet-connected", { walletAddress: walletAddress })
     .then((res) => {
@@ -24,7 +23,7 @@ export const connectedWallet = (walletAddress) => async (dispatch) => {
         type: types.CONNECTED_WALLET,
         payload: "",
       });
-      dispatch(getProfile(walletAddress));
+      // dispatch(getProfile(walletAddress));
     })
     .catch((err) => console.log(err));
 };

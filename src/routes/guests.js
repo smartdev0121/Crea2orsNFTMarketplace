@@ -8,26 +8,26 @@ import OtherProfile from "../pages/OtherProfile";
 import AllCollections from "../pages/AllCollections";
 
 const routes = [
-  {
-    path: "/sign-in",
-    component: SignIn,
-    exact: true,
-  },
-  {
-    path: "/sign-up",
-    component: SignUp,
-    exact: true,
-  },
-  {
-    path: "/password-reset",
-    component: PasswordReset,
-    exact: true,
-  },
-  {
-    path: "/reset-password/:token/:email",
-    component: ResetComponent,
-    exact: true,
-  },
+  // {
+  //   path: "/sign-in",
+  //   component: SignIn,
+  //   exact: true,
+  // },
+  // {
+  //   path: "/sign-up",
+  //   component: SignUp,
+  //   exact: true,
+  // },
+  // {
+  //   path: "/password-reset",
+  //   component: PasswordReset,
+  //   exact: true,
+  // },
+  // {
+  //   path: "/reset-password/:token/:email",
+  //   component: ResetComponent,
+  //   exact: true,
+  // },
   {
     path: "/all-collections",
     exact: true,

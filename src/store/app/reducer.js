@@ -2,11 +2,13 @@ import { types } from "./actions";
 
 const initialState = {
   spinners: {},
+  contents: [],
 };
 
 export default (appState = initialState, { type, payload }) => {
   switch (type) {
     case types.SHOW_SPINNER:
+      console.log("spinner", payload);
       return {
         ...appState,
         spinners: {

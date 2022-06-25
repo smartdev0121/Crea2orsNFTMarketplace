@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderData, canceledOrder } from "src/store/order/actions";
 import { purple } from "@mui/material/colors";
 import MAlertDialog from "src/components/MAlertDialog";
+import MBuyNFTDialog from "src/components/MBuyNFTDialog";
 import {
   cancelListing,
   getMarketplaceContractAddress,
@@ -35,6 +36,8 @@ export default function CustomizedTables(props) {
   const [bidDlgOpen, setBidDlgOpen] = React.useState(false);
   const [rowIndex, setRowIndex] = React.useState(0);
   const [cancelOrderID, setCancelOrderID] = React.useState(undefined);
+  const [buyOrderConfirm, setBuyOrderConfirm] = React.useState(false);
+  const [buyOrderId, setBuyOrderId] = React.useState(undefined);
   useEffect(() => {
     dispatch(fetchOrderData(props.nftId));
   }, []);
@@ -71,33 +74,43 @@ export default function CustomizedTables(props) {
 
   const confirmDlgClosed = () => {
     setConfirmStatus(false);
+    setBuyOrderConfirm(false);
   };
 
-  const buyOrder = async (event, id) => {
-    const OrderState = {
-      Creator: ordersData[id].creatorAddress,
-      NftAddress: contractAddress,
-      TokenId: ordersData[id].contractNftId,
-      Amount: ordersData[id].amount,
-      Price: ordersData[id].price,
-      StartTime: ordersData[id].startTime,
-      EndTime: ordersData[id].endTime,
-      OrderType: ordersData[id].orderType,
-      Buyer: ordersData[id].creatorAddress,
-      BuyerPrice: ordersData[id].price,
-      CurrencyTokenAddress: currencyTokenAddress,
-      CurrencyDecimals: 9,
-    };
+  const buyOrder = async (id, amount) => {
+    console.log(id, amount);
+    // const OrderState = {
+    //   Creator: ordersData[id].creatorAddress,
+    //   NftAddress: contractAddress,
+    //   TokenId: ordersData[id].contractNftId,
+    //   Amount: ordersData[id].amount,
+    //   Price: ordersData[id].price,
+    //   StartTime: ordersData[id].startTime,
+    //   EndTime: ordersData[id].endTime,
+    //   OrderType: ordersData[id].orderType,
+    //   Buyer: ordersData[id].creatorAddress,
+    //   BuyerPrice: ordersData[id].price,
+    //   CurrencyTokenAddress: currencyTokenAddress,
+    //   CurrencyDecimals: 9,
+    // };
 
-    const result = await buyAsset(OrderState);
-    if (result) {
-      const mContractAddress = await getMarketplaceContractAddress();
-      const event = await holdEvent("OrderFinalized", mContractAddress);
-      const values = await getValuefromEvent(event);
-      dispatch(
-        orderFinialized(values[0], ordersData[id].id, ordersData[id].nftId)
-      );
-    }
+    // const result = await buyAsset(OrderState);
+    // if (result) {
+    //   const mContractAddress = await getMarketplaceContractAddress();
+    //   const event = await holdEvent("OrderFinalized", mContractAddress);
+    //   const values = await getValuefromEvent(event);
+    //   dispatch(
+    //     orderFinialized(values[0], ordersData[id].id, ordersData[id].nftId)
+    //   );
+    // }
+    console.log(ordersData[id], id);
+    console.log(profile.id);
+    dispatch(orderFinialized(ordersData[id].id, Number(amount), profile.id));
+  };
+
+  const buyOrderClicked = async (event, id) => {
+    setBuyOrderId(id);
+    setBuyOrderConfirm(true);
   };
 
   const onBidDlgClose = () => {
@@ -149,7 +162,15 @@ export default function CustomizedTables(props) {
             open={confirmStatus}
             onOK={(index) => cancelOrder(index)}
             onCancel={confirmDlgClosed}
-            cancelOrderID={cancelOrderID}
+            orderID={cancelOrderID}
+          >
+            Are you sure to cancel?
+          </MAlertDialog>
+          <MBuyNFTDialog
+            open={buyOrderConfirm}
+            orderID={buyOrderId}
+            onOK={(index, amount) => buyOrder(index, amount)}
+            onCancel={confirmDlgClosed}
           />
           {ordersData.map((row, index) => {
             let diff = row.endTime - row.startTime;
@@ -201,7 +222,7 @@ export default function CustomizedTables(props) {
                       <BuyButton
                         variant="contained"
                         startIcon={<ShoppingBasket />}
-                        onClick={(eve) => buyOrder(eve, index)}
+                        onClick={(eve) => buyOrderClicked(eve, index)}
                       >
                         Buy Now
                       </BuyButton>

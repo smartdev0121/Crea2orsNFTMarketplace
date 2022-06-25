@@ -13,8 +13,10 @@ const HomePage = (props) => {
   const dispatch = useDispatch();
   const [keyword, setKeyword] = useState("All");
   const homepageContents = useSelector((state) => state.app.contents);
-  console.log("homepage", homepageContents);
+  console.log(10);
   useEffect(() => {
+    console.log(11);
+
     dispatch(fetchHomepageContent(keyword));
   }, []);
 

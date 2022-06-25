@@ -5,11 +5,18 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { TextField, Typography } from "@mui/material";
 
-const MAlertDialog = (props) => {
+const MBuyNFTDialog = (props) => {
+  const [num, setNum] = useState(0);
   const onOK = () => {
-    props.onOK(props.orderID);
+    console.log(props.orderID, num);
+    props.onOK(props.orderID, num);
     props.onCancel();
+  };
+
+  const onInputChange = (eve) => {
+    setNum(eve.target.value);
   };
   return (
     <Dialog
@@ -18,10 +25,17 @@ const MAlertDialog = (props) => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Confirm</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Buy NFT</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          {props.children}
+          <h4>How much are you going to buy?</h4>
+          <TextField
+            id="outlined-basic"
+            type="number"
+            variant="filled"
+            defaultValue={num}
+            onChange={onInputChange}
+          />
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -34,4 +48,4 @@ const MAlertDialog = (props) => {
   );
 };
 
-export default MAlertDialog;
+export default MBuyNFTDialog;

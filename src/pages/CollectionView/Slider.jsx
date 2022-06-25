@@ -17,10 +17,12 @@ const SimpleSlider = (props) => {
   }, []);
 
   var settings = {
-    infinite: true,
+    infinite: initialState.images.length > 3,
     slidesToShow: 3,
     slidesToScroll: 1,
     autoplay: true,
+    swipeToSlide: true,
+    dots: true,
     speed: 2000,
     autoplaySpeed: 1000,
     arrows: true,

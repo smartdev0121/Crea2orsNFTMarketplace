@@ -16,16 +16,32 @@ import { ToastContainer } from "react-toastify";
 import { Web3ReactProvider } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 import "react-toastify/dist/ReactToastify.css";
+import { getProfile } from "./store/profile/actions";
 import { getCachedProvider, getCurrentWalletAddress } from "./utils/wallet";
 const history = createBrowserHistory({});
 const store = buildStore(history, {});
 
+const connectCacheWallet = () => {
+  return new Promise(async (resolve, reject) => {
+    console.log(3);
+
+    if (getCachedProvider()) {
+      let curAddress = "";
+      try {
+        curAddress = await getCurrentWalletAddress();
+        await store.dispatch(connectedWallet(curAddress));
+        await store.dispatch(getProfile(curAddress));
+        return resolve();
+      } catch (err) {
+        console.log(err);
+        return reject();
+      }
+    }
+  });
+};
+
 (async () => {
-  if (getCachedProvider()) {
-    let curAddress = "";
-    curAddress = await getCurrentWalletAddress();
-    store.dispatch(connectedWallet(curAddress));
-  }
+  await connectCacheWallet();
 })();
 
 const getLibrary = (provider, connector) => {

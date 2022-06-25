@@ -21,6 +21,7 @@ import "dotenv/config";
 export default function IconLabelTabs(props) {
   const [value, setValue] = React.useState(0);
   const owners = props.owners;
+  console.log("Owners", owners);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };

@@ -48,7 +48,6 @@ const HeaderContent = () => {
 
   const connectWallet = async () => {
     try {
-      await disconnectWallet();
       await showWeb3WalletModal();
       const curAddress = await getCurrentWalletAddress();
       console.log(curAddress);
@@ -97,7 +96,7 @@ const HeaderContent = () => {
       : "Connect";
 
     setConnectBtnTxt(btnTxt);
-  }, [connectedStatus, false, active]);
+  }, [active]);
 
   const onLogout = () => {
     dispatch(logout());

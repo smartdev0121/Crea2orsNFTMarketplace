@@ -41,7 +41,7 @@ const AllCollections = (props) => {
       <MFlexBox>
         {allCollections.map((item, index) => {
           return (
-            <div data-aos="fade-up">
+            <div data-aos="fade-up" key={"collection_item" + index}>
               <MCollectionCard
                 data={item}
                 key={item.id + index}

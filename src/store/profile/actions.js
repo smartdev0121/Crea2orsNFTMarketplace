@@ -12,7 +12,7 @@ export const updateProfile = (newProfile) => ({
   payload: newProfile,
 });
 
-export const getProfile = (walletAddress) => (dispatch) => {
+export const getProfile = (walletAddress) => async (dispatch) => {
   dispatch(appActions.showSpinner("PROFILE_INFO"));
   return api
     .get(`/profile/info/${walletAddress}`)

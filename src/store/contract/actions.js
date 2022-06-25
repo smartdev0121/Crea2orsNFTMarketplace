@@ -116,6 +116,7 @@ export const getNFTInformation = (nftId) => (dispatch) => {
   return api
     .get(`/get-nft/${nftId}`)
     .then((res) => {
+      console.log("NFT datas", res);
       dispatch({ type: types.NFT_FETCHED, payload: res });
     })
     .catch((err) => {
