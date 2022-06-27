@@ -162,7 +162,7 @@ const HeaderContent = () => {
             }
           </MClipboard>
         </div>
-        <MProfile onLogout={onLogout} onDisconnect={onDisconnect} />
+        {active && <MProfile onLogout={onLogout} onDisconnect={onDisconnect} />}
       </div>
 
       <div className="mobile-header">

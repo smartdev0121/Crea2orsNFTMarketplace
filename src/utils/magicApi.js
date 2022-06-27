@@ -57,12 +57,12 @@ const withPromise = (axiosInstance) =>
         } else if (
           // redirect to login page if user is not authenticated
           err.response.status === 401 &&
-          window.location.pathname.indexOf("/sign-in") === -1
+          window.location.pathname.indexOf("/") === -1
         ) {
           // clear user from storage
           clearInfo();
           // redirect
-          document.location = "/sign-in";
+          document.location = "/";
         }
 
         // general error
