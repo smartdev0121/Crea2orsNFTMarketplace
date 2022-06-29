@@ -56,7 +56,6 @@ const App = () => {
           })}
         </Switch>
       )}
-      {<Redirect to="/" />}
     </MainLayout>
   );
 };
