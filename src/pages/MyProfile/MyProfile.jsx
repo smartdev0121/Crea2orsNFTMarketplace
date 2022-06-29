@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Container, Button, Box } from "@mui/material";
+import {
+  Container,
+  Button,
+  Box,
+  Popper,
+  Fade,
+  Paper,
+  IconButton,
+  ClickAwayListener,
+} from "@mui/material";
 import MClipboard from "../../components/MClipboard";
 import { setItem, deleteItem, getItem } from "../../utils/storage";
 import {
@@ -7,10 +16,15 @@ import {
   DownloadForOffline,
   MoreHoriz,
   Edit,
+  Facebook,
+  Twitter,
+  Telegram,
+  Email,
+  ContentCopy,
 } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
+import styled from "styled-components";
 import ProfileTab from "./ProfileTab";
 import MBorderButton from "src/components/MButtons/MBorderButton";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -20,6 +34,16 @@ import { getUserInfo } from "../../store/users/actions";
 import { getCurrentWalletAddress } from "src/utils/wallet";
 import { connectedWallet, rejectConnectWallet } from "src/store/wallet/actions";
 import { showNotify } from "src/utils/notify";
+import {
+  FacebookShareButton,
+  EmailShareButton,
+  TelegramShareButton,
+  TwitterShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  EmailIcon,
+  TelegramIcon,
+} from "react-share";
 import "./MyProfile.scss";
 import "dotenv/config";
 
@@ -32,9 +56,14 @@ const MyProfile = (props) => {
   const [walletAddress, setWalletAddress] = useState(undefined);
   const [account, setAccount] = useState("");
   const [value, setValue] = useState("1");
+  const [popperOpen, setPopperOpen] = useState(false);
+  const [popperOpen2, setPopperOPen2] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl2, setAnchorEl2] = useState(null);
   const userInfo = useSelector((state) => state.profile);
   const followInfo = useSelector((state) => state.users.userFollow);
   const active = useSelector((state) => state.wallet.active);
+  console.log("Custom Url", userInfo.CustomUrl);
   const dispatch = useDispatch();
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -87,6 +116,31 @@ const MyProfile = (props) => {
   const onInputBackImageChanged = (event) => {
     setFile(event.target.files[0]);
   };
+
+  const handleClick = (type) => (eve) => {
+    if (type == 1) {
+      setPopperOpen(!popperOpen);
+      setAnchorEl(eve.currentTarget);
+    } else if (type == 2) {
+      setPopperOPen2(!popperOpen2);
+      setAnchorEl2(eve.currentTarget);
+    }
+  };
+
+  const handleClickAway1 = (event) => {
+    if (anchorEl?.current && anchorEl?.current.contains(event.target)) {
+      return;
+    }
+    setPopperOpen(false);
+  };
+
+  const handleClickAway2 = (event) => {
+    if (anchorEl2?.current && anchorEl2?.current.contains(event.target)) {
+      return;
+    }
+    setPopperOPen2(false);
+  };
+
   return (
     <Container maxWidth="xl" sx={{ marginTop: "100px" }}>
       <section className="profile-info-bar">
@@ -213,12 +267,86 @@ const MyProfile = (props) => {
             <Settings sx={{ fontSize: "16px" }} />
             &nbsp;Edit Profile
           </MBorderButton>
-          <IconButton sx={{ color: "#888", marginLeft: "15px" }}>
-            <DownloadForOffline />
-          </IconButton>
-          <IconButton sx={{ color: "#888" }}>
-            <MoreHoriz />
-          </IconButton>
+          <ClickAwayListener onClickAway={handleClickAway1}>
+            <InlineDiv>
+              <IconButton
+                sx={{ color: "#888", marginLeft: "15px" }}
+                onClick={handleClick(1)}
+              >
+                <DownloadForOffline />
+              </IconButton>
+              <Popper open={popperOpen} anchorEl={anchorEl} transition>
+                {({ TransitionProps }) => (
+                  <Fade {...TransitionProps} timeoout={350}>
+                    <Paper sx={{ backgroundColor: "#141c38" }}>
+                      <FacebookShareButton
+                        url={
+                          process.env.REACT_APP_FRONT_URL + userInfo.customUrl
+                        }
+                        quote={""}
+                      >
+                        <FacebookIcon round size={32} />
+                      </FacebookShareButton>
+                      <TwitterShareButton
+                        url={
+                          process.env.REACT_APP_FRONT_URL + userInfo.customUrl
+                        }
+                      >
+                        <TwitterIcon round size={32} />
+                      </TwitterShareButton>
+                      <TelegramShareButton
+                        url={
+                          process.env.REACT_APP_FRONT_URL + userInfo.customUrl
+                        }
+                      >
+                        <TelegramIcon round size={32} />
+                      </TelegramShareButton>
+                      <EmailShareButton
+                        url={
+                          process.env.REACT_APP_FRONT_URL + userInfo.customUrl
+                        }
+                      >
+                        <EmailIcon round size={32} />
+                      </EmailShareButton>
+                      <MClipboard>
+                        {({ copy }) => (
+                          <IconButton
+                            sx={{ color: "#888" }}
+                            onClick={() =>
+                              copy(
+                                process.env.REACT_APP_FRONT_URL +
+                                  userInfo.customUrl
+                              )
+                            }
+                          >
+                            <ContentCopy />
+                          </IconButton>
+                        )}
+                      </MClipboard>
+                    </Paper>
+                  </Fade>
+                )}
+              </Popper>
+            </InlineDiv>
+          </ClickAwayListener>
+          <ClickAwayListener onClickAway={handleClickAway2}>
+            <InlineDiv>
+              <IconButton sx={{ color: "#888" }} onClick={handleClick(2)}>
+                <MoreHoriz />
+              </IconButton>
+              <Popper anchorEl={anchorEl2} open={popperOpen2} transition>
+                {({ TransitionProps }) => (
+                  <Fade {...TransitionProps} timeoout={350}>
+                    <Paper sx={{ backgroundColor: "#141c38" }}>
+                      <Button sx={{ color: "#888" }} onClick={handleClick}>
+                        Report page
+                      </Button>
+                    </Paper>
+                  </Fade>
+                )}
+              </Popper>
+            </InlineDiv>
+          </ClickAwayListener>
         </div>
       </section>
       <section className="tab-bar">
@@ -229,3 +357,7 @@ const MyProfile = (props) => {
 };
 
 export default MyProfile;
+
+const InlineDiv = styled.div`
+  display: inline-block;
+`;

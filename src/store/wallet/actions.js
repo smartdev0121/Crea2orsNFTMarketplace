@@ -23,7 +23,7 @@ export const connectedWallet = (walletAddress) => async (dispatch) => {
         type: types.CONNECTED_WALLET,
         payload: "",
       });
-      // dispatch(getProfile(walletAddress));
+      dispatch(getProfile(walletAddress));
     })
     .catch((err) => console.log(err));
 };

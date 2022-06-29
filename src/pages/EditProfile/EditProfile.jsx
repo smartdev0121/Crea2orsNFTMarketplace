@@ -43,6 +43,8 @@ const EditProfile = (props) => {
   const [mailSent, setMailSent] = useState(false);
   const handleFileChange = (e) => {
     uploader(e);
+    console.log("[[[[[[[[[[[[[[[[[[[[[", e.target.files[0]);
+
     setFile(e.target.files[0]);
     !!e.target.files[0] ? setHandled(true) : setHandled(false);
   };
@@ -56,7 +58,6 @@ const EditProfile = (props) => {
 
     const uploader = (e) => {
       const imageFile = e.target.files[0];
-
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
         setResult(e.target.result);
@@ -83,7 +84,6 @@ const EditProfile = (props) => {
 
     dispatch(getUserInfo(dispatch));
   }, []);
-  console.log(email);
 
   useEffect(() => {
     if (!sidebarTop) return;
@@ -114,9 +114,10 @@ const EditProfile = (props) => {
 
   const onSubmit = (values) => {
     const data = new FormData();
+    console.log("Profile image", file, confirmedFile);
     data.append("name", "Image Upload");
     data.append("nick_name", values.nickName);
-    data.append("file_attachment", confirmedFile);
+    data.append("file_attachment", file);
     data.append("email", values.email);
     data.append("handled", handled);
     data.append("bio", values.bio);
@@ -197,7 +198,7 @@ const EditProfile = (props) => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          crea2ors.com/custom/
+                          crea2ors.com/user/
                         </InputAdornment>
                       ),
                     }}
@@ -309,11 +310,11 @@ const EditProfile = (props) => {
                       ref={hiddenFileInput}
                       name="avatar"
                       id="image-file"
-                      accept=".jpg, .png, .jpeg, .bmp"
+                      accept=".jpg, .png, .jpeg, .bmp, .gif"
                       onChange={handleFileChange}
                       className="file-input"
                     />
-                    <MImageCropper
+                    {/* <MImageCropper
                       file={file}
                       onConfirm={(croppedFile) => {
                         setResizedImage(
@@ -323,11 +324,11 @@ const EditProfile = (props) => {
                         setConfirmedFile(croppedFile);
                       }}
                       onCompleted={() => setFile(null)}
-                    />
+                    /> */}
                     <div className="profile-image" onClick={handleImageClick}>
                       <img
                         src={
-                          resizedImage ||
+                          result ||
                           (userInfo.avatar_url
                             ? process.env.REACT_APP_BACKEND_URL +
                               userInfo.avatar_url
