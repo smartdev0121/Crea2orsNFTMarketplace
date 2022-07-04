@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Container, Button, Box } from "@mui/material";
+import {
+  Container,
+  Button,
+  Box,
+  Popper,
+  Fade,
+  Paper,
+  IconButton,
+  ClickAwayListener,
+} from "@mui/material";
 import MClipboard from "../../components/MClipboard";
-import "./OtherProfile.scss";
+import styled from "styled-components";
+import { showNotify } from "../../utils/notify";
 import { setItem, deleteItem } from "../../utils/storage";
 import Tooltip from "@material-ui/core/Tooltip";
 import {
@@ -9,14 +19,27 @@ import {
   MailOutline,
   DownloadForOffline,
   MoreHoriz,
+  ContentCopy,
 } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
 import MBorderButton from "src/components/MButtons/MBorderButton";
 import { useDispatch, useSelector } from "react-redux";
 import ProfileTab from "./ProfileTab";
 import { getOtherProfile, follow, unFollow } from "../../store/users/actions";
 import { getCurrentWalletAddress } from "src/utils/wallet";
+import {
+  FacebookShareButton,
+  EmailShareButton,
+  TelegramShareButton,
+  TwitterShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  EmailIcon,
+  TelegramIcon,
+} from "react-share";
+import ReportDialog from "../MyProfile/ReportDialog";
+import { reportPage } from "src/store/profile/actions";
 import "dotenv/config";
+import "./OtherProfile.scss";
 
 const OtherProfile = (props) => {
   const [connectBtnTxt, setConnectBtnTxt] = useState("Connect");
@@ -26,8 +49,12 @@ const OtherProfile = (props) => {
   const profileStatus = useSelector((state) => state.users.status);
   const otherInfo = useSelector((state) => state.users.otherUserInfo);
   const profile = useSelector((state) => state.profile);
+  const [popperOpen, setPopperOpen] = useState(false);
+  const [popperOpen2, setPopperOPen2] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl2, setAnchorEl2] = useState(null);
+  const [reportOpen, setReportOpen] = useState(false);
   const followInfo = useSelector((state) => state.users.otherFollow);
-  const [account, setAccount] = useState("");
   const [alreadyFollowed, setAlreadyFollowed] = useState(false);
   const dispatch = useDispatch();
 
@@ -36,21 +63,17 @@ const OtherProfile = (props) => {
   };
 
   useEffect(() => {
+    dispatch(getOtherProfile(params.customUrl));
+  }, []);
+
+  useEffect(() => {
     for (let i = 0; i < followInfo.followers.length; i++) {
-      if (followInfo.followers[i].follower_id === profile.id) {
+      if (followInfo.followers[i].follower_id === profile?.id) {
         setAlreadyFollowed(true);
         break;
       }
     }
   }, [followInfo]);
-
-  useEffect(() => {
-    const btnTxt = active
-      ? `${String(account).substring(0, 6)}...${String(account).substring(38)}`
-      : "Connect";
-    setConnectBtnTxt(btnTxt);
-    dispatch(getOtherProfile(params.customUrl));
-  }, [active, false]);
 
   const connectWallet = async () => {
     try {
@@ -64,14 +87,52 @@ const OtherProfile = (props) => {
   const onFollow = () => {
     profile
       ? dispatch(follow(otherInfo.email))
-      : props.history.push("/sign-in");
+      : showNotify("You can follow after sign-in.", "warning");
   };
 
   const onUnFollow = () => {
     profile
       ? dispatch(unFollow(otherInfo.email))
-      : props.history.push("/sign-in");
+      : showNotify("You can unfollow after sign-in.", "warning");
     setAlreadyFollowed(false);
+  };
+
+  const handleClick = (type) => (eve) => {
+    if (type == 1) {
+      setPopperOpen(!popperOpen);
+      setAnchorEl(eve.currentTarget);
+    } else if (type == 2) {
+      setPopperOPen2(!popperOpen2);
+      setAnchorEl2(eve.currentTarget);
+    }
+  };
+
+  const handleClickAway1 = (event) => {
+    if (anchorEl?.current && anchorEl?.current.contains(event.target)) {
+      return;
+    }
+    setPopperOpen(false);
+  };
+
+  const handleClickAway2 = (event) => {
+    if (anchorEl2?.current && anchorEl2?.current.contains(event.target)) {
+      return;
+    }
+    setPopperOPen2(false);
+  };
+
+  const reportBtnClicked = () => {
+    setReportOpen(true);
+  };
+
+  const reportDlgClosed = () => {
+    setReportOpen(false);
+  };
+
+  const onSubmit = (content) => {
+    console.log(content);
+    dispatch(reportPage(content));
+    setReportOpen(false);
   };
 
   return (
@@ -81,13 +142,18 @@ const OtherProfile = (props) => {
       ) : (
         <>
           <section className="profile-info-bar">
+            <ReportDialog
+              open={reportOpen}
+              onClose={reportDlgClosed}
+              onSubmit={onSubmit}
+            />
             <div
               style={{
                 width: "100%",
-                top: "-75%",
+                top: "-33px",
                 position: "absolute",
-                height: "300px",
-                backgroundImage: `url(${process.env.REACT_APP_BACKEND_URL}${otherInfo.backgroundImageUrl})`,
+                height: "200px",
+                backgroundImage: `url(${process.env.REACT_APP_BACKEND_URL}${otherInfo?.backgroundImageUrl})`,
                 backgroundSize: "cover",
               }}
             ></div>
@@ -96,25 +162,26 @@ const OtherProfile = (props) => {
               <Button className="profile-image">
                 <img
                   src={
-                    (otherInfo.avatar_url &&
+                    (otherInfo?.avatar_url &&
                       process.env.REACT_APP_BACKEND_URL +
-                        otherInfo.avatar_url) ||
+                        otherInfo?.avatar_url) ||
                     "/images/profile-images/profile-empty.png"
                   }
                 />
               </Button>
             </Tooltip>
-            <div className="wallet-address"></div>
+            <p className="nick_name">@{otherInfo?.nickName}</p>
+
             <div className="bio-text">
-              <p>{otherInfo.bio || ""}</p>
+              <p>{otherInfo?.bio || ""}</p>
             </div>
             <div className="personal">
               <a
-                href={`https://${otherInfo.personalSite}`}
+                href={`https://${otherInfo?.personalSite}`}
                 target="_blank"
                 style={{ color: "#999" }}
               >
-                <b>@{otherInfo.personalSite || ""}</b>
+                <b>@{otherInfo?.personalSite || ""}</b>
               </a>
             </div>
             <div className="following-bar">
@@ -144,16 +211,102 @@ const OtherProfile = (props) => {
                 </MBorderButton>
               )}
 
-              <MBorderButton className="edit-btn" onClick={onFollow}>
+              {/* <MBorderButton className="edit-btn" onClick={onFollow}>
                 <MailOutline sx={{ fontSize: "16px" }} />
                 &nbsp;Send Message
-              </MBorderButton>
-              <IconButton sx={{ color: "#888", marginLeft: "15px" }}>
-                <DownloadForOffline />
-              </IconButton>
-              <IconButton sx={{ color: "#888" }}>
-                <MoreHoriz />
-              </IconButton>
+              </MBorderButton> */}
+              <ClickAwayListener onClickAway={handleClickAway1}>
+                <InlineDiv>
+                  <IconButton
+                    sx={{ color: "#888", marginLeft: "15px" }}
+                    onClick={handleClick(1)}
+                  >
+                    <DownloadForOffline />
+                  </IconButton>
+                  <Popper open={popperOpen} anchorEl={anchorEl} transition>
+                    {({ TransitionProps }) => (
+                      <Fade {...TransitionProps} timeoout={350}>
+                        <Paper sx={{ backgroundColor: "#141c38" }}>
+                          <FacebookShareButton
+                            url={
+                              process.env.REACT_APP_FRONT_URL +
+                              "user/" +
+                              otherInfo?.customUrl
+                            }
+                            quote={""}
+                          >
+                            <FacebookIcon round size={32} />
+                          </FacebookShareButton>
+                          <TwitterShareButton
+                            url={
+                              process.env.REACT_APP_FRONT_URL +
+                              "user/" +
+                              otherInfo?.customUrl
+                            }
+                          >
+                            <TwitterIcon round size={32} />
+                          </TwitterShareButton>
+                          <TelegramShareButton
+                            url={
+                              process.env.REACT_APP_FRONT_URL +
+                              "user/" +
+                              otherInfo?.customUrl
+                            }
+                          >
+                            <TelegramIcon round size={32} />
+                          </TelegramShareButton>
+                          <EmailShareButton
+                            url={
+                              process.env.REACT_APP_FRONT_URL +
+                              "user/" +
+                              otherInfo?.customUrl
+                            }
+                          >
+                            <EmailIcon round size={32} />
+                          </EmailShareButton>
+                          <MClipboard>
+                            {({ copy }) => (
+                              <IconButton
+                                sx={{ color: "#888" }}
+                                onClick={() =>
+                                  copy(
+                                    process.env.REACT_APP_FRONT_URL +
+                                      "user/" +
+                                      otherInfo?.customUrl
+                                  )
+                                }
+                              >
+                                <ContentCopy />
+                              </IconButton>
+                            )}
+                          </MClipboard>
+                        </Paper>
+                      </Fade>
+                    )}
+                  </Popper>
+                </InlineDiv>
+              </ClickAwayListener>
+              <ClickAwayListener onClickAway={handleClickAway2}>
+                <InlineDiv>
+                  <IconButton sx={{ color: "#888" }} onClick={handleClick(2)}>
+                    <MoreHoriz />
+                  </IconButton>
+                  <Popper anchorEl={anchorEl2} open={popperOpen2} transition>
+                    {({ TransitionProps }) => (
+                      <Fade {...TransitionProps} timeoout={350}>
+                        <Paper sx={{ backgroundColor: "#141c38" }}>
+                          <Button
+                            sx={{ color: "#888" }}
+                            onClick={reportBtnClicked}
+                          >
+                            Report page
+                          </Button>
+                        </Paper>
+                      </Fade>
+                    )}
+                  </Popper>
+                </InlineDiv>
+              </ClickAwayListener>
             </div>
           </section>
           <section className="tab-bar">
@@ -166,3 +319,7 @@ const OtherProfile = (props) => {
 };
 
 export default OtherProfile;
+
+const InlineDiv = styled.div`
+  display: inline-block;
+`;

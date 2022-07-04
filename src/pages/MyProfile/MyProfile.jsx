@@ -44,6 +44,8 @@ import {
   EmailIcon,
   TelegramIcon,
 } from "react-share";
+import ReportDialog from "./ReportDialog";
+import { reportPage } from "src/store/profile/actions";
 import "./MyProfile.scss";
 import "dotenv/config";
 
@@ -60,10 +62,11 @@ const MyProfile = (props) => {
   const [popperOpen2, setPopperOPen2] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [anchorEl2, setAnchorEl2] = useState(null);
+  const [reportOpen, setReportOpen] = useState(false);
   const userInfo = useSelector((state) => state.profile);
   const followInfo = useSelector((state) => state.users.userFollow);
   const active = useSelector((state) => state.wallet.active);
-  console.log("Custom Url", userInfo.CustomUrl);
+
   const dispatch = useDispatch();
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -141,9 +144,27 @@ const MyProfile = (props) => {
     setPopperOPen2(false);
   };
 
+  const reportBtnClicked = () => {
+    setReportOpen(true);
+  };
+
+  const reportDlgClosed = () => {
+    setReportOpen(false);
+  };
+
+  const onSubmit = (content) => {
+    console.log(content);
+    dispatch(reportPage(content));
+    setReportOpen(false);
+  };
   return (
     <Container maxWidth="xl" sx={{ marginTop: "100px" }}>
       <section className="profile-info-bar">
+        <ReportDialog
+          open={reportOpen}
+          onClose={reportDlgClosed}
+          onSubmit={onSubmit}
+        />
         <div
           style={{
             width: "100%",
@@ -281,7 +302,9 @@ const MyProfile = (props) => {
                     <Paper sx={{ backgroundColor: "#141c38" }}>
                       <FacebookShareButton
                         url={
-                          process.env.REACT_APP_FRONT_URL + userInfo.customUrl
+                          process.env.REACT_APP_FRONT_URL +
+                          "user/" +
+                          userInfo.customUrl
                         }
                         quote={""}
                       >
@@ -289,21 +312,27 @@ const MyProfile = (props) => {
                       </FacebookShareButton>
                       <TwitterShareButton
                         url={
-                          process.env.REACT_APP_FRONT_URL + userInfo.customUrl
+                          process.env.REACT_APP_FRONT_URL +
+                          "user/" +
+                          userInfo.customUrl
                         }
                       >
                         <TwitterIcon round size={32} />
                       </TwitterShareButton>
                       <TelegramShareButton
                         url={
-                          process.env.REACT_APP_FRONT_URL + userInfo.customUrl
+                          process.env.REACT_APP_FRONT_URL +
+                          "user/" +
+                          userInfo.customUrl
                         }
                       >
                         <TelegramIcon round size={32} />
                       </TelegramShareButton>
                       <EmailShareButton
                         url={
-                          process.env.REACT_APP_FRONT_URL + userInfo.customUrl
+                          process.env.REACT_APP_FRONT_URL +
+                          "user/" +
+                          userInfo.customUrl
                         }
                       >
                         <EmailIcon round size={32} />
@@ -315,6 +344,7 @@ const MyProfile = (props) => {
                             onClick={() =>
                               copy(
                                 process.env.REACT_APP_FRONT_URL +
+                                  "user/" +
                                   userInfo.customUrl
                               )
                             }
@@ -338,7 +368,7 @@ const MyProfile = (props) => {
                 {({ TransitionProps }) => (
                   <Fade {...TransitionProps} timeoout={350}>
                     <Paper sx={{ backgroundColor: "#141c38" }}>
-                      <Button sx={{ color: "#888" }} onClick={handleClick}>
+                      <Button sx={{ color: "#888" }} onClick={reportBtnClicked}>
                         Report page
                       </Button>
                     </Paper>

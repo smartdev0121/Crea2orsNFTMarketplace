@@ -10,9 +10,20 @@ const DetailInfo = (props) => {
       <div className="image-part">
         {props.url && (
           <>
-            <video width="100%" height="100%" controls>
+            {/* <video width="100%" height="100%" controls>
               <source src={props.url}></source>
-            </video>
+            </video> */}
+            <div>
+              <iframe
+                src={props.url}
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen
+                width="100%"
+                height="100%"
+                title="video"
+              />{" "}
+            </div>
             <div className="creator-detail">
               <Avatar
                 sx={{

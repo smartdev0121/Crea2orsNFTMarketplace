@@ -43,7 +43,6 @@ const EditProfile = (props) => {
   const [mailSent, setMailSent] = useState(false);
   const handleFileChange = (e) => {
     uploader(e);
-    console.log("[[[[[[[[[[[[[[[[[[[[[", e.target.files[0]);
 
     setFile(e.target.files[0]);
     !!e.target.files[0] ? setHandled(true) : setHandled(false);

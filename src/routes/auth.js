@@ -88,7 +88,7 @@ const routes = [
     exact: true,
   },
   {
-    path: "/custom/:customUrl",
+    path: "/user/:customUrl",
     component: OtherProfile,
     exact: true,
   },
