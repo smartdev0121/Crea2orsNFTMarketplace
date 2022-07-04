@@ -7,22 +7,25 @@ import { Link } from "react-router-dom";
 
 const MNFTCard = (props) => {
   const { data } = props;
+  const onBuyNow = () => {
+    props.history.push(`/nft-view/${data.nfts.id}`);
+  };
   return (
     <CardContainer>
       <FlexBetween>
         <Stack>
-          <MTitle>{data.name}</MTitle>
-          <div>
+          <MTitle>{data.nfts.name}</MTitle>
+          {/* <div>
             <SubTitle>
-              {data.category
-                ? data.category + "/" + data.subCategory
-                : data.subCategory}
+              {data.nfts.category
+                ? data.nfts.category + "/" + data.nfts.subCategory
+                : data.nfts.subCategory}
             </SubTitle>
-            <MEditionText>{data.token_limit}</MEditionText>
-          </div>
+            <MEditionText>{data.nfts.token_limit}</MEditionText>
+          </div> */}
         </Stack>
         <Stack>
-          <Link to={`/nft-view/${data.id}`}>
+          <Link to={`/nft-view/${data.nfts.id}`}>
             <ViewButton>
               <Visibility fontSize="small" />
               &nbsp;View
@@ -32,19 +35,21 @@ const MNFTCard = (props) => {
       </FlexBetween>
       <Grid container sx={{ height: "300px" }}>
         <Grid item xs={12} sx={{ height: "300px", position: "relative" }}>
-          <MImg src={data.fileUrl}></MImg>
+          <MImg src={data.nfts.file_url}></MImg>
           <MSaleBox>
             <MPriceBox>
               <div>
                 <h6>PRICE</h6>
-                <h6>1000 CR2(=$1)</h6>
+                <h6>
+                  {data.price} CR2(=${data.price * 0.001})
+                </h6>
               </div>
               <div>
-                <h6>EDITION</h6>
-                <h6>1 of 1</h6>
+                <h6>AMOUNT</h6>
+                <h6 style={{ textAlign: "right" }}>{data.amount}</h6>
               </div>
             </MPriceBox>
-            <MBuyButton>
+            <MBuyButton onClick={onBuyNow}>
               <ShoppingCart fontSize="small" />
               &nbsp;&nbsp;Buy Now
             </MBuyButton>

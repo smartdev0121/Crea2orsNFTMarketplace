@@ -11,7 +11,7 @@ const SimpleSlider = (props) => {
     isOpen: false,
     images: [],
   });
-
+  console.log("?????????????????", props.images);
   useEffect(() => {
     setInitialState({ ...initialState, images: props.images });
   }, []);
@@ -22,7 +22,6 @@ const SimpleSlider = (props) => {
     slidesToScroll: 1,
     autoplay: true,
     swipeToSlide: true,
-    dots: true,
     speed: 2000,
     autoplaySpeed: 1000,
     arrows: true,
@@ -50,7 +49,11 @@ const SimpleSlider = (props) => {
           <div className="mt-5 md:mt-0 relative">
             <Slider {...settings}>
               {initialState.images.map((element, i) => (
-                <MNFTCard data={element} key={"NFTCard" + i}></MNFTCard>
+                <MNFTCard
+                  data={element}
+                  key={"NFTCard" + i}
+                  history={props.history}
+                ></MNFTCard>
               ))}
             </Slider>
           </div>
