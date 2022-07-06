@@ -27,29 +27,30 @@ export const getCachedProvider = () => {
   return web3Modal.cachedProvider;
 };
 
-export const signMsg = (msg, from) => new Promise((resolve,reject) => {
-  const web3 = new Web3(provider);
-  
-  web3.currentProvider.sendAsync({
-    method: 'eth_signTypedData',
-    params: [msg, from],
-    from: from,
-  }, (err, result) => {
-    if (err) return reject(err);
-    if (result.error) {
-      return reject(result.error.message);
-    }
-    // const recovered = sigUtil.recoverTypedSignature({
-    //   data: msgParam,
-    //   sig: result.result,
-    // })
+export const signMsg = (msg, from) =>
+  new Promise((resolve, reject) => {
+    const web3 = new Web3(provider);
+    web3.currentProvider.sendAsync(
+      {
+        method: "eth_signTypedData",
+        params: [msg, from],
+        from: from,
+      },
+      (err, result) => {
+        if (err) return reject(err);
+        if (result.error) {
+          return reject(result.error.message);
+        }
+        // const recovered = sigUtil.recoverTypedSignature({
+        //   data: msgParam,
+        //   sig: result.result,
+        // })
 
-    // console.log("recovered", recovered);
-    return resolve(result.result);
-  } )
-}) 
- 
-
+        // console.log("recovered", recovered);
+        return resolve(result.result);
+      }
+    );
+  });
 
 export const disconnectWallet = async () => {
   try {
