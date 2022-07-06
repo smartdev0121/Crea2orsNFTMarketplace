@@ -104,7 +104,7 @@ export const deployContract = (contract_type, contract_metadata) =>
       const contract_data = await readContractABI(contract_type);
 
       const contract = new web3.eth.Contract(contract_data);
-
+      console.log("ddd");
       contract
         .deploy({
           data: bytecode,
