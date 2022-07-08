@@ -108,33 +108,6 @@ export const createOrder = (
 
       showNotification("Waiting", "Listing ...", "waiting");
 
-      console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", [
-        WalletAddress,
-        AssetAddress,
-        TokenId,
-        Amount,
-        web3.utils
-          .toBN(
-            BigNumber(Price).times(
-              BigNumber(10).pow(BigNumber(CurrencyTokenDecimals))
-            )
-          )
-          .toString(),
-        StartTime,
-        EndTime,
-        OrderType,
-        WalletAddress,
-        web3.utils
-          .toBN(
-            BigNumber(Price).times(
-              BigNumber(10).pow(BigNumber(CurrencyTokenDecimals))
-            )
-          )
-          .toString(),
-      ]);
-
-      console.log(Math.round(StartTime / 1000), Math.round(EndTime / 1000));
-
       await contract.methods
         .createOrder([
           WalletAddress,

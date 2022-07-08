@@ -1,5 +1,4 @@
 import Web3 from "web3";
-
 import { CONTRACT_TYPE } from "src/config/global";
 import { uploadContractMetadata, uploadAssetMetaData } from "./pinata";
 import web3Modal, {
@@ -9,6 +8,7 @@ import web3Modal, {
 } from "./wallet";
 import { showNotify } from "./notify";
 import "dotenv/config";
+import { GavelSharp } from "@mui/icons-material";
 const contract_source_arr = [
   "/Crea2orsContracts/compiled/Crea2orsNFT/Crea2orsNFT",
   "/Crea2orsContracts/compiled/CR2/CR2",
@@ -163,39 +163,23 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
 
       const web3 = new Web3(provider);
 
-      const { metadata_uri, file_uri } = await uploadAssetMetaData(metadata);
+      // const { metadata_uri, file_uri } = await uploadAssetMetaData(metadata);
 
       const contract_data = await readContractABI(contract_type);
       const wallet_address = await getCurrentWalletAddress();
-
       const contract = new web3.eth.Contract(contract_data, contract_address);
+      const tx_data = contract.methods.redeem(wallet_address, metadata);
 
-      let tx = {
-        from: wallet_address,
-        to: contract_address,
-        value: 0,
-      };
+      const gas = await tx_data.estimateGas({ from: wallet_address });
+      // await web3.eth.sendTransaction(tx);
+      console.log(tx_data, contract_address, wallet_address);
+      await contract.methods
+        .redeem(wallet_address, metadata)
+        .send({ from: wallet_address, to: contract_address, gas: gas });
 
-      if (contract_type === CONTRACT_TYPE.ERC721) {
-        await contract.methods.mint(metadata_uri).send(tx);
-      } else {
-        await contract.methods
-          .create(
-            Number(metadata.batchSize),
-            wallet_address,
-            Number(metadata.royaltyFee),
-            metadata_uri,
-            []
-          )
-          .send(tx);
-      }
-
-      showNotify("Success", "Successfully minted", "success", 3);
-
-      return resolve({ metaDataUri: metadata_uri, fileUri: file_uri });
+      return resolve(true);
     } catch (e) {
       console.log(e);
-      showNotify("Failed", "Failed", "failed", 3);
       return reject();
     }
   });

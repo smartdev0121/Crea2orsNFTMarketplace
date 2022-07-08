@@ -1,13 +1,17 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import { Chip, Avatar, Button } from "@mui/material";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  Paper,
+  TableBody,
+  Chip,
+  Avatar,
+  Button,
+  TableContainer,
+} from "@mui/material";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import { Cancel, ShoppingBasket } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderData, canceledOrder } from "src/store/order/actions";
@@ -25,11 +29,13 @@ import { currencyTokenAddress } from "src/config/contracts";
 import { orderFinialized, bidPlaced } from "src/store/order/actions";
 import MBidDialog from "./MBidDialog";
 import "dotenv/config";
+import { mintAsset } from "src/utils/contract";
+import { CONTRACT_TYPE } from "src/config/global";
 
 export default function CustomizedTables(props) {
   const dispatch = useDispatch();
   const ordersData = useSelector((state) => state.orders);
-  console.log("This is orders data", ordersData);
+  console.log("lazy orders", ordersData);
   const profile = useSelector((state) => state.profile);
   const [confirmStatus, setConfirmStatus] = React.useState(false);
   const contractAddress = props.contractAddress;
@@ -78,23 +84,25 @@ export default function CustomizedTables(props) {
   };
 
   const buyOrder = async (id, amount) => {
-    console.log(id, amount);
-    // const OrderState = {
-    //   Creator: ordersData[id].creatorAddress,
-    //   NftAddress: contractAddress,
-    //   TokenId: ordersData[id].contractNftId,
-    //   Amount: ordersData[id].amount,
-    //   Price: ordersData[id].price,
-    //   StartTime: ordersData[id].startTime,
-    //   EndTime: ordersData[id].endTime,
-    //   OrderType: ordersData[id].orderType,
-    //   Buyer: ordersData[id].creatorAddress,
-    //   BuyerPrice: ordersData[id].price,
-    //   CurrencyTokenAddress: currencyTokenAddress,
-    //   CurrencyDecimals: 9,
-    // };
+    const metaData = {
+      tokenId: String(ordersData[id].nfts.nft_id),
+      metaUri: ordersData[id].nfts.metadata_url,
+      mintCount: amount,
+      // minPrice: ordersData[id].price,
+      initialSupply: String(ordersData[id].nfts.batch_size),
+      royaltyFee: String(ordersData[id].nfts.royalty_fee),
+      royaltyAddress: ordersData[id].maker_address,
+    };
 
-    // const result = await buyAsset(OrderState);
+    const result = await mintAsset(
+      CONTRACT_TYPE.ERC1155,
+      contractAddress,
+      metaData
+    );
+
+    if (result) {
+      dispatch(orderFinialized(ordersData[id].id, Number(amount), profile.id));
+    }
     // if (result) {
     //   const mContractAddress = await getMarketplaceContractAddress();
     //   const event = await holdEvent("OrderFinalized", mContractAddress);
@@ -103,9 +111,6 @@ export default function CustomizedTables(props) {
     //     orderFinialized(values[0], ordersData[id].id, ordersData[id].nftId)
     //   );
     // }
-    console.log(ordersData[id], id);
-    console.log(profile.id);
-    dispatch(orderFinialized(ordersData[id].id, Number(amount), profile.id));
   };
 
   const buyOrderClicked = async (event, id) => {

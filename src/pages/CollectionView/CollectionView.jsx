@@ -16,6 +16,7 @@ const CollectionView = (props) => {
   const newCollectionInfo = useSelector(
     (state) => state.contract.collectionInfo
   );
+  console.log(newCollectionInfo);
   const { contractAddress } = props.match.params;
   const dispatch = useDispatch();
   const [metaData, setMetaData] = useState({});

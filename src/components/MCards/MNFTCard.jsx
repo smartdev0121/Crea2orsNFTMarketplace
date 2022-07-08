@@ -8,13 +8,13 @@ import { Link } from "react-router-dom";
 const MNFTCard = (props) => {
   const { data } = props;
   const onBuyNow = () => {
-    props.history.push(`/nft-view/${data.nfts.id}`);
+    props.history.push(`/nft-view/${data.id}`);
   };
   return (
     <CardContainer>
       <FlexBetween>
         <Stack>
-          <MTitle>{data.nfts.name}</MTitle>
+          <MTitle>{data.name}</MTitle>
           {/* <div>
             <SubTitle>
               {data.nfts.category
@@ -24,34 +24,34 @@ const MNFTCard = (props) => {
             <MEditionText>{data.nfts.token_limit}</MEditionText>
           </div> */}
         </Stack>
-        <Stack>
-          <Link to={`/nft-view/${data.nfts.id}`}>
+        {/* <Stack>
+          <Link to={`/nft-view/${data.id}`}>
             <ViewButton>
               <Visibility fontSize="small" />
               &nbsp;View
             </ViewButton>
           </Link>
-        </Stack>
+        </Stack> */}
       </FlexBetween>
       <Grid container sx={{ height: "300px" }}>
         <Grid item xs={12} sx={{ height: "300px", position: "relative" }}>
-          <MImg src={data.nfts.file_url}></MImg>
+          <MImg src={data.fileUrl}></MImg>
           <MSaleBox>
             <MPriceBox>
-              <div>
+              {/* <div>
                 <h6>PRICE</h6>
                 <h6>
                   {data.price} CR2(=${data.price * 0.001})
                 </h6>
-              </div>
+              </div> */}
               <div>
-                <h6>AMOUNT</h6>
-                <h6 style={{ textAlign: "right" }}>{data.amount}</h6>
+                <h6>TOTAL</h6>
+                <h6 style={{ textAlign: "right" }}>{data.batchSize}</h6>
               </div>
             </MPriceBox>
             <MBuyButton onClick={onBuyNow}>
               <ShoppingCart fontSize="small" />
-              &nbsp;&nbsp;Buy Now
+              &nbsp;&nbsp;View NFT
             </MBuyButton>
           </MSaleBox>
         </Grid>
@@ -71,9 +71,7 @@ const MBuyButton = styled(Button)`
 const MPriceBox = styled.div`
   padding: 10px;
   width: 100%;
-  display: flex;
-  text-align: start;
-  justify-content: space-between;
+  text-align: end;
 `;
 const MSaleBox = styled.div`
   display: flex;

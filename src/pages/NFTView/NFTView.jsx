@@ -36,6 +36,7 @@ import SaleDialog from "./SaleDialog";
 import { MRoundBox } from "src/components/MLayout";
 import { getSpinner } from "src/store/app/reducer";
 import MSpinner from "src/components/MSpinner";
+import MintStatus from "./MintStatus";
 const NFTView = (props) => {
   const { nftId } = props.match.params;
   const dispatch = useDispatch();
@@ -118,16 +119,10 @@ const NFTView = (props) => {
                 tokenId={nftInfo?.nftId}
                 nftId={nftInfo?.id}
               />
-              {/* <Stack direction="row">
-              <AssetButton className="asset-btn">
-                <AudioFile />
-                Music
-              </AssetButton>
-              <AssetButton className="asset-btn">
-                <LockOpen />
-                Reedeemable
-              </AssetButton>
-            </Stack> */}
+              <MintStatus
+                creator={nftInfo?.creator}
+                contractAddress={nftInfo.Contract?.contract_address}
+              />
               <MTradeState
                 owners={nftInfo.owners}
                 contractAddress={nftInfo.Contract?.contract_address}
