@@ -220,19 +220,13 @@ export const transferNFT = (
         provider = await web3Modal.connect();
         window.location.reload();
       }
-      console.log(2);
       const web3 = new Web3(provider);
       const contract_data = await readContractABI(CONTRACT_TYPE.MANAGER);
-      console.log(3, contract_data);
 
       const wallet_address = await getCurrentWalletAddress();
-      console.log(2, wallet_address);
 
-      const contract = new web3.eth.Contract(contract_data, contract_address);
-      console.log(
-        { contract_address, from_address, wallet_address, id, amount },
-        { from: wallet_address, to: managerAddress, gas: 300000 }
-      );
+      const contract = new web3.eth.Contract(contract_data, managerAddress);
+
       await contract.methods
         .transferNFT(contract_address, from_address, wallet_address, id, amount)
         .send({ from: wallet_address, to: managerAddress, gas: 300000 });
