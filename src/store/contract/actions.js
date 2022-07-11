@@ -80,7 +80,6 @@ export const saveNFT =
     curWalletAddress
   ) =>
   (dispatch) => {
-    console.log("//////////////", curWalletAddress);
     return api
       .post("/create-nft", {
         contractId,
@@ -112,16 +111,13 @@ export const saveNFT =
       });
   };
 
-export const getNFTInformation = (nftId) => (dispatch) => {
-  return api
-    .get(`/get-nft/${nftId}`)
-    .then((res) => {
-      console.log("NFT datas", res);
-      dispatch({ type: types.NFT_FETCHED, payload: res });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+export const getNFTInformation = (nftId) => async (dispatch) => {
+  try {
+    const res = await api.get(`/get-nft/${nftId}`);
+    dispatch({ type: types.NFT_FETCHED, payload: res });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const getUserCollections = () => (dispatch) => {

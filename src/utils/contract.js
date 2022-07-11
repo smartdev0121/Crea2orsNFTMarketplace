@@ -12,6 +12,7 @@ import { GavelSharp } from "@mui/icons-material";
 const contract_source_arr = [
   "/Crea2orsContracts/compiled/Crea2orsNFT/Crea2orsNFT",
   "/Crea2orsContracts/compiled/CR2/CR2",
+  "/Crea2orsContracts/compiled/Crea2orsManager/Crea2orsManager",
 ];
 
 let provider;
@@ -20,7 +21,7 @@ const readContractABI = async (contract_type) =>
   new Promise((resolve, reject) => {
     let contract_data;
     let contract_source = contract_source_arr[contract_type];
-
+    console.log("CONTRACT TYPE", contract_type, contract_source);
     fetch(`${contract_source}.abi`)
       .then((response) => response.text())
       .then((data) => {
@@ -128,6 +129,30 @@ export const deployContract = (contract_type, contract_metadata) =>
     }
   });
 
+export const addCollection2Manager = (contract_address, newCollectionAddress) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        provider = await web3Modal.connect();
+        window.location.reload();
+      }
+      const web3 = new Web3(provider);
+      const contract_data = await readContractABI(CONTRACT_TYPE.MANAGER);
+      const wallet_address = await getCurrentWalletAddress();
+      const contract = new web3.eth.Contract(contract_data, contract_address);
+      await contract.methods
+        .addCollection(newCollectionAddress)
+        .send({ from: wallet_address, to: contract_address, gas: 300000 });
+
+      return resolve(true);
+    } catch (err) {
+      console.log(err);
+      return reject(false);
+    }
+  });
+
 export const createVoucher = (metaDataUri, royaltyFee, batchSize, from) =>
   new Promise(async (resolve, reject) => {
     const voucher = { metaDataUri, royaltyFee, batchSize };
@@ -135,8 +160,6 @@ export const createVoucher = (metaDataUri, royaltyFee, batchSize, from) =>
       { type: "string", name: "metaDataUri", value: metaDataUri },
     ];
     const signature = await signMsg(msgParams, from);
-    console.log("signature", signature, metaDataUri);
-    alert();
     return signature ? resolve(signature) : reject();
   });
 
@@ -148,6 +171,76 @@ export const createNFT = (metadata) =>
     } catch (e) {
       console.log(e);
       return reject();
+    }
+  });
+
+export const approveToken = (
+  contract_address,
+  approval_address,
+  tokenId,
+  amount
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        provider = await web3Modal.connect();
+        window.location.reload();
+      }
+
+      const web3 = new Web3(provider);
+      const contract_data = await readContractABI(CONTRACT_TYPE.ERC1155);
+      const wallet_address = await getCurrentWalletAddress();
+      const contract = new web3.eth.Contract(contract_data, contract_address);
+
+      await contract.methods
+        .setApprovalForAll(approval_address, true)
+        .send({ from: wallet_address, to: contract_address, gas: 300000 });
+
+      return resolve(true);
+    } catch (err) {
+      console.log(err);
+      return reject(false);
+    }
+  });
+
+export const transferNFT = (
+  contract_address,
+  from_address,
+  id,
+  amount,
+  managerAddress
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        provider = await web3Modal.connect();
+        window.location.reload();
+      }
+      console.log(2);
+      const web3 = new Web3(provider);
+      const contract_data = await readContractABI(CONTRACT_TYPE.MANAGER);
+      console.log(3, contract_data);
+
+      const wallet_address = await getCurrentWalletAddress();
+      console.log(2, wallet_address);
+
+      const contract = new web3.eth.Contract(contract_data, contract_address);
+      console.log(
+        { contract_address, from_address, wallet_address, id, amount },
+        { from: wallet_address, to: managerAddress, gas: 300000 }
+      );
+      await contract.methods
+        .transferNFT(contract_address, from_address, wallet_address, id, amount)
+        .send({ from: wallet_address, to: managerAddress, gas: 300000 });
+
+      return resolve(true);
+    } catch (err) {
+      console.log(err);
+      return reject(false);
     }
   });
 
@@ -168,14 +261,9 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
       const contract_data = await readContractABI(contract_type);
       const wallet_address = await getCurrentWalletAddress();
       const contract = new web3.eth.Contract(contract_data, contract_address);
-      const tx_data = contract.methods.redeem(wallet_address, metadata);
-
-      const gas = await tx_data.estimateGas({ from: wallet_address });
-      // await web3.eth.sendTransaction(tx);
-      console.log(tx_data, contract_address, wallet_address);
       await contract.methods
         .redeem(wallet_address, metadata)
-        .send({ from: wallet_address, to: contract_address, gas: gas });
+        .send({ from: wallet_address, to: contract_address, gas: 300000 });
 
       return resolve(true);
     } catch (e) {

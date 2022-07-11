@@ -23,12 +23,15 @@ import { InputAdornment } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { createOrder } from "../../utils/order";
+import { approveToken } from "../../utils/contract";
 import { holdEvent, getValuefromEvent } from "src/utils/order";
 import { useDispatch } from "react-redux";
 import { showSpinner, hideSpinner } from "src/store/app/actions";
 import { orderCreated } from "src/store/order/actions";
 import { showNotify } from "../../utils/notify";
 import { useSelector } from "react-redux";
+import { marketplace_contract_address } from "src/config/contracts";
+import "dotenv/config"
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -62,36 +65,26 @@ const SaleDialog = (props) => {
       dispatch(showSpinner("MAKING_ORDER"));
 
       if (value == 0) {
-        // const { result, marketPlaceContractAddress } = await createOrder(
-        //   0,
-        //   props.contractAddress,
-        //   props.tokenId,
-        //   Number(values.quantity),
-        //   Number(values.price),
-        //   curTime,
-        //   curTime,
-        //   0,
-        //   9
-        // );
-        // if (result) {
-        //   showNotify("Your sell is successfully created!");
-        //   const event = await holdEvent(
-        //     "OrderCreated",
-        //     marketPlaceContractAddress
-        //   );
-        //   const orderData = await getValuefromEvent(event);
-        //   dispatch(orderCreated(orderData[0], props.nftId));
-        // }
         const orderData = {
           maker_address: userProfile.walletAddress,
           user_id: userProfile.id,
-          // nftTokenId: props.nftTokenId,
+          nftTokenId: props.tokenId,
           nftDbId: props.nftId,
           amount: values.quantity,
           price: values.price,
         };
-        console.log(orderData);
-        dispatch(orderCreated(orderData));
+
+        const result = await approveToken(
+          props.contractAddress,
+          marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+          props.tokenId,
+          values.quantity
+        );
+        console.log(result);
+
+        result
+          ? dispatch(orderCreated(orderData))
+          : showNotify("Error occured in approving tokens", "error");
       } else if (value == 1) {
         const { result, marketPlaceContractAddress } = await createOrder(
           0,

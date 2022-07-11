@@ -18,25 +18,20 @@ import { fetchOrderData, canceledOrder } from "src/store/order/actions";
 import { purple } from "@mui/material/colors";
 import MAlertDialog from "src/components/MAlertDialog";
 import MBuyNFTDialog from "src/components/MBuyNFTDialog";
-import {
-  cancelListing,
-  getMarketplaceContractAddress,
-  buyAsset,
-  placeBid,
-} from "src/utils/order";
+import { getMarketplaceContractAddress, placeBid } from "src/utils/order";
 import { holdEvent, getValuefromEvent } from "src/utils/order";
 import { currencyTokenAddress } from "src/config/contracts";
 import { orderFinialized, bidPlaced } from "src/store/order/actions";
 import MBidDialog from "./MBidDialog";
 import "dotenv/config";
-import { mintAsset } from "src/utils/contract";
-import { CONTRACT_TYPE } from "src/config/global";
+import { transferNFT } from "src/utils/contract";
+import { marketplace_contract_address } from "src/config/contracts";
 
 export default function CustomizedTables(props) {
   const dispatch = useDispatch();
   const ordersData = useSelector((state) => state.orders);
-  console.log("lazy orders", ordersData);
   const profile = useSelector((state) => state.profile);
+  console.log("MSellTable>>>", profile);
   const [confirmStatus, setConfirmStatus] = React.useState(false);
   const contractAddress = props.contractAddress;
   const [bidDlgOpen, setBidDlgOpen] = React.useState(false);
@@ -84,20 +79,13 @@ export default function CustomizedTables(props) {
   };
 
   const buyOrder = async (id, amount) => {
-    const metaData = {
-      tokenId: String(ordersData[id].nfts.nft_id),
-      metaUri: ordersData[id].nfts.metadata_url,
-      mintCount: amount,
-      // minPrice: ordersData[id].price,
-      initialSupply: String(ordersData[id].nfts.batch_size),
-      royaltyFee: String(ordersData[id].nfts.royalty_fee),
-      royaltyAddress: ordersData[id].maker_address,
-    };
-
-    const result = await mintAsset(
-      CONTRACT_TYPE.ERC1155,
+    console.log(1);
+    const result = await transferNFT(
       contractAddress,
-      metaData
+      ordersData[id].maker_address,
+      ordersData[id].nfts.nft_id,
+      amount,
+      marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID]
     );
 
     if (result) {

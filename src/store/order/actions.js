@@ -28,6 +28,19 @@ export const orderCreated = (orderData) => async (dispatch) => {
   }
 };
 
+export const nftMinted = (nftId, amount) => async (dispatch) => {
+  return api
+    .post(`/nft-minted`, { nftId, amount })
+    .then((res) => {
+      dispatch({ type: "NFT_FETCHED", payload: res.nftInfo });
+      showNotify("Successfully minted!");
+    })
+    .catch((err) => {
+      console.log(err);
+      showNotify("Error is counted!", "error");
+    });
+};
+
 export const fetchOrderData = (nftId) => async (dispatch) => {
   return api
     .get(`/get-orders/${nftId}`)
@@ -71,7 +84,6 @@ export const orderFinialized = (orderId, amount, userId) => (dispatch) => {
     .post("/order-finalized", { orderId, userId, amount })
     .then((res) => {
       console.log(res);
-      dispatch({ type: types.ORDERS_FETCHED, payload: [...res.ordersData] });
       dispatch({ type: "NFT_FETCHED", payload: res.nftInfo });
     })
     .catch((err) => {

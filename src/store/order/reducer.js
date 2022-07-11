@@ -9,7 +9,6 @@ export default (appState = initialState, { type, payload }) => {
       newOrderArray.push(payload);
       return newOrderArray;
     case types.ORDERS_FETCHED:
-      console.log(payload);
       return payload;
     default:
       return appState;

@@ -18,7 +18,7 @@ import { mintAsset } from "src/utils/contract";
 import MBuyNFTDialog from "src/components/MBuyNFTDialog";
 import { CONTRACT_TYPE } from "src/config/global";
 import { useDispatch, useSelector } from "react-redux";
-import { orderFinialized } from "src/store/order/actions";
+import { nftMinted } from "src/store/order/actions";
 
 const MintStatus = (props) => {
   const creator = props.creator;
@@ -38,7 +38,7 @@ const MintStatus = (props) => {
         walletAddress.substring(addrLength - 2, addrLength);
       setWalAbbr(addressAbbr);
     }
-  }, []);
+  }, [creator]);
 
   const confirmDlgClosed = () => {
     setBuyOrderConfirm(false);
@@ -59,7 +59,7 @@ const MintStatus = (props) => {
       metaData
     );
     if (result) {
-      dispatch(orderFinialized(creator.id, Number(amount), profile.id));
+      dispatch(nftMinted(creator.id, Number(amount)));
     }
   };
 
@@ -108,15 +108,18 @@ const MintStatus = (props) => {
                 <TableRow>
                   <TableCell>{creator.price}CR2</TableCell>
                   <TableCell>{creator.nfts.batch_size}</TableCell>
-                  <TableCell>{creator.minted_count}</TableCell>
+                  <TableCell>{creator.nfts.minted_count}</TableCell>
                   <TableCell>
-                    {creator.nfts.batch_size - creator.minted_count}
+                    {creator.nfts.batch_size - creator.nfts.minted_count}
                   </TableCell>
                   <TableCell>
                     <BuyButton
                       variant="contained"
                       startIcon={<AccountTree />}
                       onClick={buyOrderClicked}
+                      disabled={
+                        creator.nfts.batch_size - creator.nfts.minted_count == 0
+                      }
                     >
                       MINT
                     </BuyButton>

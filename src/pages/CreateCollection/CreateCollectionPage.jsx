@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CONTRACT_TYPE } from "src/config/global";
+import { marketplace_contract_address } from "src/config/contracts";
 import {
   deployContract,
   holdEvent,
   getValuefromEvent,
+  addCollection2Manager,
 } from "src/utils/contract";
 import {
   Button,
@@ -31,6 +33,7 @@ import {
   submitCollectionPreview,
 } from "../../store/contract/actions";
 import "./CreateCollectionPage.scss";
+import "dotenv/config";
 
 const Paragraph = styled("p")(
   ({ theme }) =>
@@ -154,6 +157,11 @@ const CreateCollectionPage = (props) => {
       const { contractAddress, contractUri, imageUri } = await deployContract(
         0,
         metadata
+      );
+
+      const result = await addCollection2Manager(
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+        contractAddress
       );
 
       const events = await holdEvent("ContractDeployed", contractAddress);
