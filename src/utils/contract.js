@@ -7,7 +7,9 @@ import web3Modal, {
   signMsg,
 } from "./wallet";
 import { showNotify } from "./notify";
+import { CURRENCYDECIMAL } from "src/config/global";
 import "dotenv/config";
+import BigNumber from "bignumber.js";
 
 const contract_source_arr = [
   "/Crea2orsContracts/compiled/Crea2orsNFT/Crea2orsNFT",
@@ -621,11 +623,9 @@ export const getTokenBalance = async (address) => {
     } else {
       return null;
     }
-    console.log(address);
     // Get a Web3 instance for the wallet
     const web3 = new Web3(provider);
     const contract_data = await readContractABI(CONTRACT_TYPE.ERC20);
-    console.log(CONTRACT_TYPE.ERC20);
     const wallet_address = await getCurrentWalletAddress();
 
     const contract = new web3.eth.Contract(contract_data, address);
@@ -637,3 +637,38 @@ export const getTokenBalance = async (address) => {
     return null;
   }
 };
+
+export const transferCustomCrypto = async (
+  cr2TokenAddress,
+  toAddress,
+  amount
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        return null;
+      }
+      // Get a Web3 instance for the wallet
+      const web3 = new Web3(provider);
+      const contract_data = await readContractABI(CONTRACT_TYPE.ERC20);
+      const wallet_address = await getCurrentWalletAddress();
+
+      const contract = new web3.eth.Contract(contract_data, cr2TokenAddress);
+
+      await contract.methods
+        .transfer(
+          toAddress,
+          web3.utils.toBN(
+            BigNumber(amount).times(BigNumber(10).pow(CURRENCYDECIMAL))
+          )
+        )
+        .send({ from: wallet_address, to: cr2TokenAddress, gas: 300000 });
+
+      return resolve(true);
+    } catch (e) {
+      console.error("sdfsdf", e);
+      return reject(false);
+    }
+  });

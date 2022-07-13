@@ -15,7 +15,11 @@ import MBuyNFTDialog from "src/components/MBuyNFTDialog";
 import styled from "styled-components";
 import { AccountTree } from "@mui/icons-material";
 import { useState } from "react";
-import { mintAsset, getTokenBalance } from "src/utils/contract";
+import {
+  mintAsset,
+  getTokenBalance,
+  transferCustomCrypto,
+} from "src/utils/contract";
 import { CONTRACT_TYPE } from "src/config/global";
 import { useDispatch, useSelector } from "react-redux";
 import { nftMinted } from "src/store/order/actions";
@@ -56,11 +60,7 @@ const MintStatus = (props) => {
       royaltyFee: String(creator.nfts.royalty_fee),
       royaltyAddress: creator.user.wallet_address,
     };
-    console.log(creator);
-    console.log(profile);
-    console.log();
     const balance = await getTokenBalance(currencyTokenAddress);
-    console.log("CR2 balance", balance);
 
     if (!balance) {
       showNotify(
@@ -93,7 +93,14 @@ const MintStatus = (props) => {
         props.contractAddress,
         metaData
       );
-      if (result) {
+
+      const cr2Result = await transferCustomCrypto(
+        currencyTokenAddress,
+        creator.user.wallet_address,
+        Number(creator.price)
+      );
+
+      if (result && cr2Result) {
         dispatch(nftMinted(creator.id, Number(amount)));
       }
       loading_screen.finish();
