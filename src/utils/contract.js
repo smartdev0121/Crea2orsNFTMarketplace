@@ -8,7 +8,7 @@ import web3Modal, {
 } from "./wallet";
 import { showNotify } from "./notify";
 import "dotenv/config";
-import { GavelSharp } from "@mui/icons-material";
+
 const contract_source_arr = [
   "/Crea2orsContracts/compiled/Crea2orsNFT/Crea2orsNFT",
   "/Crea2orsContracts/compiled/CR2/CR2",
@@ -21,7 +21,6 @@ const readContractABI = async (contract_type) =>
   new Promise((resolve, reject) => {
     let contract_data;
     let contract_source = contract_source_arr[contract_type];
-    console.log("CONTRACT TYPE", contract_type, contract_source);
     fetch(`${contract_source}.abi`)
       .then((response) => response.text())
       .then((data) => {
@@ -61,7 +60,6 @@ export const holdEvent = async (eventName, contractAddress) =>
     let historical_block = latest_block - 10000;
     const contract_data = await readContractABI(0);
     const contract = new web3.eth.Contract(contract_data, contractAddress);
-    console.log("block", latest_block, historical_block, contract);
     const events = await contract.getPastEvents(eventName, {
       fromBlock: historical_block,
       toBlock: "latest",

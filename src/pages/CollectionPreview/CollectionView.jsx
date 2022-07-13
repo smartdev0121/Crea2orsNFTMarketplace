@@ -11,8 +11,6 @@ const CollectionView = (props) => {
   const newCollectionInfo = useSelector(
     (state) => state.contract.collectionPreview
   );
-  console.log(newCollectionInfo);
-
   const goBack = () => {
     props.history.push("/create-collection");
   };

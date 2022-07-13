@@ -41,12 +41,6 @@ export const signMsg = (msg, from) =>
         if (result.error) {
           return reject(result.error.message);
         }
-        // const recovered = sigUtil.recoverTypedSignature({
-        //   data: msgParam,
-        //   sig: result.result,
-        // })
-
-        // console.log("recovered", recovered);
         return resolve(result.result);
       }
     );
@@ -82,7 +76,6 @@ export const getCurrentWalletAddress = async () => {
     // Get a Web3 instance for the wallet
     const web3 = new Web3(provider);
     const accounts = await web3.eth.getAccounts();
-    console.log("getCurrent actions", accounts[0]);
 
     if (accounts && accounts.length > 0) {
       selectedAccount = accounts[0];

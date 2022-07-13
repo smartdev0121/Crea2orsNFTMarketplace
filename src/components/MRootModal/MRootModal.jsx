@@ -11,7 +11,6 @@ const MRootModal = () => {
   }
 
   const SpecificModal = MODAL_COMPONENTS[modalType];
-  console.log(SpecificModal);
   return <SpecificModal {...modalProps} />;
 };
 export default MRootModal;

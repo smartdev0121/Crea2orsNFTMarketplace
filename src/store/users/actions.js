@@ -98,7 +98,6 @@ export const getUserInfo = (dispatch) => {
     api
       .get("/get-user-info")
       .then((res) => {
-        console.log(res);
         dispatch({ type: types.GET_USER_INFO, payload: res });
       })
       .catch((err) => {
@@ -121,7 +120,6 @@ export const createUser = (values, history) => {
         dispatch(showModal());
       })
       .catch((res) => {
-        console.log(res);
         showNotify(
           res.email
             ? "Sorry! email already exists"

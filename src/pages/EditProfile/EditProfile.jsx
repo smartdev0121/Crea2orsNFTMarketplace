@@ -113,7 +113,6 @@ const EditProfile = (props) => {
 
   const onSubmit = (values) => {
     const data = new FormData();
-    console.log("Profile image", file, confirmedFile);
     data.append("name", "Image Upload");
     data.append("nick_name", values.nickName);
     data.append("file_attachment", file);

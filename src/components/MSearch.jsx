@@ -70,7 +70,6 @@ const MSearch = () => {
   const isLogged = useSelector((state) => getProfile(state));
   const handleSearch = async (term) => {
     const result = await getSearchAsset(term);
-    console.log(term, result);
     setSearchTerm(term);
     setRes(result || {});
   };

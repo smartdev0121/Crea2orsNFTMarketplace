@@ -20,7 +20,6 @@ let provider;
 
 export const getMarketplaceContractAddress = async () => {
   const networkId = await getCurrentNetworkId();
-  console.log("=========network id", networkId);
   return marketplace_contract_address[networkId];
 };
 
@@ -250,31 +249,6 @@ export const placeBid = (OrderState, BidPrice) =>
         1
       );
 
-      console.log("UUUUUUUUUUUUUUUUU", [
-        OrderState.Creator,
-        OrderState.NftAddress,
-        OrderState.TokenId,
-        OrderState.Amount,
-        web3.utils
-          .toBN(
-            BigNumber(OrderState.Price).times(
-              BigNumber(10).pow(BigNumber(OrderState.CurrencyDecimals))
-            )
-          )
-          .toString(),
-        OrderState.StartTime,
-        OrderState.EndTime,
-        OrderState.OrderType,
-        OrderState.Buyer,
-        web3.utils
-          .toBN(
-            BigNumber(BidPrice).times(
-              BigNumber(10).pow(BigNumber(OrderState.CurrencyDecimals))
-            )
-          )
-          .toString(),
-      ]);
-
       const tx = {
         from: WalletAddress,
         to: ContractAddress,
@@ -331,17 +305,7 @@ export const cancelListing = (OrderState) =>
       const WalletAddress = await getCurrentWalletAddress();
 
       const contract = new web3.eth.Contract(ContractData, ContractAddress);
-      console.log(BigNumber(10).pow(BigNumber(OrderState.CurrencyDecimals)));
-      console.log(
-        "here",
-        web3.utils
-          .toBN(
-            BigNumber(OrderState.Price).times(
-              BigNumber(10).pow(BigNumber(OrderState.CurrencyTokenDecimals))
-            )
-          )
-          .toString()
-      );
+
       const tx = {
         from: WalletAddress,
         to: ContractAddress,

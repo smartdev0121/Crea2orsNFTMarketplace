@@ -16,8 +16,8 @@ const CollectionView = (props) => {
   const newCollectionInfo = useSelector(
     (state) => state.contract.collectionInfo
   );
-  console.log(newCollectionInfo);
   const { contractAddress } = props.match.params;
+  const profile = useSelector((state) => state.profile);
   const dispatch = useDispatch();
   const [metaData, setMetaData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -111,11 +111,13 @@ const CollectionView = (props) => {
           <Slider images={newCollectionInfo.nfts} history={props.history} />
         )}
       </MFlexBox>
-      <section className="create-button-part">
-        <MColorButtonView onClick={onCreateNFT}>
-          Create your NFTs
-        </MColorButtonView>
-      </section>
+      {newCollectionInfo?.userId === profile.id && (
+        <section className="create-button-part">
+          <MColorButtonView onClick={onCreateNFT}>
+            Create your NFTs
+          </MColorButtonView>
+        </section>
+      )}
     </Container>
   );
 };

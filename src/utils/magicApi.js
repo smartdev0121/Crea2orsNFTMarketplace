@@ -45,7 +45,6 @@ const withPromise = (axiosInstance) =>
         resolve(res.data);
       },
       (err) => {
-        console.log("Withpromise");
         // service is unavailable
         if (!err.response) {
           reject(new Error({ status: 503, error: "Service is unavailable" }));
@@ -86,7 +85,6 @@ export function create(config) {
 }
 
 export function get(endpoint, query) {
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>", endpoint);
   const config = requestConfig;
 
   setAuthHeaders(config.headers);
@@ -99,7 +97,6 @@ export function get(endpoint, query) {
 
 export function post(endpoint, body, config = {}) {
   config = Object.assign(config, requestConfig);
-  console.log("post>>>>>>>>>>>>>>>>>>>>>>>>", endpoint);
 
   let requestBody = body;
 

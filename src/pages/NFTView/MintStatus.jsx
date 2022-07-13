@@ -19,6 +19,7 @@ import MBuyNFTDialog from "src/components/MBuyNFTDialog";
 import { CONTRACT_TYPE } from "src/config/global";
 import { useDispatch, useSelector } from "react-redux";
 import { nftMinted } from "src/store/order/actions";
+import { pleaseWait } from "please-wait";
 
 const MintStatus = (props) => {
   const creator = props.creator;
@@ -27,7 +28,6 @@ const MintStatus = (props) => {
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile);
 
-  console.log(creator);
   useEffect(() => {
     if (creator) {
       const walletAddress = String(creator.user.wallet_address);
@@ -54,13 +54,32 @@ const MintStatus = (props) => {
       royaltyFee: String(creator.nfts.royalty_fee),
       royaltyAddress: creator.user.wallet_address,
     };
-    const result = await mintAsset(
-      CONTRACT_TYPE.ERC1155,
-      props.contractAddress,
-      metaData
-    );
-    if (result) {
-      dispatch(nftMinted(creator.id, Number(amount)));
+    var loading_screen = pleaseWait({
+      logo: "/favicon.ico",
+      backgroundColor: "#343434",
+      loadingHtml: `<div class="spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
+      <div>
+        <h4 class="wait-text">Minting NFT ...</h4>
+      </div>`,
+      transitionSupport: false,
+    });
+    try {
+      const result = await mintAsset(
+        CONTRACT_TYPE.ERC1155,
+        props.contractAddress,
+        metaData
+      );
+      if (result) {
+        dispatch(nftMinted(creator.id, Number(amount)));
+      }
+      loading_screen.finish();
+    } catch (err) {
+      console.log(err);
+      loading_screen.finish();
     }
   };
 
@@ -133,66 +152,6 @@ const MintStatus = (props) => {
           </TableContainer>
         </>
       )}
-
-      {/* 
-          
-            
-            {ordersData.map((row, index) => {
-              let diff = row.endTime - row.startTime;
-              
-              if (diff != 0) {
-                const curTime = Math.round(Number(new Date().getTime()) / 1000);
-                if (curTime > row.startTime) diff = row.endTime - curTime;
-              }
-              return (
-                <StyledTableRow key={"Order_table" + index}>
-                  <StyledTableCell>{row.price}CR2</StyledTableCell>
-                  <StyledTableCell>{row.amount}</StyledTableCell>
-                  <StyledTableCell>
-                    <Chip
-                      icon={
-                        <Avatar
-                          sx={{ width: 24, height: 24 }}
-                          src={
-                            process.env.REACT_APP_BACKEND_URL +
-                              row.User?.avatar_url || ""
-                          }
-                        />
-                      }
-                      label={row.user?.nickName || addressAbbr}
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    {row.user?.id == profile?.id ? (
-                      <ColorButton
-                        variant="contained"
-                        startIcon={<Cancel />}
-                        onClick={(eve) => cancelOrderClicked(eve, index)}
-                      >
-                        Cancel
-                      </ColorButton>
-                    ) : (
-                      <BuyButton
-                        variant="contained"
-                        startIcon={<ShoppingBasket />}
-                        onClick={(eve) => buyOrderClicked(eve, index)}
-                      >
-                        Buy Now
-                      </BuyButton>
-                    )}
-                  </StyledTableCell>
-                </StyledTableRow>
-              );
-            })}
-            <MBidDialog
-              open={bidDlgOpen}
-              onPlaceBid={onPlaceBid}
-              onClose={onBidDlgClose}
-              index={rowIndex}
-            />
-          </TableBody>
-        </Table>
-      </TableContainer> */}
     </>
   );
 };

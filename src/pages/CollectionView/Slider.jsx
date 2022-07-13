@@ -11,7 +11,6 @@ const SimpleSlider = (props) => {
     isOpen: false,
     images: [],
   });
-  console.log("?????????????????", props.images);
   useEffect(() => {
     setInitialState({ ...initialState, images: props.images });
   }, []);

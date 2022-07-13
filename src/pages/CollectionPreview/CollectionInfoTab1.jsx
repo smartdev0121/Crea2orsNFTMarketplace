@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 export default function LabTabs(props) {
   const [value, setValue] = React.useState("1");
   const userProfile = useSelector((state) => state.profile);
-  console.log(props.metaData);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };

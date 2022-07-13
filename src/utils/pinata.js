@@ -44,11 +44,9 @@ export const uploadContractMetadata = async (mt) =>
 export const fetchMetaData = (uri) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("pinata fetch", uri);
       axios
         .get(uri)
         .then((res) => {
-          console.log(res);
           return resolve(res.data);
         })
         .catch((err) => reject("Can't fetch metadata"));
@@ -96,7 +94,6 @@ export const uploadAssetMetaData = async (mt) =>
 
       // metadata.attributes = attributes;
       //make pinata call
-      console.log("Pinata", metadata);
       const pinataResponse = await pinJSONToIPFS(metadata);
       if (!pinataResponse.success) {
         showNotification("Failed", "Uploading Metadata Failed", "failed", 2000);

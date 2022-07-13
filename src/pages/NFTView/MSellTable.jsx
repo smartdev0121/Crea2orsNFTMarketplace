@@ -26,12 +26,12 @@ import MBidDialog from "./MBidDialog";
 import "dotenv/config";
 import { transferNFT } from "src/utils/contract";
 import { marketplace_contract_address } from "src/config/contracts";
+import { pleaseWait } from "please-wait";
 
 export default function CustomizedTables(props) {
   const dispatch = useDispatch();
   const ordersData = useSelector((state) => state.orders);
   const profile = useSelector((state) => state.profile);
-  console.log("MSellTable>>>", profile);
   const [confirmStatus, setConfirmStatus] = React.useState(false);
   const contractAddress = props.contractAddress;
   const [bidDlgOpen, setBidDlgOpen] = React.useState(false);
@@ -57,14 +57,6 @@ export default function CustomizedTables(props) {
       BuyerPrice: ordersData[id].price,
       CurrencyTokenDecimals: 9,
     };
-
-    // const result = await cancelListing(OrderState);
-    // if (result) {
-    //   const mContractAddress = await getMarketplaceContractAddress();
-    //   const event = await holdEvent("OrderCancelled", mContractAddress);
-    //   const values = await getValuefromEvent(event);
-    //   dispatch(canceledOrder(ordersData[id].id));
-    // }
     dispatch(canceledOrder(ordersData[id].id));
   };
 
@@ -79,17 +71,38 @@ export default function CustomizedTables(props) {
   };
 
   const buyOrder = async (id) => {
+    var loading_screen = pleaseWait({
+      logo: "/favicon.ico",
+      backgroundColor: "#343434",
+      loadingHtml: `<div class="spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
+      <div>
+        <h4 class="wait-text">Buying NFT ...</h4>
+      </div>`,
+      transitionSupport: false,
+    });
     const amount = 1;
-    const result = await transferNFT(
-      contractAddress,
-      ordersData[id].maker_address,
-      ordersData[id].nfts.nft_id,
-      amount,
-      marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID]
-    );
+    try {
+      const result = await transferNFT(
+        contractAddress,
+        ordersData[id].maker_address,
+        ordersData[id].nfts.nft_id,
+        amount,
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID]
+      );
 
-    if (result) {
-      dispatch(orderFinialized(ordersData[id].id, Number(amount), profile.id));
+      if (result) {
+        dispatch(
+          orderFinialized(ordersData[id].id, Number(amount), profile.id)
+        );
+      }
+      loading_screen.finish();
+    } catch (err) {
+      console.log(err);
+      loading_screen.finish();
     }
   };
 

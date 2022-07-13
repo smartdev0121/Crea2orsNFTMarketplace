@@ -118,6 +118,7 @@ const NFTView = (props) => {
                 contractAddress={nftInfo?.Contract?.contract_address}
                 tokenId={nftInfo?.nftId}
                 nftId={nftInfo?.id}
+                curUserAmount={curUserAmount}
               />
               <MintStatus
                 creator={nftInfo?.creator}

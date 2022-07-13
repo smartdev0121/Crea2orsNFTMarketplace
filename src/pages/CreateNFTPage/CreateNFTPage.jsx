@@ -40,6 +40,8 @@ import { saveNFT } from "src/store/contract/actions";
 import { createNFT, createVoucher } from "src/utils/contract";
 import { getCurrentWalletAddress } from "../../utils/wallet";
 import styled from "styled-components";
+import { formValidation } from "./form-validation";
+import { pleaseWait } from "please-wait";
 import "./CreateNFTPage.scss";
 
 export default function CreateNFTPage(props) {
@@ -117,13 +119,19 @@ export default function CreateNFTPage(props) {
     };
 
     try {
-      dispatch(showSpinner("NFT_MINTING"));
-
-      // const { metaDataUri, fileUri } = await mintAsset(
-      //   CONTRACT_TYPE.ERC1155,
-      //   contractAddress,
-      //   metaData
-      // );
+      var loading_screen = pleaseWait({
+        logo: "/favicon.ico",
+        backgroundColor: "#343434",
+        loadingHtml: `<div class="spinner">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
+        </div>
+        <div>
+          <h4 class="wait-text">Signing NFT metadata for Lazy Mint ...</h4>
+        </div>`,
+        transitionSupport: false,
+      });
 
       const { metaDataUri, fileUri } = await createNFT(metaData);
 
@@ -146,7 +154,6 @@ export default function CreateNFTPage(props) {
             fileUri,
             props.history,
             values?.price ? values.price : -1,
-            // returnValues.id,
             signature,
             curWalletAddress
           )
@@ -156,13 +163,15 @@ export default function CreateNFTPage(props) {
         showNotify("Error is occured on minting!", "error");
       }
 
-      dispatch(hideSpinner("NFT_MINTING"));
+      // dispatch(hideSpinner("NFT_MINTING"));
+      loading_screen.finish();
     } catch (err) {
       showNotify(
         "You can't mint your nft by some issue, confirm input values and try again!",
         "error"
       );
-      dispatch(hideSpinner("NFT_MINTING"));
+      // dispatch(hideSpinner("NFT_MINTING"));
+      loading_screen.finish();
     }
   };
   return (
@@ -180,9 +189,7 @@ export default function CreateNFTPage(props) {
             onSubmit={onSubmit}
             initialValues={{ formInitialValues }}
             initialValuesEqual={() => true}
-            validate={(values) => {
-              const errors = {};
-            }}
+            validate={(values) => formValidation.validateForm(values)}
             render={({ handleSubmit, submitting, form, values, pristine }) => {
               return (
                 <form onSubmit={handleSubmit} noValidate>
