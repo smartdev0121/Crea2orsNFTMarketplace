@@ -44,7 +44,8 @@ const MintStatus = (props) => {
     setBuyOrderConfirm(false);
   };
 
-  const mintNFT = async (index, amount) => {
+  const mintNFT = async (index) => {
+    const amount = 1;
     const metaData = {
       tokenId: creator.nfts.nft_id,
       metaUri: creator.nfts.metadata_url,
@@ -102,9 +103,11 @@ const MintStatus = (props) => {
                 <MBuyNFTDialog
                   open={buyOrderConfirm}
                   orderID={0}
-                  onOK={(index, amount) => mintNFT(index, amount)}
+                  onOK={(index) => mintNFT(index)}
                   onCancel={confirmDlgClosed}
-                />
+                >
+                  Are you sure to mint NFT?
+                </MBuyNFTDialog>
                 <TableRow>
                   <TableCell>{creator.price}CR2</TableCell>
                   <TableCell>{creator.nfts.batch_size}</TableCell>

@@ -78,8 +78,8 @@ export default function CustomizedTables(props) {
     setBuyOrderConfirm(false);
   };
 
-  const buyOrder = async (id, amount) => {
-    console.log(1);
+  const buyOrder = async (id) => {
+    const amount = 1;
     const result = await transferNFT(
       contractAddress,
       ordersData[id].maker_address,
@@ -91,14 +91,6 @@ export default function CustomizedTables(props) {
     if (result) {
       dispatch(orderFinialized(ordersData[id].id, Number(amount), profile.id));
     }
-    // if (result) {
-    //   const mContractAddress = await getMarketplaceContractAddress();
-    //   const event = await holdEvent("OrderFinalized", mContractAddress);
-    //   const values = await getValuefromEvent(event);
-    //   dispatch(
-    //     orderFinialized(values[0], ordersData[id].id, ordersData[id].nftId)
-    //   );
-    // }
   };
 
   const buyOrderClicked = async (event, id) => {
@@ -130,15 +122,10 @@ export default function CustomizedTables(props) {
       const mContractAddress = await getMarketplaceContractAddress();
       const event = await holdEvent("OrderNewBid", mContractAddress);
       const values = await getValuefromEvent(event);
-      console.log("this is event data", values);
       dispatch(bidPlaced(values[0], ordersData[id].id, ordersData[id].nftId));
     }
   };
 
-  const placeBidClicked = async (eve, id) => {
-    setRowIndex(id);
-    setBidDlgOpen(true);
-  };
   return (
     <TableContainer component={Paper}>
       <Table aria-label="customized table">
@@ -162,9 +149,11 @@ export default function CustomizedTables(props) {
           <MBuyNFTDialog
             open={buyOrderConfirm}
             orderID={buyOrderId}
-            onOK={(index, amount) => buyOrder(index, amount)}
+            onOK={(index) => buyOrder(index)}
             onCancel={confirmDlgClosed}
-          />
+          >
+            Are you sure to buy NFT?
+          </MBuyNFTDialog>
           {ordersData.map((row, index) => {
             let diff = row.endTime - row.startTime;
             const addrLength = String(row.maker_address).length;
