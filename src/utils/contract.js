@@ -621,13 +621,15 @@ export const getTokenBalance = async (address) => {
     } else {
       return null;
     }
+    console.log(address);
     // Get a Web3 instance for the wallet
     const web3 = new Web3(provider);
     const contract_data = await readContractABI(CONTRACT_TYPE.ERC20);
+    console.log(CONTRACT_TYPE.ERC20);
     const wallet_address = await getCurrentWalletAddress();
 
     const contract = new web3.eth.Contract(contract_data, address);
-
+    console.log(contract);
     const balance = await contract.methods.balanceOf(wallet_address).call();
     return balance;
   } catch (e) {

@@ -1,7 +1,6 @@
 export const CONTRACT_TYPE = {
-  ERC721: 1,
   ERC1155: 0,
-  ERC20: 3,
+  ERC20: 1,
   MANAGER: 2,
 };
 

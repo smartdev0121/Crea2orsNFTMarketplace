@@ -11,15 +11,17 @@ import {
   TableCell,
   TableContainer,
 } from "@mui/material";
+import MBuyNFTDialog from "src/components/MBuyNFTDialog";
+import styled from "styled-components";
 import { AccountTree } from "@mui/icons-material";
 import { useState } from "react";
-import styled from "styled-components";
-import { mintAsset } from "src/utils/contract";
-import MBuyNFTDialog from "src/components/MBuyNFTDialog";
+import { mintAsset, getTokenBalance } from "src/utils/contract";
 import { CONTRACT_TYPE } from "src/config/global";
 import { useDispatch, useSelector } from "react-redux";
 import { nftMinted } from "src/store/order/actions";
 import { pleaseWait } from "please-wait";
+import { showNotify } from "src/utils/notify";
+import { currencyTokenAddress } from "src/config/contracts";
 
 const MintStatus = (props) => {
   const creator = props.creator;
@@ -54,6 +56,23 @@ const MintStatus = (props) => {
       royaltyFee: String(creator.nfts.royalty_fee),
       royaltyAddress: creator.user.wallet_address,
     };
+    console.log(creator);
+    console.log(profile);
+    console.log();
+    const balance = await getTokenBalance(currencyTokenAddress);
+    console.log("CR2 balance", balance);
+
+    if (!balance) {
+      showNotify(
+        "An error occurred while obtaining your CR2 wallet balance",
+        "error"
+      );
+      return;
+    } else if (balance < creator.price) {
+      showNotify("Your CR2 balance is less than the NFT mint price", "warning");
+      return;
+    }
+
     var loading_screen = pleaseWait({
       logo: "/favicon.ico",
       backgroundColor: "#343434",
@@ -67,6 +86,7 @@ const MintStatus = (props) => {
       </div>`,
       transitionSupport: false,
     });
+
     try {
       const result = await mintAsset(
         CONTRACT_TYPE.ERC1155,
