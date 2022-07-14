@@ -3,12 +3,14 @@ export const marketplace_contract_address = {
   // 4: '0x3D9c17469F520aA88465928e8655a4111A72766e', //rinkeby
   // 4: '0xE149DA7Fd43C577B9b6d8C071C5986Adc9dCC9eb', //rinkeby
   // 4: '0xE3cD297BAE1A73aDeD2E43C0914404742b55Fc99', //fix issue on make offer
-  4: "0x9f9022Dc1D05Eb059BB88252aDFE32f81c452812", //fix place bid issue
+  4: "0xc132c377b7c8f927D0D5de6C1b4964F2262Ef6Fd", //fix place bid issue
   97: "0x956CC6E76b825aedCcefefC1D25c96daD27Ff37B",
   80001: "0x435b204107ccdfB3516c5A2f552Ce713A87c466e",
   250: "0xE9020EA2aB23Bc8B15823F7Ec9Fb17Bd5bb6B150",
   32520: "0x63BdC459184097114dD5Ef58FDc07Ca8eCB54e63",
 };
 
-export const currencyTokenAddress =
-  "0xcaa395E63Eaf26bb65fF906ccC9F3752594b614B";
+export const currencyTokenAddress = {
+  4: "0xa6b29174F295173C44A5Bc6B97BeAC1C813389fA",
+  32520: "0xcaa395E63Eaf26bb65fF906ccC9F3752594b614B",
+};

@@ -26,6 +26,7 @@ import { nftMinted } from "src/store/order/actions";
 import { pleaseWait } from "please-wait";
 import { showNotify } from "src/utils/notify";
 import { currencyTokenAddress } from "src/config/contracts";
+import "dotenv/config";
 
 const MintStatus = (props) => {
   const creator = props.creator;
@@ -95,7 +96,7 @@ const MintStatus = (props) => {
       );
 
       const cr2Result = await transferCustomCrypto(
-        currencyTokenAddress,
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
         creator.user.wallet_address,
         Number(creator.price)
       );

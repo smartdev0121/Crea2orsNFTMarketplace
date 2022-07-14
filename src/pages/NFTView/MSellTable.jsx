@@ -127,7 +127,8 @@ export default function CustomizedTables(props) {
       OrderType: ordersData[id].orderType,
       Buyer: ordersData[id].creatorAddress,
       BuyerPrice: ordersData[id].price,
-      CurrencyTokenAddress: currencyTokenAddress,
+      CurrencyTokenAddress:
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
       CurrencyDecimals: 9,
     };
     const result = await placeBid(OrderState, Number(bidPrice));
