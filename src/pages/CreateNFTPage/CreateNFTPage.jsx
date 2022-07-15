@@ -118,6 +118,8 @@ export default function CreateNFTPage(props) {
       traits,
     };
 
+    console.log(metaData);
+
     try {
       var loading_screen = pleaseWait({
         logo: "/favicon.ico",

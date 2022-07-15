@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CONTRACT_TYPE } from "src/config/global";
-import { marketplace_contract_address } from "src/config/contracts";
+import {
+  marketplace_contract_address,
+  currencyTokenAddress,
+} from "src/config/contracts";
 import {
   deployContract,
   holdEvent,
   getValuefromEvent,
   addCollection2Manager,
+  setupCR2Token,
 } from "src/utils/contract";
 import {
   Button,
@@ -136,20 +140,21 @@ const CreateCollectionPage = (props) => {
       file: file,
     };
     try {
-      loading_screen.updateLoadingHtml(
-        "<div class='spinner'><div class='bounce1'></div><div class='bounce2'></div><div class='bounce3'></div></div><div><h4 class='wait-text'>Deploying contract ...</h4></div>"
-      );
+      console.log("Before");
       // dispatch(showSpinner("DEPLOY_CONTRACT"));
       const { contractAddress, contractUri, imageUri } = await deployContract(
         0,
         metadata
       );
-      loading_screen.updateLoadingHtml(
-        "<div class='spinner'><div class='bounce1'></div><div class='bounce2'></div><div class='bounce3'></div></div><div><h4 class='wait-text'>Registering Contract to Manager Contract ...</h4></div>"
-      );
+
       const result = await addCollection2Manager(
         marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
         contractAddress
+      );
+
+      const resultCr2Setup = await setupCR2Token(
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
       );
 
       const events = await holdEvent("ContractDeployed", contractAddress);

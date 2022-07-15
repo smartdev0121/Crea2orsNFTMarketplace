@@ -3,11 +3,11 @@ export const marketplace_contract_address = {
   // 4: '0x3D9c17469F520aA88465928e8655a4111A72766e', //rinkeby
   // 4: '0xE149DA7Fd43C577B9b6d8C071C5986Adc9dCC9eb', //rinkeby
   // 4: '0xE3cD297BAE1A73aDeD2E43C0914404742b55Fc99', //fix issue on make offer
-  4: "0xc132c377b7c8f927D0D5de6C1b4964F2262Ef6Fd", //fix place bid issue
+  4: "0x7C35741221b3f97Cad6Cb4E328B805401665E6ec", //fix place bid issue
   97: "0x956CC6E76b825aedCcefefC1D25c96daD27Ff37B",
   80001: "0x435b204107ccdfB3516c5A2f552Ce713A87c466e",
   250: "0xE9020EA2aB23Bc8B15823F7Ec9Fb17Bd5bb6B150",
-  32520: "0x63BdC459184097114dD5Ef58FDc07Ca8eCB54e63",
+  32520: "0x592E99e9903E20a7f2A67761afc2d4531A057bA2",
 };
 
 export const currencyTokenAddress = {

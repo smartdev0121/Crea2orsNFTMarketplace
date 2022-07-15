@@ -23,10 +23,11 @@ import { holdEvent, getValuefromEvent } from "src/utils/order";
 import { currencyTokenAddress } from "src/config/contracts";
 import { orderFinialized, bidPlaced } from "src/store/order/actions";
 import MBidDialog from "./MBidDialog";
-import "dotenv/config";
-import { transferNFT } from "src/utils/contract";
+import { transferNFT, getTokenBalance } from "src/utils/contract";
 import { marketplace_contract_address } from "src/config/contracts";
+import { showNotify } from "src/utils/notify";
 import { pleaseWait } from "please-wait";
+import "dotenv/config";
 
 export default function CustomizedTables(props) {
   const dispatch = useDispatch();
@@ -85,13 +86,30 @@ export default function CustomizedTables(props) {
       transitionSupport: false,
     });
     const amount = 1;
+
+    const balance = await getTokenBalance(
+      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
+    );
+
+    if (!balance) {
+      showNotify(
+        "An error occurred while obtaining your CR2 wallet balance",
+        "error"
+      );
+      return;
+    } else if (balance < ordersData[id].price) {
+      showNotify("Your CR2 balance is less than the NFT mint price", "warning");
+      return;
+    }
+
     try {
       const result = await transferNFT(
         contractAddress,
         ordersData[id].maker_address,
         ordersData[id].nfts.nft_id,
         amount,
-        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID]
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+        ordersData[id].price
       );
 
       if (result) {

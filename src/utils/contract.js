@@ -7,6 +7,7 @@ import web3Modal, {
   signMsg,
 } from "./wallet";
 import { showNotify } from "./notify";
+import { currencyTokenAddress } from "src/config/contracts";
 import { CURRENCYDECIMAL } from "src/config/global";
 import "dotenv/config";
 import BigNumber from "bignumber.js";
@@ -105,11 +106,17 @@ export const deployContract = (contract_type, contract_metadata) =>
       const contract_data = await readContractABI(contract_type);
 
       const contract = new web3.eth.Contract(contract_data);
-      console.log("ddd");
+      console.log("deploying");
       contract
         .deploy({
           data: bytecode,
-          arguments: [name, symbol, contract_uri, tokenLimit],
+          arguments: [
+            name,
+            symbol,
+            contract_uri,
+            tokenLimit,
+            currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+          ],
         })
         .send({ from: accounts[0] })
         .then(async (deployment) => {
@@ -126,6 +133,30 @@ export const deployContract = (contract_type, contract_metadata) =>
       console.log(e);
       showNotify("Failed", "Failed", "failed", 3);
       return reject("Could not deploy smart contract");
+    }
+  });
+
+export const setupCR2Token = (contract_address, cr2TokenAddress) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        provider = await web3Modal.connect();
+        window.location.reload();
+      }
+      const web3 = new Web3(provider);
+      const contract_data = await readContractABI(CONTRACT_TYPE.MANAGER);
+      const wallet_address = await getCurrentWalletAddress();
+      const contract = new web3.eth.Contract(contract_data, contract_address);
+      await contract.methods
+        .setCr2ContractInstance(cr2TokenAddress)
+        .send({ from: wallet_address, to: contract_address, gas: 300000 });
+
+      return resolve(true);
+    } catch (err) {
+      console.log(err);
+      return reject(false);
     }
   });
 
@@ -210,7 +241,8 @@ export const transferNFT = (
   from_address,
   id,
   amount,
-  managerAddress
+  managerAddress,
+  price
 ) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -226,9 +258,20 @@ export const transferNFT = (
       const wallet_address = await getCurrentWalletAddress();
 
       const contract = new web3.eth.Contract(contract_data, managerAddress);
-
+      console.log(managerAddress);
+      console.log(contract.methods);
       await contract.methods
-        .transferNFT(contract_address, from_address, wallet_address, id, amount)
+        .transferNFT(
+          contract_address,
+          from_address,
+          wallet_address,
+          id,
+          amount,
+          12
+          // web3.utils
+          //   .toBN(BigNumber(price).times(BigNumber(10).pow(CURRENCYDECIMAL)))
+          //   .toNumber()
+        )
         .send({ from: wallet_address, to: managerAddress, gas: 300000 });
 
       return resolve(true);
@@ -255,8 +298,20 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
       const contract_data = await readContractABI(contract_type);
       const wallet_address = await getCurrentWalletAddress();
       const contract = new web3.eth.Contract(contract_data, contract_address);
+      const priceMetadata = {
+        ...metadata,
+        mintPrice: web3.utils
+          .toBN(
+            BigNumber(metadata.mintPrice).times(
+              BigNumber(10).pow(CURRENCYDECIMAL)
+            )
+          )
+          .toNumber(),
+      };
+      console.log(contract_address, priceMetadata);
+
       await contract.methods
-        .redeem(wallet_address, metadata)
+        .redeem(wallet_address, priceMetadata)
         .send({ from: wallet_address, to: contract_address, gas: 300000 });
 
       return resolve(true);
@@ -560,7 +615,7 @@ export const approve = (
   contract_address,
   asset_address,
   amount,
-  contract_type = 0
+  contract_type = 1
 ) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -573,8 +628,6 @@ export const approve = (
 
       const web3 = new Web3(provider);
 
-      showNotify("Waiting", "Approving ...", "waiting");
-
       const contract_data = await readContractABI(contract_type);
       const current_address = await getCurrentWalletAddress();
 
@@ -583,15 +636,20 @@ export const approve = (
       const tx = {
         from: current_address,
         to: asset_address,
-        data: mContract.methods.approve(contract_address, amount).encodeABI(),
+        data: mContract.methods
+          .approve(
+            contract_address,
+            web3.utils
+              .toBN(BigNumber(amount).times(BigNumber(10).pow(CURRENCYDECIMAL)))
+              .toNumber()
+          )
+          .encodeABI(),
       };
 
       await web3.eth.sendTransaction(tx);
 
-      showNotify("Success", "Approved successfully", "success", 3);
       return resolve({ success: true });
     } catch (e) {
-      showNotify("Failed", "Failed", "failed", 3);
       return reject();
     }
   });

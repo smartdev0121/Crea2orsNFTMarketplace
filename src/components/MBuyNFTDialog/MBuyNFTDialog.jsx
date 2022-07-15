@@ -18,7 +18,7 @@ const MBuyNFTDialog = (props) => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Buy NFT</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Confirm...</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           <h4>{props.children}</h4>
