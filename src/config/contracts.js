@@ -7,7 +7,7 @@ export const marketplace_contract_address = {
   97: "0x956CC6E76b825aedCcefefC1D25c96daD27Ff37B",
   80001: "0x435b204107ccdfB3516c5A2f552Ce713A87c466e",
   250: "0xE9020EA2aB23Bc8B15823F7Ec9Fb17Bd5bb6B150",
-  32520: "0x592E99e9903E20a7f2A67761afc2d4531A057bA2",
+  32520: "0xA18f2d091C4B2f0411F4cb95603D5d6095f50FBD",
 };
 
 export const currencyTokenAddress = {
