@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button, Paper, Stack, Grid, IconButton } from "@mui/material";
 import { MImg } from "../MImages";
@@ -7,9 +7,15 @@ import { Link } from "react-router-dom";
 
 const MNFTCard = (props) => {
   const { data } = props;
+  const [blob, setBlob] = useState();
   const onBuyNow = () => {
     props.history.push(`/nft-view/${data.id}`);
   };
+
+  useEffect(async () => {
+    let blobIns = await fetch(data?.fileUrl).then((r) => r.blob());
+    setBlob(blobIns);
+  }, []);
   return (
     <CardContainer>
       <FlexBetween>
@@ -35,7 +41,17 @@ const MNFTCard = (props) => {
       </FlexBetween>
       <Grid container sx={{ height: "300px" }}>
         <Grid item xs={12} sx={{ height: "300px", position: "relative" }}>
-          <MImg src={data.fileUrl}></MImg>
+          {String(blob?.type).split("/")[0] == "image" && (
+            <MImg src={data.fileUrl}></MImg>
+          )}
+          {String(blob?.type).split("/")[0] == "video" && (
+            <MDiv>
+              <video width="100%" controls>
+                <source src={data.fileUrl} />
+              </video>
+            </MDiv>
+          )}
+
           <MSaleBox>
             <MPriceBox>
               {/* <div>
@@ -61,6 +77,12 @@ const MNFTCard = (props) => {
 };
 
 export default MNFTCard;
+
+const MDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const MBuyButton = styled(Button)`
   color: #fff700 !important;

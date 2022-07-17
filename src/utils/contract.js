@@ -105,6 +105,10 @@ export const deployContract = (contract_type, contract_metadata) =>
       const bytecode = await readContractByteCode(contract_type);
       const contract_data = await readContractABI(contract_type);
 
+      console.log(
+        "CURRENCE",
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
+      );
       const contract = new web3.eth.Contract(contract_data);
       console.log("deploying");
       contract
@@ -267,10 +271,9 @@ export const transferNFT = (
           wallet_address,
           id,
           amount,
-          12
-          // web3.utils
-          //   .toBN(BigNumber(price).times(BigNumber(10).pow(CURRENCYDECIMAL)))
-          //   .toNumber()
+          web3.utils
+            .toBN(BigNumber(price).times(BigNumber(10).pow(CURRENCYDECIMAL)))
+            .toNumber()
         )
         .send({ from: wallet_address, to: managerAddress, gas: 300000 });
 
@@ -293,25 +296,44 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
 
       const web3 = new Web3(provider);
 
-      // const { metadata_uri, file_uri } = await uploadAssetMetaData(metadata);
-
       const contract_data = await readContractABI(contract_type);
       const wallet_address = await getCurrentWalletAddress();
       const contract = new web3.eth.Contract(contract_data, contract_address);
-      const priceMetadata = {
-        ...metadata,
-        mintPrice: web3.utils
+
+      console.log(
+        wallet_address,
+        metadata.tokenId,
+        metadata.metaUri,
+        metadata.initialSupply,
+        web3.utils
           .toBN(
             BigNumber(metadata.mintPrice).times(
               BigNumber(10).pow(CURRENCYDECIMAL)
             )
           )
           .toNumber(),
-      };
-      console.log(contract_address, priceMetadata);
+        metadata.mintCount,
+        metadata.royaltyFee,
+        metadata.royaltyAddress
+      );
 
       await contract.methods
-        .redeem(wallet_address, priceMetadata)
+        .redeem(
+          wallet_address,
+          metadata.tokenId,
+          metadata.metaUri,
+          metadata.initialSupply,
+          web3.utils
+            .toBN(
+              BigNumber(metadata.mintPrice).times(
+                BigNumber(10).pow(CURRENCYDECIMAL)
+              )
+            )
+            .toNumber(),
+          metadata.mintCount,
+          metadata.royaltyFee,
+          metadata.royaltyAddress
+        )
         .send({ from: wallet_address, to: contract_address, gas: 300000 });
 
       return resolve(true);
@@ -632,7 +654,7 @@ export const approve = (
       const current_address = await getCurrentWalletAddress();
 
       const mContract = new web3.eth.Contract(contract_data, asset_address);
-
+      console.log(asset_address, contract_address, amount);
       const tx = {
         from: current_address,
         to: asset_address,
@@ -649,6 +671,33 @@ export const approve = (
       await web3.eth.sendTransaction(tx);
 
       return resolve({ success: true });
+    } catch (e) {
+      return reject();
+    }
+  });
+
+export const allowance = (asset_address, spender, contract_type = 1) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        provider = await web3Modal.connect();
+        window.location.reload();
+      }
+
+      const web3 = new Web3(provider);
+
+      const contract_data = await readContractABI(contract_type);
+      const current_address = await getCurrentWalletAddress();
+
+      const mContract = new web3.eth.Contract(contract_data, asset_address);
+
+      const balance = await mContract.methods
+        .allowance(current_address, spender)
+        .call();
+
+      return resolve(balance);
     } catch (e) {
       return reject();
     }
@@ -718,9 +767,9 @@ export const transferCustomCrypto = async (
       await contract.methods
         .transfer(
           toAddress,
-          web3.utils.toBN(
-            BigNumber(amount).times(BigNumber(10).pow(CURRENCYDECIMAL))
-          )
+          web3.utils
+            .toBN(BigNumber(amount).times(BigNumber(10).pow(CURRENCYDECIMAL)))
+            .toNumber()
         )
         .send({ from: wallet_address, to: cr2TokenAddress, gas: 300000 });
 

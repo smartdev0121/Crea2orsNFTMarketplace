@@ -15,7 +15,13 @@ import MBuyNFTDialog from "src/components/MBuyNFTDialog";
 import styled from "styled-components";
 import { AccountTree } from "@mui/icons-material";
 import { useState } from "react";
-import { mintAsset, getTokenBalance, approve } from "src/utils/contract";
+import {
+  mintAsset,
+  getTokenBalance,
+  approve,
+  allowance,
+  transferCustomCrypto,
+} from "src/utils/contract";
 import { CONTRACT_TYPE } from "src/config/global";
 import { useDispatch, useSelector } from "react-redux";
 import { nftMinted } from "src/store/order/actions";
@@ -49,15 +55,7 @@ const MintStatus = (props) => {
 
   const mintNFT = async (index) => {
     const amount = 1;
-    const metaData = {
-      tokenId: creator.nfts.nft_id,
-      metaUri: creator.nfts.metadata_url,
-      mintCount: amount,
-      mintPrice: creator.price,
-      initialSupply: creator.nfts.batch_size,
-      royaltyFee: creator.nfts.royalty_fee,
-      royaltyAddress: creator.user.wallet_address,
-    };
+
     const balance = await getTokenBalance(
       currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
     );
@@ -83,6 +81,13 @@ const MintStatus = (props) => {
       return;
     }
 
+    const allowanceAmount = await allowance(
+      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+      props.contractAddress
+    );
+
+    console.log("Allowance", allowanceAmount);
+
     var loading_screen = pleaseWait({
       logo: "/favicon.ico",
       backgroundColor: "#343434",
@@ -98,19 +103,28 @@ const MintStatus = (props) => {
     });
 
     try {
+      const metaData = {
+        tokenId: creator.nfts.nft_id,
+        metaUri: creator.nfts.metadata_url,
+        mintCount: amount,
+        mintPrice: creator.price,
+        initialSupply: creator.nfts.batch_size,
+        royaltyFee: creator.nfts.royalty_fee,
+        royaltyAddress: creator.user.wallet_address,
+      };
+
       const result = await mintAsset(
         CONTRACT_TYPE.ERC1155,
         props.contractAddress,
         metaData
       );
 
-      // const cr2Result = await transferCustomCrypto(
-      //   currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
-      //   creator.user.wallet_address,
-      //   Number(creator.price)
-      // );
-
-      if (result) {
+      const cr2Result = await transferCustomCrypto(
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+        creator.user.wallet_address,
+        Number(creator.price)
+      );
+      if (result && cr2Result) {
         dispatch(nftMinted(creator.id, Number(amount)));
       }
       loading_screen.finish();

@@ -57,7 +57,7 @@ export default function CreateNFTPage(props) {
   const hiddenFileInput = React.useRef(null);
   const dispatch = useDispatch();
   const isMinting = useSelector((state) => getSpinner(state, "NFT_MINTING"));
-
+  console.log("Result", String(file?.type).split("/")[0]);
   const useDisplayImage = () => {
     const uploader = (e) => {
       const imageFile = e.target.files[0];
@@ -222,7 +222,16 @@ export default function CreateNFTPage(props) {
                           accept=".PNG, .GIF, .WEBP, .MP4, .MP3, .jpg, .jpeg"
                         />
                         {result ? (
-                          <img src={result || ""} className="viewport" />
+                          <div>
+                            {String(file?.type).split("/")[0] == "image" && (
+                              <img src={result || ""} className="viewport" />
+                            )}
+                            {String(file?.type).split("/")[0] == "video" && (
+                              <video width="600" controls className="viewport">
+                                <source src={URL.createObjectURL(file)} />
+                              </video>
+                            )}
+                          </div>
                         ) : (
                           <>
                             <h6 className="grey-txt multi-txt">
@@ -422,7 +431,16 @@ export default function CreateNFTPage(props) {
                     <Box>
                       <div className="preview-part">
                         {result ? (
-                          <img src={result || ""} className="viewport" />
+                          <div>
+                            {String(file?.type).split("/")[0] == "image" && (
+                              <img src={result || ""} className="viewport" />
+                            )}
+                            {String(file?.type).split("/")[0] == "video" && (
+                              <video width="600" controls className="viewport">
+                                <source src={URL.createObjectURL(file)} />
+                              </video>
+                            )}
+                          </div>
                         ) : (
                           <h6 className="grey-txt">
                             Upload file to preview your brand new NFT

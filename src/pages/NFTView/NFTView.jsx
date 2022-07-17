@@ -39,18 +39,21 @@ import MSpinner from "src/components/MSpinner";
 import MintStatus from "./MintStatus";
 const NFTView = (props) => {
   const { nftId } = props.match.params;
+  const [blob, setBlob] = useState();
   const dispatch = useDispatch();
   const nftInfo = useSelector((state) => state.contract.nftInfo);
   const userInfo = useSelector((state) => state.profile);
   const [curUserAmount, setCurUserAmount] = useState(0);
   const isMaking = useSelector((state) => getSpinner(state, "MAKING_ORDER"));
   const [open, setOpen] = React.useState(false);
-
-  useEffect(() => {
+  console.log(blob);
+  useEffect(async () => {
     dispatch(getNFTInformation(nftId));
   }, []);
 
-  useEffect(() => {
+  useEffect(async () => {
+    let blobIns = await fetch(nftInfo?.fileUrl).then((r) => r.blob());
+    setBlob(blobIns);
     nftInfo.owners?.forEach((item) => {
       item.user_id == userInfo.id && setCurUserAmount(item.amount);
     });
@@ -71,7 +74,15 @@ const NFTView = (props) => {
           <Grid item xs={5}>
             <div className="left-side">
               <div className="asset-view">
-                <img src={nftInfo.fileUrl || "/images/home/visual.png"} />
+                {String(blob?.type).split("/")[0] == "image" && (
+                  <img src={nftInfo.fileUrl || "/images/home/visual.png"} />
+                )}
+                {String(blob?.type).split("/")[0] == "video" && (
+                  <video width="100%" controls>
+                    <source src={nftInfo.fileUrl} />
+                  </video>
+                )}
+
                 <div className="control-part">
                   <IconButton sx={{ color: "yellow" }}>
                     <Pause />
