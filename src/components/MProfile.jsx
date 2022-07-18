@@ -28,7 +28,11 @@ const AccountMenu = (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const dispatch = useDispatch();
+  const profile = useSelector((state) => state.profile);
+
+  console.log(profile);
   const avatarUrl = useSelector((state) => state.profile?.avatar_url);
+  const customUrl = useSelector((state) => state.profile?.customUrl);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -91,7 +95,7 @@ const AccountMenu = (props) => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MProfileLink to="/my-profile">
+        <MProfileLink to={`/user/${customUrl}`}>
           <MenuItem>
             <ListItemIcon>
               <ManageAccounts fontSize="small" />

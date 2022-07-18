@@ -58,6 +58,7 @@ export const getContractUri = (contractAddress) => (dispatch) => {
           id: res.id,
           userId: res.userId,
           nfts: res.nfts,
+          tokenLimit: res.tokenLimit,
         },
       });
     })

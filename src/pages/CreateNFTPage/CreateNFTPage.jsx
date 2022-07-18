@@ -1,42 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Container,
   Switch,
   Stack,
-  ToggleButton,
-  TextField,
   FormControl,
   Button,
   IconButton,
-  Input,
-  InputLabel,
   InputAdornment,
   FormHelperText,
 } from "@mui/material";
 import { Form, Field } from "react-final-form";
-import { CONTRACT_TYPE } from "src/config/global";
-import MFileInput from "../../components/MInput/MFileInput";
-import {
-  LocalOffer,
-  AllInclusive,
-  DeleteForever,
-  Add,
-  Public,
-  HelpOutline,
-} from "@mui/icons-material";
+import { DeleteForever, Add, HelpOutline } from "@mui/icons-material";
 import MTextField from "../../components/MInput/MTextField";
 import MColorButtonView from "../../components/MInput/MColorButtonView";
 import MSpinner from "src/components/MSpinner";
-import { MPanButton } from "../../components/MButtons/MPanButton";
 import { useDispatch, useSelector } from "react-redux";
 import { showNotify } from "src/utils/notify";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { showSpinner, hideSpinner } from "src/store/app/actions";
 import { getSpinner } from "src/store/app/reducer";
-import { saveNFT } from "src/store/contract/actions";
+import { saveNFT, getContractUri } from "src/store/contract/actions";
 import { createNFT, createVoucher } from "src/utils/contract";
 import { getCurrentWalletAddress } from "../../utils/wallet";
 import styled from "styled-components";
@@ -44,20 +26,28 @@ import { formValidation } from "./form-validation";
 import { pleaseWait } from "please-wait";
 import "./CreateNFTPage.scss";
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function CreateNFTPage(props) {
+  const newCollectionInfo = useSelector(
+    (state) => state.contract.collectionInfo
+  );
+  console.log(newCollectionInfo);
   const { contractAddress, contractId } = props.match.params;
   const [file, setFile] = React.useState(null);
   const [formInitialValues, setFormInitialValues] = React.useState({});
   const [result, setResult] = React.useState(null);
-  const [saleStatus, setSaleStatus] = React.useState(true);
-  const [value, setValue] = React.useState(new Date());
   const [show, setShow] = React.useState(false);
   const [property, setProperty] = React.useState([0]);
   const [isPut, setIsPut] = React.useState(true);
   const hiddenFileInput = React.useRef(null);
   const dispatch = useDispatch();
   const isMinting = useSelector((state) => getSpinner(state, "NFT_MINTING"));
-  console.log("Result", String(file?.type).split("/")[0]);
+
+  useEffect(async () => {
+    dispatch(getContractUri(contractAddress));
+  }, []);
+
   const useDisplayImage = () => {
     const uploader = (e) => {
       const imageFile = e.target.files[0];
@@ -99,6 +89,12 @@ export default function CreateNFTPage(props) {
   };
 
   const onSubmit = async (values) => {
+    await sleep(3000);
+    if (newCollectionInfo.tokenLimit <= newCollectionInfo.nfts.length) {
+      showNotify("Congratulation!. You created all NFTs of your collection.");
+      props.history.push("/");
+      return;
+    }
     let traits = [];
 
     traits = property.map((item) => {
@@ -117,8 +113,6 @@ export default function CreateNFTPage(props) {
       file: file,
       traits,
     };
-
-    console.log(metaData);
 
     try {
       var loading_screen = pleaseWait({
@@ -160,20 +154,38 @@ export default function CreateNFTPage(props) {
             curWalletAddress
           )
         );
-        window.location.reload(false);
+        console.log(
+          newCollectionInfo.tokenLimit,
+          newCollectionInfo.nfts.length
+        );
+        if (newCollectionInfo.tokenLimit <= newCollectionInfo.nfts.length) {
+          showNotify(
+            "Congratulation!. You created all NFTs of your collection."
+          );
+          props.history.push("/");
+          loading_screen.finish();
+          setResult(undefined);
+          setFile(null);
+          return;
+        }
+
+        // window.location.reload(false);
       } else {
         showNotify("Error is occured on minting!", "error");
       }
 
-      // dispatch(hideSpinner("NFT_MINTING"));
       loading_screen.finish();
+      setResult(undefined);
+      setFile(null);
+      dispatch(getContractUri(contractAddress));
     } catch (err) {
       showNotify(
         "You can't mint your nft by some issue, confirm input values and try again!",
         "error"
       );
-      // dispatch(hideSpinner("NFT_MINTING"));
       loading_screen.finish();
+      setResult(undefined);
+      setFile(null);
     }
   };
   return (
@@ -185,16 +197,23 @@ export default function CreateNFTPage(props) {
       >
         <MBox>
           <div className="title">
-            <h1 className="text">Create NFT-Collectible 1</h1>
+            <h1 className="text">
+              Create NFT-Collectible {newCollectionInfo?.nfts?.length + 1}
+            </h1>
           </div>
           <Form
             onSubmit={onSubmit}
-            initialValues={{ formInitialValues }}
-            initialValuesEqual={() => true}
             validate={(values) => formValidation.validateForm(values)}
-            render={({ handleSubmit, submitting, form, values, pristine }) => {
+            render={({ handleSubmit, reset, form, values }) => {
               return (
-                <form onSubmit={handleSubmit} noValidate>
+                <form
+                  onSubmit={async (event) => {
+                    const error = await handleSubmit(event);
+                    console.log("Form submit error", error);
+                    if (error) return error;
+                    form.reset();
+                  }}
+                >
                   <MFlexBox
                     direction="row"
                     sx={{ flexWrap: "wrap" }}

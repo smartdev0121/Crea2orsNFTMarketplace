@@ -45,6 +45,7 @@ const CreateCollectionPage = (props) => {
   const collectionPreview = useSelector(
     (state) => state.contract.collectionPreview
   );
+
   const [inputValues, setInputValues] = useState(
     collectionPreview || {
       collectionName: "",

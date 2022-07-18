@@ -80,7 +80,7 @@ export const setUserInfo = (data, history) => {
         dispatch({ type: types.SET_USER_INFO, payload: res });
         dispatch(updateProfile(res));
         showNotify("Profile information is successfully updated");
-        history.push("/my-profile");
+        history.push(`/user/${res.customUrl}`);
       })
       .catch((res) => {
         if (res.email)
