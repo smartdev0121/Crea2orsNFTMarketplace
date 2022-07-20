@@ -379,7 +379,7 @@ const MyProfile = (props) => {
         </div>
       </section>
       <section className="tab-bar">
-        <ProfileTab />
+        <ProfileTab history={props.history} />
       </section>
     </Container>
   );

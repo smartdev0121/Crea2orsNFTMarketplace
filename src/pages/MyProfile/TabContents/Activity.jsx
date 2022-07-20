@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import InputLabel from "@mui/material/InputLabel";
@@ -7,26 +7,65 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import InputBase from "@mui/material/InputBase";
 import { Loyalty } from "@mui/icons-material";
+import { useSelector, useDispatch } from "react-redux";
+import { getActivity } from "src/store/profile/actions";
+import Chip from "@mui/material/Chip";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import ImageIcon from "@mui/icons-material/Image";
+import WorkIcon from "@mui/icons-material/Work";
+import Diamond from "@mui/icons-material/Diamond";
+import BeachAccessIcon from "@mui/icons-material/BeachAccess";
 
 const Activity = () => {
-  const [age, setAge] = React.useState(10);
+  const dispatch = useDispatch();
+  const activities = useSelector((state) => state.profile?.activity);
+  console.log("Activit", activities);
+  useEffect(() => {
+    dispatch(getActivity());
+  }, []);
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
   return (
     <div className="filter-bowl">
       <div className="act-content">
-        <section className="content">
-          <h4>Nothing yet</h4>
-          <p>Looks like there's still nothing. Activity will be shown here</p>
-          <div className="button-container">
-            <BrowseButton>Explore Crea2ors</BrowseButton>
-          </div>
-        </section>
+        {activities ? (
+          <List dense>
+            {activities.map((item, index) => {
+              const time = item.createdAt;
+              return (
+                <ListItem
+                  disablePadding
+                  key={"Owner" + index}
+                  secondaryAction={<Chip icon={<Diamond />} label={time} />}
+                >
+                  <ListItemAvatar>
+                    <Avatar>
+                      <img src={item?.image_url} />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={item?.type + " " + item?.target}
+                    secondary={item?.to_address || ""}
+                  />
+                </ListItem>
+              );
+            })}
+          </List>
+        ) : (
+          <section className="content">
+            <h4>Nothing yet</h4>
+            <p>Looks like there's still nothing. Activity will be shown here</p>
+            <div className="button-container">
+              <BrowseButton>Explore Crea2ors</BrowseButton>
+            </div>
+          </section>
+        )}
       </div>
 
-      <section className="filter-container">
+      {/* <section className="filter-container">
         <h4>Filters</h4>
         <div className="filter-btn-container">
           <BarButton>
@@ -62,7 +101,7 @@ const Activity = () => {
             &nbsp;Followings
           </BarButton>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };
