@@ -58,6 +58,7 @@ const NFTView = (props) => {
       item.user_id == userInfo.id && setCurUserAmount(item.amount);
     });
   }, [nftInfo]);
+
   const handleClickOpen = () => {
     setOpen(true);
   };

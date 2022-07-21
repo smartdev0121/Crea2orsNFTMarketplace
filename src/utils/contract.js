@@ -301,6 +301,7 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
       const contract = new web3.eth.Contract(contract_data, contract_address);
 
       console.log(
+        typeof wallet_address,
         wallet_address,
         metadata.tokenId,
         metadata.metaUri,
@@ -734,7 +735,7 @@ export const getTokenBalance = async (address) => {
     const web3 = new Web3(provider);
     const contract_data = await readContractABI(CONTRACT_TYPE.ERC20);
     const wallet_address = await getCurrentWalletAddress();
-
+    console.log(address, wallet_address);
     const contract = new web3.eth.Contract(contract_data, address);
     console.log(contract);
     const balance = await contract.methods.balanceOf(wallet_address).call();

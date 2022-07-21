@@ -73,13 +73,11 @@ export const saveNFT =
     metaData,
     metaDataUri,
     fileUri,
-    history,
     price,
     signature,
-    // nftId,
     curWalletAddress
   ) =>
-  (dispatch) => {
+  async (dispatch) => {
     return api
       .post("/create-nft", {
         contractId,
@@ -87,7 +85,6 @@ export const saveNFT =
         metaDataUri,
         fileUri,
         price,
-        // nftId,
         signature,
         curWalletAddress,
       })

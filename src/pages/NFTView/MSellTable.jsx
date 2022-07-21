@@ -117,8 +117,6 @@ export default function CustomizedTables(props) {
       CONTRACT_TYPE.ERC20
     );
 
-    alert(approveResult);
-
     try {
       const result = await transferNFT(
         contractAddress,

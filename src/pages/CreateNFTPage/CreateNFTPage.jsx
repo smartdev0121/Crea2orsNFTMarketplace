@@ -40,6 +40,7 @@ export default function CreateNFTPage(props) {
   const [show, setShow] = React.useState(false);
   const [property, setProperty] = React.useState([0]);
   const [isPut, setIsPut] = React.useState(true);
+  const [nftNumber, setNftNumber] = React.useState(1);
   const hiddenFileInput = React.useRef(null);
   const dispatch = useDispatch();
   const isMinting = useSelector((state) => getSpinner(state, "NFT_MINTING"));
@@ -47,6 +48,10 @@ export default function CreateNFTPage(props) {
   useEffect(async () => {
     dispatch(getContractUri(contractAddress));
   }, []);
+
+  useEffect(() => {
+    setNftNumber(newCollectionInfo?.nfts?.length + 1);
+  }, [newCollectionInfo]);
 
   const useDisplayImage = () => {
     const uploader = (e) => {
@@ -148,7 +153,6 @@ export default function CreateNFTPage(props) {
             metaData,
             metaDataUri,
             fileUri,
-            props.history,
             values?.price ? values.price : -1,
             signature,
             curWalletAddress
@@ -158,7 +162,7 @@ export default function CreateNFTPage(props) {
           newCollectionInfo.tokenLimit,
           newCollectionInfo.nfts.length
         );
-        if (newCollectionInfo.tokenLimit <= newCollectionInfo.nfts.length) {
+        if (newCollectionInfo.tokenLimit <= newCollectionInfo.nfts.length + 1) {
           showNotify(
             "Congratulation!. You created all NFTs of your collection."
           );
@@ -197,9 +201,7 @@ export default function CreateNFTPage(props) {
       >
         <MBox>
           <div className="title">
-            <h1 className="text">
-              Create NFT-Collectible {newCollectionInfo?.nfts?.length + 1}
-            </h1>
+            <h1 className="text">Create NFT-Collectible {nftNumber}</h1>
           </div>
           <Form
             onSubmit={onSubmit}
