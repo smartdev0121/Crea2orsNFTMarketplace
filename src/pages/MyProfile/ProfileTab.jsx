@@ -11,7 +11,7 @@ import Created from "./TabContents/Created";
 import Owned from "./TabContents/Owned";
 
 const tablist = ["On Sale", "Owned", "Created", "Collections", "Activity"];
-export default function LabTabs() {
+export default function LabTabs(props) {
   const [value, setValue] = React.useState("1");
 
   const handleChange = (event, newValue) => {
@@ -53,7 +53,7 @@ export default function LabTabs() {
           </TabList>
         </Box>
         <TabPanel value="0" sx={{ paddingLeft: "0px", color: "white" }}>
-          <OnSale />
+          <OnSale history={props.history} />
         </TabPanel>
         <TabPanel value="1" sx={{ paddingLeft: "0px", color: "white" }}>
           <Owned />

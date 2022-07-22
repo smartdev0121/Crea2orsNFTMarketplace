@@ -83,7 +83,6 @@ export const orderFinialized = (orderId, amount, userId) => (dispatch) => {
   return api
     .post("/order-finalized", { orderId, userId, amount })
     .then((res) => {
-      console.log(res);
       dispatch({ type: "NFT_FETCHED", payload: res.nftInfo });
     })
     .catch((err) => {

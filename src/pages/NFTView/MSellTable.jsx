@@ -23,15 +23,22 @@ import { holdEvent, getValuefromEvent } from "src/utils/order";
 import { currencyTokenAddress } from "src/config/contracts";
 import { orderFinialized, bidPlaced } from "src/store/order/actions";
 import MBidDialog from "./MBidDialog";
-import "dotenv/config";
-import { transferNFT } from "src/utils/contract";
+import {
+  transferNFT,
+  getTokenBalance,
+  allowance,
+  approve,
+} from "src/utils/contract";
 import { marketplace_contract_address } from "src/config/contracts";
+import { showNotify } from "src/utils/notify";
+import { CONTRACT_TYPE } from "src/config/global";
+import { pleaseWait } from "please-wait";
+import "dotenv/config";
 
 export default function CustomizedTables(props) {
   const dispatch = useDispatch();
   const ordersData = useSelector((state) => state.orders);
   const profile = useSelector((state) => state.profile);
-  console.log("MSellTable>>>", profile);
   const [confirmStatus, setConfirmStatus] = React.useState(false);
   const contractAddress = props.contractAddress;
   const [bidDlgOpen, setBidDlgOpen] = React.useState(false);
@@ -57,14 +64,6 @@ export default function CustomizedTables(props) {
       BuyerPrice: ordersData[id].price,
       CurrencyTokenDecimals: 9,
     };
-
-    // const result = await cancelListing(OrderState);
-    // if (result) {
-    //   const mContractAddress = await getMarketplaceContractAddress();
-    //   const event = await holdEvent("OrderCancelled", mContractAddress);
-    //   const values = await getValuefromEvent(event);
-    //   dispatch(canceledOrder(ordersData[id].id));
-    // }
     dispatch(canceledOrder(ordersData[id].id));
   };
 
@@ -79,17 +78,71 @@ export default function CustomizedTables(props) {
   };
 
   const buyOrder = async (id) => {
+    var loading_screen = pleaseWait({
+      logo: "/favicon.ico",
+      backgroundColor: "#343434",
+      loadingHtml: `<div class="spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
+      <div>
+        <h4 class="wait-text">Buying NFT ...</h4>
+      </div>`,
+      transitionSupport: false,
+    });
     const amount = 1;
-    const result = await transferNFT(
-      contractAddress,
-      ordersData[id].maker_address,
-      ordersData[id].nfts.nft_id,
-      amount,
-      marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID]
+
+    const balance = await getTokenBalance(
+      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
     );
 
-    if (result) {
-      dispatch(orderFinialized(ordersData[id].id, Number(amount), profile.id));
+    console.log("CR2 balance", balance);
+
+    if (!balance) {
+      showNotify(
+        "An error occurred while obtaining your CR2 wallet balance",
+        "error"
+      );
+      return;
+    } else if (balance < ordersData[id].price) {
+      showNotify("Your CR2 balance is less than the NFT mint price", "warning");
+      return;
+    }
+
+    const approveResult = await approve(
+      marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+      ordersData[id].price,
+      CONTRACT_TYPE.ERC20
+    );
+
+    try {
+      const result = await transferNFT(
+        contractAddress,
+        ordersData[id].maker_address,
+        ordersData[id].nfts.nft_id,
+        amount,
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+        ordersData[id].price
+      );
+
+      if (result) {
+        dispatch(
+          orderFinialized(ordersData[id].id, Number(amount), profile.id)
+        );
+      }
+      loading_screen.finish();
+    } catch (err) {
+      const allowanceAmount = await allowance(
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID]
+      );
+
+      console.log("Allowance", allowanceAmount);
+
+      console.log(err);
+      loading_screen.finish();
     }
   };
 
@@ -114,7 +167,8 @@ export default function CustomizedTables(props) {
       OrderType: ordersData[id].orderType,
       Buyer: ordersData[id].creatorAddress,
       BuyerPrice: ordersData[id].price,
-      CurrencyTokenAddress: currencyTokenAddress,
+      CurrencyTokenAddress:
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
       CurrencyDecimals: 9,
     };
     const result = await placeBid(OrderState, Number(bidPrice));

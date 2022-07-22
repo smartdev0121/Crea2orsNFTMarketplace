@@ -50,7 +50,6 @@ const HeaderContent = () => {
     try {
       await showWeb3WalletModal();
       const curAddress = await getCurrentWalletAddress();
-      console.log(curAddress);
       if (curAddress) {
         dispatch(connectedWallet(curAddress));
       }

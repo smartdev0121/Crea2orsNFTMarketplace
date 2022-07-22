@@ -22,11 +22,8 @@ const store = buildStore(history, {});
 
 const connectCacheWallet = () => {
   return new Promise(async (resolve, reject) => {
-    console.log(3);
-
     if (getCachedProvider()) {
       let curAddress = "";
-      console.log("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ");
       try {
         curAddress = await getCurrentWalletAddress();
         await store.dispatch(connectedWallet(curAddress));

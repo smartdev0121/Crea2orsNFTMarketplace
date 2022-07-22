@@ -1,38 +1,43 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import InputBase from "@mui/material/InputBase";
-import {
-  Web,
-  Widgets,
-  Category,
-  MonetizationOn,
-  MobiledataOff,
-} from "@mui/icons-material";
+import { useSelector, useDispatch } from "react-redux";
+import { getUserCollections } from "src/store/contract/actions";
+import { MFlexBox } from "src/components/MLayout";
+import MCollectionCard from "src/components/MCards/MCollectionCard";
 
 const Collections = () => {
-  const [age, setAge] = React.useState(10);
+  const dispatch = useDispatch();
+  const myCollections = useSelector((state) => state.contract.myCollections);
+  useEffect(() => {
+    dispatch(getUserCollections());
+  }, []);
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
   return (
     <div className="tab-container">
-      <section className="content">
-        <h4>No collections found</h4>
-        <p>
-          We couldn't find any of your collections. Looks like you don't have
-          any
-        </p>
-        <div className="button-container">
-          <BrowseButton>Create a collection</BrowseButton>
-          <ImportButton>Import an existing</ImportButton>
-        </div>
-      </section>
+      {myCollections.length == 0 ? (
+        <section className="content">
+          <h4>No collections found</h4>
+          <p>
+            We couldn't find any of your collections. Looks like you don't have
+            any
+          </p>
+          <div className="button-container">
+            <BrowseButton>Create a collection</BrowseButton>
+            <ImportButton>Import an existing</ImportButton>
+          </div>
+        </section>
+      ) : (
+        <MFlexBox>
+          {myCollections.map((item, index) => {
+            return (
+              <div data-aos="fade-up">
+                <MCollectionCard data={item} key={item.id + index} />
+              </div>
+            );
+          })}
+        </MFlexBox>
+      )}
     </div>
   );
 };

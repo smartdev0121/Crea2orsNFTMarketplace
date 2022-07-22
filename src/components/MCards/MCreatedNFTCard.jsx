@@ -15,7 +15,6 @@ import { Link } from "react-router-dom";
 
 const MNFTCard = (props) => {
   const { data, isLoading } = props;
-  console.log("Item", data);
   const onNftClicked = (index) => {
     props.history.push(`/nft-view/${index}`);
   };
@@ -36,10 +35,7 @@ const MNFTCard = (props) => {
             <MImg src={data?.nfts?.file_url}></MImg>
           )}
 
-          <MChip
-            icon={<Diamond />}
-            label={data?.amount + "/" + data?.nfts?.batch_size}
-          />
+          <MChip icon={<Diamond />} label={data?.nfts?.batch_size} />
         </Grid>
       </Grid>
     </CardContainer>

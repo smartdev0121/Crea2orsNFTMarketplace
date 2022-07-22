@@ -16,6 +16,19 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "cr2ContractAddress",
+				"type": "address"
+			}
+		],
+		"name": "setCr2ContractInstance",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "collectionAddress",
 				"type": "address"
 			},
@@ -37,6 +50,11 @@
 			{
 				"internalType": "uint256",
 				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "fund",
 				"type": "uint256"
 			}
 		],

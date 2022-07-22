@@ -31,7 +31,8 @@ import { orderCreated } from "src/store/order/actions";
 import { showNotify } from "../../utils/notify";
 import { useSelector } from "react-redux";
 import { marketplace_contract_address } from "src/config/contracts";
-import "dotenv/config"
+import { pleaseWait } from "please-wait";
+import "dotenv/config";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -59,65 +60,49 @@ const SaleDialog = (props) => {
   };
 
   const onSubmit = async (values) => {
-    const curTime = new Date().getTime();
-    console.log("current", curTime);
-    try {
-      dispatch(showSpinner("MAKING_ORDER"));
-
-      if (value == 0) {
-        const orderData = {
-          maker_address: userProfile.walletAddress,
-          user_id: userProfile.id,
-          nftTokenId: props.tokenId,
-          nftDbId: props.nftId,
-          amount: values.quantity,
-          price: values.price,
-        };
-
-        const result = await approveToken(
-          props.contractAddress,
-          marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
-          props.tokenId,
-          values.quantity
-        );
-        console.log(result);
-
-        result
-          ? dispatch(orderCreated(orderData))
-          : showNotify("Error occured in approving tokens", "error");
-      } else if (value == 1) {
-        const { result, marketPlaceContractAddress } = await createOrder(
-          0,
-          props.contractAddress,
-          props.tokenId,
-          Number(values.quantity),
-          Number(values.price),
-          startTime.getTime(),
-          endTime.getTime(),
-          1,
-          9
-        );
-        if (result) {
-          showNotify("Your sell is successfully created!");
-          const event = await holdEvent(
-            "OrderCreated",
-            marketPlaceContractAddress
-          );
-          const orderData = await getValuefromEvent(event);
-          dispatch(orderCreated(orderData[0], props.nftId));
-        }
-      }
-
-      dispatch(hideSpinner("MAKING_ORDER"));
-    } catch (err) {
-      if (!err) {
-        showNotify("Confirm internet connection, please", "warning");
-      }
-      console.log(err);
-
-      dispatch(hideSpinner("MAKING_ORDER"));
+    if (values.quantity > props.curUserAmount) {
+      showNotify("You are exceeding amount you owned!", "warning");
+      return;
     }
+    const curTime = new Date().getTime();
+    try {
+      var loading_screen = pleaseWait({
+        logo: "/favicon.ico",
+        backgroundColor: "#343434",
+        loadingHtml: `<div class="spinner">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
+        </div>
+        <div>
+          <h4 class="wait-text">Putting the NFT on marketplace ...</h4>
+        </div>`,
+        transitionSupport: false,
+      });
+      const orderData = {
+        maker_address: userProfile.walletAddress,
+        user_id: userProfile.id,
+        nftTokenId: props.tokenId,
+        nftDbId: props.nftId,
+        amount: values.quantity,
+        price: values.price,
+      };
 
+      const result = await approveToken(
+        props.contractAddress,
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+        props.tokenId,
+        values.quantity
+      );
+
+      result
+        ? dispatch(orderCreated(orderData))
+        : showNotify("Error occured in approving tokens", "error");
+      loading_screen.finish();
+    } catch (err) {
+      console.log(err);
+      loading_screen.finish();
+    }
     props.onClose();
   };
   const required = (value) => {

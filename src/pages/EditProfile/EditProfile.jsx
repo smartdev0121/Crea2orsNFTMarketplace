@@ -34,8 +34,8 @@ const EditProfile = (props) => {
   const [sidebarTop, setSidebarTop] = useState(undefined);
   const [email, setEmail] = useState();
   const [boxBottom, setBoxBottom] = useState(undefined);
-  const [resizedImage, setResizedImage] = useState(null);
   const userInfo = useSelector((state) => state.users.userInfo);
+  console.log("USeromf", userInfo);
   const hiddenFileInput = React.useRef(null);
   const [confirmedFile, setConfirmedFile] = useState(undefined);
   const [handled, setHandled] = useState(false);
@@ -113,7 +113,6 @@ const EditProfile = (props) => {
 
   const onSubmit = (values) => {
     const data = new FormData();
-    console.log("Profile image", file, confirmedFile);
     data.append("name", "Image Upload");
     data.append("nick_name", values.nickName);
     data.append("file_attachment", file);
@@ -268,7 +267,7 @@ const EditProfile = (props) => {
                     name="email"
                     label="Email"
                     onChange={onEmailChange}
-                    initialValue={email}
+                    initialValue={email == "null" ? "" : email}
                     variant="standard"
                     placeholder="Enter your email address"
                     InputLabelProps={{ shrink: true }}

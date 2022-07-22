@@ -1,68 +1,147 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import InputBase from "@mui/material/InputBase";
-import {
-  Web,
-  Widgets,
-  Category,
-  MonetizationOn,
-  MobiledataOff,
-} from "@mui/icons-material";
+import { useSelector, useDispatch } from "react-redux";
+import { getUserCollections } from "src/store/contract/actions";
+import { fetchOnSaleData } from "src/store/profile/actions";
+import MProfileNFTCard from "src/components/MCards/MProfileNFTCard";
 
-const OnSale = () => {
-  const [age, setAge] = React.useState(10);
+const OnSale = (props) => {
+  const myCollections = useSelector((state) => state.contract.myCollections);
+  const saleRawDatas = useSelector((state) => state.profile?.saleDatas);
+  const [saleDatas, setSaleDatas] = React.useState();
+  console.log("saleDatas", saleDatas);
+  const [category, setCategory] = React.useState(-1);
+  const [collection, setCollection] = React.useState(-1);
+  const dispatch = useDispatch();
+  console.log("collectioninfo", myCollections);
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
+  useEffect(() => {
+    dispatch(getUserCollections());
+    dispatch(fetchOnSaleData(-1, -1));
+  }, []);
+
+  useEffect(() => {
+    setSaleDatas(saleRawDatas);
+  }, [saleRawDatas]);
+
+  const handleChange = (event, type) => {
+    console.log(type);
+    switch (type) {
+      case "category":
+        setCategory(event.target.value);
+        console.log(event.target.value, collection);
+
+        event.target.value == -1
+          ? setSaleDatas(
+              collection == -1
+                ? saleRawDatas
+                : saleRawDatas.filter(
+                    (item) =>
+                      myCollections[collection].id == item.nfts.contractId
+                  )
+            )
+          : setSaleDatas(
+              collection == -1
+                ? saleRawDatas.filter((item) => {
+                    return Number(item.category_id) == event.target.value;
+                  })
+                : saleRawDatas.filter(
+                    (item) =>
+                      Number(item.category_id) == event.target.value &&
+                      myCollections[collection].id == item.nfts.contractId
+                  )
+            );
+        break;
+      case "collection":
+        setCollection(event.target.value);
+
+        console.log(category, event.target.value);
+        event.target.value == -1
+          ? setSaleDatas(
+              category == -1
+                ? saleRawDatas
+                : saleRawDatas.filter(
+                    (item) => category == Number(item.category_id)
+                  )
+            )
+          : setSaleDatas(
+              category == -1
+                ? saleRawDatas.filter(
+                    (item, index) =>
+                      item.nfts.contractId ==
+                      myCollections[event.target.value]?.id
+                  )
+                : saleRawDatas.filter(
+                    (item, index) =>
+                      item.nfts.contractId ==
+                        myCollections[event.target.value]?.id &&
+                      category == Number(item.category_id)
+                  )
+            );
+        break;
+      default:
+        break;
+    }
   };
   return (
     <div className="tab-container">
       <section className="button-bar">
         <div>
-          <BarButton className="edit-btn">
-            <Web sx={{ fontSize: "14px" }} />
-            &nbsp;Blockchain
-          </BarButton>
-          <BarButton className="edit-btn">
-            <Widgets sx={{ fontSize: "14px" }} />
-            &nbsp;Category
-          </BarButton>
-          <BarButton className="edit-btn">
-            <Category sx={{ fontSize: "14px" }} />
-            &nbsp;Collection
-          </BarButton>
-          <BarButton className="edit-btn">
-            <MonetizationOn sx={{ fontSize: "14px" }} />
-            &nbsp;Price range
-          </BarButton>
-        </div>
-        <FormControl size="small">
           <BarSelect
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={age}
-            label="Age"
-            onChange={handleChange}
+            className="edit-btn"
+            value={category}
+            onChange={(eve) => handleChange(eve, "category")}
           >
-            <MenuItem value={10}>Recently Added</MenuItem>
-            <MenuItem value={20}>Price: Low to High</MenuItem>
-            <MenuItem value={30}>Price: High to Low</MenuItem>
-            <MenuItem value={30}>Auction ending soon</MenuItem>
+            <MenuItem value={-1}>Category</MenuItem>
+            <MenuItem value={0}>Art</MenuItem>
+            <MenuItem value={1}>Music</MenuItem>
+            <MenuItem value={2}>Ticket</MenuItem>
+            <MenuItem value={3}>Community</MenuItem>
+            <MenuItem value={4}>Moments</MenuItem>
+            <MenuItem value={5}>Asset</MenuItem>
           </BarSelect>
-        </FormControl>
+          <BarSelect
+            className="edit-btn"
+            value={collection}
+            onChange={(eve) => handleChange(eve, "collection")}
+          >
+            <MenuItem value={-1}>{"Collection"}</MenuItem>
+            {myCollections.map((item, index) => {
+              return (
+                <MenuItem value={index} key={item.id + "collection"}>
+                  {item.name}
+                </MenuItem>
+              );
+            })}
+          </BarSelect>
+        </div>
       </section>
-      <section className="content">
-        <h4>No items found</h4>
-        <p>
-          Come back soon! Or try to browse something for you on our marketplace
-        </p>
-        <BrowseButton>Browse marketplace</BrowseButton>
-      </section>
+      {!saleDatas ? (
+        <section className="content">
+          <h4>No items found</h4>
+          <p>
+            Come back soon! Or try to browse something for you on our
+            marketplace
+          </p>
+          <BrowseButton>Browse marketplace</BrowseButton>
+        </section>
+      ) : (
+        <section className="item-bucket">
+          {saleDatas.map((item, index) => (
+            <MProfileNFTCard
+              history={props.history}
+              data={item}
+              isLoading={false}
+              key={"profile" + index}
+            />
+          ))}
+        </section>
+      )}
     </div>
   );
 };

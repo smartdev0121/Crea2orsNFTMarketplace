@@ -23,8 +23,6 @@ const readContractABI = async (contract_type) =>
       })
       .then((data) => {
         contract_data = JSON.parse(data);
-        console.log("AIII", contract_data);
-
         return resolve(contract_data);
       })
       .catch((e) => {
@@ -75,7 +73,6 @@ export const deployContract = (
       provider = library;
 
       const web3 = new Web3(provider);
-      console.log(web3);
       // const accounts = await web3.eth.getAccounts();
 
       const bytecode = await readContractByteCode(contract_type);
@@ -83,7 +80,6 @@ export const deployContract = (
       const contract_data = await readContractABI(contract_type);
 
       const contract = new library.eth.Contract(contract_data);
-      console.log("hereeee", contract);
 
       contract
         .deploy({
@@ -98,7 +94,6 @@ export const deployContract = (
             "success",
             8
           );
-          console.log(deployment.options.address);
 
           return resolve();
         })

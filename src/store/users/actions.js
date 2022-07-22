@@ -80,7 +80,7 @@ export const setUserInfo = (data, history) => {
         dispatch({ type: types.SET_USER_INFO, payload: res });
         dispatch(updateProfile(res));
         showNotify("Profile information is successfully updated");
-        history.push("/my-profile");
+        history.push(`/user/${res.customUrl}`);
       })
       .catch((res) => {
         if (res.email)
@@ -98,7 +98,6 @@ export const getUserInfo = (dispatch) => {
     api
       .get("/get-user-info")
       .then((res) => {
-        console.log(res);
         dispatch({ type: types.GET_USER_INFO, payload: res });
       })
       .catch((err) => {
@@ -121,7 +120,6 @@ export const createUser = (values, history) => {
         dispatch(showModal());
       })
       .catch((res) => {
-        console.log(res);
         showNotify(
           res.email
             ? "Sorry! email already exists"

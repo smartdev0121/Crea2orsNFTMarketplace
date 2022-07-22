@@ -10,25 +10,18 @@ import { MTopRadiusImg } from "src/components/MImages";
 import styled from "styled-components";
 import "./CollectionView.scss";
 import { categories } from "../CreateCollection/CreateCollectionPage";
+import { showNotify } from "src/utils/notify";
 import Slider from "./Slider";
 
 const CollectionView = (props) => {
   const newCollectionInfo = useSelector(
     (state) => state.contract.collectionInfo
   );
-  console.log(newCollectionInfo);
   const { contractAddress } = props.match.params;
+  const profile = useSelector((state) => state.profile);
   const dispatch = useDispatch();
   const [metaData, setMetaData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
 
   useEffect(async () => {
     dispatch(getContractUri(contractAddress));
@@ -45,6 +38,10 @@ const CollectionView = (props) => {
   }, [newCollectionInfo]);
 
   const onCreateNFT = () => {
+    if (newCollectionInfo.nfts.length == newCollectionInfo.tokenLimit) {
+      showNotify("You created all NFTs of you collection", "warning");
+      return;
+    }
     props.history.push(
       `/create-nft/${contractAddress}/${newCollectionInfo.id}`
     );
@@ -96,26 +93,19 @@ const CollectionView = (props) => {
         </section>
       </MBox>
       <MFlexBox>
-        {/* <Slider {...settings}>
-          {newCollectionInfo.nfts.map((item, index) => {
-            return (
-              <SwiperSlide key={item.name + index}>
-                <MNFTCard data={item}></MNFTCard>
-              </SwiperSlide>
-            );
-          })}
-        </Slider> */}
         {isLoading ? (
           <Skeleton animation="wave" width="100%" height="200px"></Skeleton>
         ) : (
           <Slider images={newCollectionInfo.nfts} history={props.history} />
         )}
       </MFlexBox>
-      <section className="create-button-part">
-        <MColorButtonView onClick={onCreateNFT}>
-          Create your NFTs
-        </MColorButtonView>
-      </section>
+      {newCollectionInfo?.userId === profile.id && (
+        <section className="create-button-part">
+          <MColorButtonView onClick={onCreateNFT}>
+            Create your NFTs
+          </MColorButtonView>
+        </section>
+      )}
     </Container>
   );
 };

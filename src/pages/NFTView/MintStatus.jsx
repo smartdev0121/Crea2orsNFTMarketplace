@@ -11,14 +11,24 @@ import {
   TableCell,
   TableContainer,
 } from "@mui/material";
+import MBuyNFTDialog from "src/components/MBuyNFTDialog";
+import styled from "styled-components";
 import { AccountTree } from "@mui/icons-material";
 import { useState } from "react";
-import styled from "styled-components";
-import { mintAsset } from "src/utils/contract";
-import MBuyNFTDialog from "src/components/MBuyNFTDialog";
+import {
+  mintAsset,
+  getTokenBalance,
+  approve,
+  allowance,
+  transferCustomCrypto,
+} from "src/utils/contract";
 import { CONTRACT_TYPE } from "src/config/global";
 import { useDispatch, useSelector } from "react-redux";
 import { nftMinted } from "src/store/order/actions";
+import { pleaseWait } from "please-wait";
+import { showNotify } from "src/utils/notify";
+import { currencyTokenAddress } from "src/config/contracts";
+import "dotenv/config";
 
 const MintStatus = (props) => {
   const creator = props.creator;
@@ -27,7 +37,6 @@ const MintStatus = (props) => {
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile);
 
-  console.log(creator);
   useEffect(() => {
     if (creator) {
       const walletAddress = String(creator.user.wallet_address);
@@ -46,21 +55,82 @@ const MintStatus = (props) => {
 
   const mintNFT = async (index) => {
     const amount = 1;
-    const metaData = {
-      tokenId: creator.nfts.nft_id,
-      metaUri: creator.nfts.metadata_url,
-      mintCount: amount,
-      initialSupply: String(creator.nfts.batch_size),
-      royaltyFee: String(creator.nfts.royalty_fee),
-      royaltyAddress: creator.user.wallet_address,
-    };
-    const result = await mintAsset(
-      CONTRACT_TYPE.ERC1155,
-      props.contractAddress,
-      metaData
+
+    const balance = await getTokenBalance(
+      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
     );
-    if (result) {
-      dispatch(nftMinted(creator.id, Number(amount)));
+    console.log("CR2 balance", balance);
+    if (!balance) {
+      showNotify(
+        "An error occurred while obtaining your CR2 wallet balance",
+        "error"
+      );
+      return;
+    } else if (balance < creator.price) {
+      showNotify("Your CR2 balance is less than the NFT mint price", "warning");
+      return;
+    }
+    const approveResult = await approve(
+      props.contractAddress,
+      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+      creator.price,
+      CONTRACT_TYPE.ERC20
+    );
+
+    if (!approveResult) {
+      return;
+    }
+
+    const allowanceAmount = await allowance(
+      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+      props.contractAddress
+    );
+
+    console.log("Allowance", allowanceAmount);
+
+    var loading_screen = pleaseWait({
+      logo: "/favicon.ico",
+      backgroundColor: "#343434",
+      loadingHtml: `<div class="spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
+      <div>
+        <h4 class="wait-text">Minting NFT ...</h4>
+      </div>`,
+      transitionSupport: false,
+    });
+
+    try {
+      const metaData = {
+        tokenId: creator.nfts.nft_id,
+        metaUri: creator.nfts.metadata_url,
+        mintCount: amount,
+        mintPrice: creator.price,
+        initialSupply: creator.nfts.batch_size,
+        royaltyFee: creator.nfts.royalty_fee,
+        royaltyAddress: creator.user.wallet_address,
+      };
+
+      const result = await mintAsset(
+        CONTRACT_TYPE.ERC1155,
+        props.contractAddress,
+        metaData
+      );
+
+      const cr2Result = await transferCustomCrypto(
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+        creator.user.wallet_address,
+        Number(creator.price)
+      );
+      if (result && cr2Result) {
+        dispatch(nftMinted(creator.id, Number(amount)));
+      }
+      loading_screen.finish();
+    } catch (err) {
+      console.log(err);
+      loading_screen.finish();
     }
   };
 
@@ -133,66 +203,6 @@ const MintStatus = (props) => {
           </TableContainer>
         </>
       )}
-
-      {/* 
-          
-            
-            {ordersData.map((row, index) => {
-              let diff = row.endTime - row.startTime;
-              
-              if (diff != 0) {
-                const curTime = Math.round(Number(new Date().getTime()) / 1000);
-                if (curTime > row.startTime) diff = row.endTime - curTime;
-              }
-              return (
-                <StyledTableRow key={"Order_table" + index}>
-                  <StyledTableCell>{row.price}CR2</StyledTableCell>
-                  <StyledTableCell>{row.amount}</StyledTableCell>
-                  <StyledTableCell>
-                    <Chip
-                      icon={
-                        <Avatar
-                          sx={{ width: 24, height: 24 }}
-                          src={
-                            process.env.REACT_APP_BACKEND_URL +
-                              row.User?.avatar_url || ""
-                          }
-                        />
-                      }
-                      label={row.user?.nickName || addressAbbr}
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    {row.user?.id == profile?.id ? (
-                      <ColorButton
-                        variant="contained"
-                        startIcon={<Cancel />}
-                        onClick={(eve) => cancelOrderClicked(eve, index)}
-                      >
-                        Cancel
-                      </ColorButton>
-                    ) : (
-                      <BuyButton
-                        variant="contained"
-                        startIcon={<ShoppingBasket />}
-                        onClick={(eve) => buyOrderClicked(eve, index)}
-                      >
-                        Buy Now
-                      </BuyButton>
-                    )}
-                  </StyledTableCell>
-                </StyledTableRow>
-              );
-            })}
-            <MBidDialog
-              open={bidDlgOpen}
-              onPlaceBid={onPlaceBid}
-              onClose={onBidDlgClose}
-              index={rowIndex}
-            />
-          </TableBody>
-        </Table>
-      </TableContainer> */}
     </>
   );
 };

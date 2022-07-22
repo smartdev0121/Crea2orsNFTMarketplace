@@ -38,7 +38,6 @@ export const saveCollection =
       .then((res) => {
         if (res.result) {
           showNotify("Contract information is successfully stored!");
-          console.log("History", history);
           history.push(`/collection-view/${contractAddress}`);
         }
       })
@@ -51,14 +50,15 @@ export const getContractUri = (contractAddress) => (dispatch) => {
   return api
     .get(`/contract/${contractAddress}`)
     .then((res) => {
-      console.log(res);
       dispatch({
         type: types.CONTRACT_DEPLOYED,
         payload: {
           contractUri: res.contractUri,
           contractAddress,
           id: res.id,
+          userId: res.userId,
           nfts: res.nfts,
+          tokenLimit: res.tokenLimit,
         },
       });
     })
@@ -73,13 +73,11 @@ export const saveNFT =
     metaData,
     metaDataUri,
     fileUri,
-    history,
     price,
     signature,
-    // nftId,
     curWalletAddress
   ) =>
-  (dispatch) => {
+  async (dispatch) => {
     return api
       .post("/create-nft", {
         contractId,
@@ -87,7 +85,6 @@ export const saveNFT =
         metaDataUri,
         fileUri,
         price,
-        // nftId,
         signature,
         curWalletAddress,
       })

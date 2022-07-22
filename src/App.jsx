@@ -10,6 +10,8 @@ import { getProfile as getProfileReducer } from "./store/profile/reducer";
 import { getSpinner } from "./store/app/reducer";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import "please-wait/build/please-wait.css";
+import "./spinner.css";
 import "./App.css";
 import "./styles/styles.css";
 

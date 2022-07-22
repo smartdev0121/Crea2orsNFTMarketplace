@@ -41,7 +41,7 @@ const routes = [
     component: AllCollections,
   },
   {
-    path: "/my-profile",
+    path: "/user/:customUrl",
     component: MyProfile,
     exact: true,
   },

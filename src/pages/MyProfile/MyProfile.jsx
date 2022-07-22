@@ -153,7 +153,6 @@ const MyProfile = (props) => {
   };
 
   const onSubmit = (content) => {
-    console.log(content);
     dispatch(reportPage(content));
     setReportOpen(false);
   };
@@ -380,7 +379,7 @@ const MyProfile = (props) => {
         </div>
       </section>
       <section className="tab-bar">
-        <ProfileTab />
+        <ProfileTab history={props.history} />
       </section>
     </Container>
   );

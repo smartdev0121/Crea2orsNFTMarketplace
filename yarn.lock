@@ -1965,6 +1965,23 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-6.10.0.tgz#c012c1ecc1a0e53d50e6af381618dca5268461c1"
   integrity sha512-lLseUPEhSFUXYTKj6q7s2O3s2vW2ebgA11vMAlKodXGf5AFw4zUoEbTz9CoFOC9jS6xY4Qr8BmRnxP/odT4Uuw==
 
+"@lemoncode/fonk-final-form@^2.3.4":
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/@lemoncode/fonk-final-form/-/fonk-final-form-2.3.4.tgz#f66e8506a40575165db76c2676b7c7c5d20f154f"
+  integrity sha512-oGtsTaI45NvvNZP/4XcyeFbb9U2JLuKZhIpqr0zhRf+0nsb7DjR2LYQ5L+gMHgzhjqWfPoG5TFbQ/ShgDjNnbA==
+
+"@lemoncode/fonk-range-number-validator@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@lemoncode/fonk-range-number-validator/-/fonk-range-number-validator-1.1.0.tgz#c2671d8a9eaf461fd824bd8c852487242140b719"
+  integrity sha512-vpFdUHZHImeOSe41LQZgm7D6WdA9CNArUfqddyRysaHAobP4Ti/p7K8pC1fwGazyDQy8zD8wrZbohPqNC802+Q==
+
+"@lemoncode/fonk@^1.5.4":
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/@lemoncode/fonk/-/fonk-1.5.4.tgz#084aea3482b9b523ee84378e66451f44b186d1a2"
+  integrity sha512-PUxmdfrQrtrVxh2lqXaVbpOV8PHkiko9ff/H4ZoMxchH39khD2iuGcTm0PnYM7qNDWexc69hyk/TqL/kAQSsgA==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+
 "@material-ui/core@3.9.3":
   version "3.9.3"
   resolved "https://registry.yarnpkg.com/@material-ui/core/-/core-3.9.3.tgz#d378c1f4beb18df9a534ca7258c2c33fb8e0e51f"
@@ -12226,6 +12243,11 @@ pkg-up@3.1.0:
   integrity sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA==
   dependencies:
     find-up "^3.0.0"
+
+please-wait@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/please-wait/-/please-wait-0.0.5.tgz#67098ce6260e92e0809e2d3b7c23f1d167dad960"
+  integrity sha512-mANJSiQCUPQN7o2HVoiVkmpcQvPGMo/xHgen5ApBEbgOrnaQRloq1eMtKEf8y56weCgB8lmnMGalbTPuAuC+Ug==
 
 pngjs@^3.3.0:
   version "3.4.0"

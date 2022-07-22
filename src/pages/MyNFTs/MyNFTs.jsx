@@ -13,7 +13,7 @@ const MyNFTs = (props) => {
     getSpinner(state, "USER_NFTS_LOADING")
   );
   const userNfts = useSelector((state) => state.contract.userNfts);
-  console.log("nft", userNfts);
+
   useEffect(() => {
     dispatch(getUserNFTs());
   }, []);

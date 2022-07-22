@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CONTRACT_TYPE } from "src/config/global";
-import { marketplace_contract_address } from "src/config/contracts";
+import {
+  marketplace_contract_address,
+  currencyTokenAddress,
+} from "src/config/contracts";
 import {
   deployContract,
   holdEvent,
   getValuefromEvent,
   addCollection2Manager,
+  setupCR2Token,
 } from "src/utils/contract";
 import {
   Button,
@@ -32,41 +36,16 @@ import {
   saveCollection,
   submitCollectionPreview,
 } from "../../store/contract/actions";
+import { formValidation } from "./form-validation";
+import { pleaseWait } from "please-wait";
 import "./CreateCollectionPage.scss";
 import "dotenv/config";
 
-const Paragraph = styled("p")(
-  ({ theme }) =>
-    `
-  font-family: IBM Plex Sans, sans-serif;
-  font-size: 0.875rem;
-  margin: 10px 0;
-  color: "white";
-  background: "transparent";
-  `
-);
-
-const PreviewBtn = styled(Button)(
-  ({}) => `
-  background-color: #383838;
-  color: white;
-  `
-);
-
-export const categories = [
-  "Art",
-  "Music",
-  "Ticket",
-  "Community",
-  "Moments",
-  "Asset",
-];
-
 const CreateCollectionPage = (props) => {
-  const [contractType, setContractType] = useState(0);
   const collectionPreview = useSelector(
     (state) => state.contract.collectionPreview
   );
+
   const [inputValues, setInputValues] = useState(
     collectionPreview || {
       collectionName: "",
@@ -87,6 +66,7 @@ const CreateCollectionPage = (props) => {
   const isDeploying = useSelector((state) =>
     getSpinner(state, "DEPLOY_CONTRACT")
   );
+  const dispatch = useDispatch();
   const [result, setResult] = React.useState("");
 
   useEffect(() => {
@@ -94,19 +74,16 @@ const CreateCollectionPage = (props) => {
     setResult(collectionPreview ? collectionPreview.image : null);
     setFile(collectionPreview ? collectionPreview.file : null);
   }, []);
-  const dispatch = useDispatch();
 
   const useDisplayImage = () => {
     const uploader = (e) => {
       const imageFile = e.target.files[0];
-
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
         setResult(e.target.result);
       });
       reader.readAsDataURL(imageFile);
     };
-
     return { uploader };
   };
 
@@ -139,6 +116,19 @@ const CreateCollectionPage = (props) => {
   };
 
   const onSubmit = async (values) => {
+    var loading_screen = pleaseWait({
+      logo: "/favicon.ico",
+      backgroundColor: "#343434",
+      loadingHtml: `<div class="spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
+      <div>
+        <h4 class="wait-text">Creating Collection ...</h4>
+      </div>`,
+      transitionSupport: false,
+    });
     const metadata = {
       name: values.collectionName,
       symbol: values.symbol,
@@ -150,10 +140,9 @@ const CreateCollectionPage = (props) => {
       tokenLimit: values.tokenLimit,
       file: file,
     };
-    console.log(metadata);
     try {
-      dispatch(showSpinner("DEPLOY_CONTRACT"));
-
+      console.log("Before");
+      // dispatch(showSpinner("DEPLOY_CONTRACT"));
       const { contractAddress, contractUri, imageUri } = await deployContract(
         0,
         metadata
@@ -164,8 +153,12 @@ const CreateCollectionPage = (props) => {
         contractAddress
       );
 
+      const resultCr2Setup = await setupCR2Token(
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
+      );
+
       const events = await holdEvent("ContractDeployed", contractAddress);
-      console.log("Collection Event", metadata, imageUri);
       dispatch(
         saveCollection(
           contractUri,
@@ -176,13 +169,12 @@ const CreateCollectionPage = (props) => {
         )
       );
       showNotify(`Collection is successfully created: ${contractAddress}`);
-
+      loading_screen.finish();
       dispatch(hideSpinner("DEPLOY_CONTRACT"));
     } catch (err) {
       console.log(err);
       showNotify(`Unfortunately, network connection problem occured`, "error");
-
-      dispatch(hideSpinner("DEPLOY_CONTRACT"));
+      loading_screen.finish();
     }
   };
 
@@ -213,9 +205,7 @@ const CreateCollectionPage = (props) => {
           </h4>
           <Form
             onSubmit={onSubmit}
-            validate={(values) => {
-              const errors = {};
-            }}
+            validate={(values) => formValidation.validateForm(values)}
             render={({ handleSubmit, submitting, form, values, pristine }) => {
               return (
                 <form onSubmit={handleSubmit} noValidate>
@@ -401,3 +391,30 @@ const CreateCollectionPage = (props) => {
 };
 
 export default CreateCollectionPage;
+
+const Paragraph = styled("p")(
+  ({ theme }) =>
+    `
+  font-family: IBM Plex Sans, sans-serif;
+  font-size: 0.875rem;
+  margin: 10px 0;
+  color: "white";
+  background: "transparent";
+  `
+);
+
+const PreviewBtn = styled(Button)(
+  ({}) => `
+  background-color: #383838;
+  color: white;
+  `
+);
+
+export const categories = [
+  "Art",
+  "Music",
+  "Ticket",
+  "Community",
+  "Moments",
+  "Asset",
+];
