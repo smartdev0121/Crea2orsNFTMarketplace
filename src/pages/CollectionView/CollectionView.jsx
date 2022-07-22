@@ -16,6 +16,7 @@ const CollectionView = (props) => {
   const newCollectionInfo = useSelector(
     (state) => state.contract.collectionInfo
   );
+  console.log(newCollectionInfo);
   const { contractAddress } = props.match.params;
   const dispatch = useDispatch();
   const [metaData, setMetaData] = useState({});
@@ -107,7 +108,7 @@ const CollectionView = (props) => {
         {isLoading ? (
           <Skeleton animation="wave" width="100%" height="200px"></Skeleton>
         ) : (
-          <Slider images={newCollectionInfo.nfts} />
+          <Slider images={newCollectionInfo.nfts} history={props.history} />
         )}
       </MFlexBox>
       <section className="create-button-part">

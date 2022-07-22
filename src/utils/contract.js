@@ -1,13 +1,18 @@
 import Web3 from "web3";
-
 import { CONTRACT_TYPE } from "src/config/global";
 import { uploadContractMetadata, uploadAssetMetaData } from "./pinata";
-import web3Modal, { getCurrentWalletAddress, switchNetwork, signMsg } from "./wallet";
+import web3Modal, {
+  getCurrentWalletAddress,
+  switchNetwork,
+  signMsg,
+} from "./wallet";
 import { showNotify } from "./notify";
 import "dotenv/config";
+import { GavelSharp } from "@mui/icons-material";
 const contract_source_arr = [
   "/Crea2orsContracts/compiled/Crea2orsNFT/Crea2orsNFT",
   "/Crea2orsContracts/compiled/CR2/CR2",
+  "/Crea2orsContracts/compiled/Crea2orsManager/Crea2orsManager",
 ];
 
 let provider;
@@ -16,7 +21,7 @@ const readContractABI = async (contract_type) =>
   new Promise((resolve, reject) => {
     let contract_data;
     let contract_source = contract_source_arr[contract_type];
-
+    console.log("CONTRACT TYPE", contract_type, contract_source);
     fetch(`${contract_source}.abi`)
       .then((response) => response.text())
       .then((data) => {
@@ -100,17 +105,11 @@ export const deployContract = (contract_type, contract_metadata) =>
       const contract_data = await readContractABI(contract_type);
 
       const contract = new web3.eth.Contract(contract_data);
-
+      console.log("ddd");
       contract
         .deploy({
           data: bytecode,
-          arguments: [
-            name,
-            symbol,
-            contract_uri,
-            process.env.REACT_APP_BATCH_SIZE,
-            tokenLimit,
-          ],
+          arguments: [name, symbol, contract_uri, tokenLimit],
         })
         .send({ from: accounts[0] })
         .then(async (deployment) => {
@@ -130,33 +129,39 @@ export const deployContract = (contract_type, contract_metadata) =>
     }
   });
 
-export const createVoucher = (metaDataUri, fileUri, price = -1, royaltyFee,batchSize, from) => 
-  new Promise(async(resolve, reject) => {
-  const voucher = {metaDataUri, price, royaltyFee, batchSize};
-  const msgParams = [
-    {
-      type: "string",
-      name: 'metaDataUri',
-      value: metaDataUri,
-    },
-    {
-      type: "uint32",
-      name: 'price',
-      value: price,
-    },{
-      type: "uint32",
-      name: "fee",
-      value: royaltyFee
-    }, {
-      type: "uint32",
-      name: "batchSize",
-      value: batchSize,
+export const addCollection2Manager = (contract_address, newCollectionAddress) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        provider = await web3Modal.connect();
+        window.location.reload();
+      }
+      const web3 = new Web3(provider);
+      const contract_data = await readContractABI(CONTRACT_TYPE.MANAGER);
+      const wallet_address = await getCurrentWalletAddress();
+      const contract = new web3.eth.Contract(contract_data, contract_address);
+      await contract.methods
+        .addCollection(newCollectionAddress)
+        .send({ from: wallet_address, to: contract_address, gas: 300000 });
+
+      return resolve(true);
+    } catch (err) {
+      console.log(err);
+      return reject(false);
     }
-  ]
-  const signature = await signMsg(msgParams, from);
-  console.log("signature", signature);
-  return signature ? resolve(signature) : reject();
-});
+  });
+
+export const createVoucher = (metaDataUri, royaltyFee, batchSize, from) =>
+  new Promise(async (resolve, reject) => {
+    const voucher = { metaDataUri, royaltyFee, batchSize };
+    const msgParams = [
+      { type: "string", name: "metaDataUri", value: metaDataUri },
+    ];
+    const signature = await signMsg(msgParams, from);
+    return signature ? resolve(signature) : reject();
+  });
 
 export const createNFT = (metadata) =>
   new Promise(async (resolve, reject) => {
@@ -166,6 +171,70 @@ export const createNFT = (metadata) =>
     } catch (e) {
       console.log(e);
       return reject();
+    }
+  });
+
+export const approveToken = (
+  contract_address,
+  approval_address,
+  tokenId,
+  amount
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        provider = await web3Modal.connect();
+        window.location.reload();
+      }
+
+      const web3 = new Web3(provider);
+      const contract_data = await readContractABI(CONTRACT_TYPE.ERC1155);
+      const wallet_address = await getCurrentWalletAddress();
+      const contract = new web3.eth.Contract(contract_data, contract_address);
+
+      await contract.methods
+        .setApprovalForAll(approval_address, true)
+        .send({ from: wallet_address, to: contract_address, gas: 300000 });
+
+      return resolve(true);
+    } catch (err) {
+      console.log(err);
+      return reject(false);
+    }
+  });
+
+export const transferNFT = (
+  contract_address,
+  from_address,
+  id,
+  amount,
+  managerAddress
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      if (web3Modal.cachedProvider) {
+        provider = await web3Modal.connect();
+      } else {
+        provider = await web3Modal.connect();
+        window.location.reload();
+      }
+      const web3 = new Web3(provider);
+      const contract_data = await readContractABI(CONTRACT_TYPE.MANAGER);
+
+      const wallet_address = await getCurrentWalletAddress();
+
+      const contract = new web3.eth.Contract(contract_data, managerAddress);
+
+      await contract.methods
+        .transferNFT(contract_address, from_address, wallet_address, id, amount)
+        .send({ from: wallet_address, to: managerAddress, gas: 300000 });
+
+      return resolve(true);
+    } catch (err) {
+      console.log(err);
+      return reject(false);
     }
   });
 
@@ -181,39 +250,18 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
 
       const web3 = new Web3(provider);
 
-      const { metadata_uri, file_uri } = await uploadAssetMetaData(metadata);
+      // const { metadata_uri, file_uri } = await uploadAssetMetaData(metadata);
 
       const contract_data = await readContractABI(contract_type);
       const wallet_address = await getCurrentWalletAddress();
-
       const contract = new web3.eth.Contract(contract_data, contract_address);
+      await contract.methods
+        .redeem(wallet_address, metadata)
+        .send({ from: wallet_address, to: contract_address, gas: 300000 });
 
-      let tx = {
-        from: wallet_address,
-        to: contract_address,
-        value: 0,
-      };
-
-      if (contract_type === CONTRACT_TYPE.ERC721) {
-        await contract.methods.mint(metadata_uri).send(tx);
-      } else {
-        await contract.methods
-          .create(
-            Number(metadata.batchSize),
-            wallet_address,
-            Number(metadata.royaltyFee),
-            metadata_uri,
-            []
-          )
-          .send(tx);
-      }
-
-      showNotify("Success", "Successfully minted", "success", 3);
-
-      return resolve({ metaDataUri: metadata_uri, fileUri: file_uri });
+      return resolve(true);
     } catch (e) {
       console.log(e);
-      showNotify("Failed", "Failed", "failed", 3);
       return reject();
     }
   });

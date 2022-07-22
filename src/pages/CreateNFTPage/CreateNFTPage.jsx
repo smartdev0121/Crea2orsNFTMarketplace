@@ -132,8 +132,6 @@ export default function CreateNFTPage(props) {
       // const returnValues = await getValuefromEvent(event, curWalletAddress);
       const signature = await createVoucher(
         metaDataUri,
-        fileUri,
-        values?.price,
         values.royaltyFee,
         values.batchSize,
         curWalletAddress

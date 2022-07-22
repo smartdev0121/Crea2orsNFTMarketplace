@@ -20,7 +20,7 @@ const DetailInfo = (props) => {
                 allow="autoplay; encrypted-media"
                 allowfullscreen
                 width="100%"
-                height="100%"
+                height="500px"
                 title="video"
               />{" "}
             </div>
@@ -56,13 +56,13 @@ const DetailInfo = (props) => {
                 )}
               </MClipboard>
             </div>
-            <div className="watch-video">
+            {/* <div className="watch-video">
               Watch on{" "}
               <IconButton type="button">
                 <PlayArrow />
                 Youtubu
               </IconButton>
-            </div>
+            </div> */}
           </>
         )}
       </div>

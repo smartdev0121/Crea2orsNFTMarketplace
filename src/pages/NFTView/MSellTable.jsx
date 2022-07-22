@@ -1,36 +1,37 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import { Chip, Avatar, Button } from "@mui/material";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  Paper,
+  TableBody,
+  Chip,
+  Avatar,
+  Button,
+  TableContainer,
+} from "@mui/material";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import { Cancel, ShoppingBasket } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderData, canceledOrder } from "src/store/order/actions";
 import { purple } from "@mui/material/colors";
 import MAlertDialog from "src/components/MAlertDialog";
 import MBuyNFTDialog from "src/components/MBuyNFTDialog";
-import {
-  cancelListing,
-  getMarketplaceContractAddress,
-  buyAsset,
-  placeBid,
-} from "src/utils/order";
+import { getMarketplaceContractAddress, placeBid } from "src/utils/order";
 import { holdEvent, getValuefromEvent } from "src/utils/order";
 import { currencyTokenAddress } from "src/config/contracts";
 import { orderFinialized, bidPlaced } from "src/store/order/actions";
 import MBidDialog from "./MBidDialog";
 import "dotenv/config";
+import { transferNFT } from "src/utils/contract";
+import { marketplace_contract_address } from "src/config/contracts";
 
 export default function CustomizedTables(props) {
   const dispatch = useDispatch();
   const ordersData = useSelector((state) => state.orders);
-  console.log("This is orders data", ordersData);
   const profile = useSelector((state) => state.profile);
+  console.log("MSellTable>>>", profile);
   const [confirmStatus, setConfirmStatus] = React.useState(false);
   const contractAddress = props.contractAddress;
   const [bidDlgOpen, setBidDlgOpen] = React.useState(false);
@@ -77,35 +78,19 @@ export default function CustomizedTables(props) {
     setBuyOrderConfirm(false);
   };
 
-  const buyOrder = async (id, amount) => {
-    console.log(id, amount);
-    // const OrderState = {
-    //   Creator: ordersData[id].creatorAddress,
-    //   NftAddress: contractAddress,
-    //   TokenId: ordersData[id].contractNftId,
-    //   Amount: ordersData[id].amount,
-    //   Price: ordersData[id].price,
-    //   StartTime: ordersData[id].startTime,
-    //   EndTime: ordersData[id].endTime,
-    //   OrderType: ordersData[id].orderType,
-    //   Buyer: ordersData[id].creatorAddress,
-    //   BuyerPrice: ordersData[id].price,
-    //   CurrencyTokenAddress: currencyTokenAddress,
-    //   CurrencyDecimals: 9,
-    // };
+  const buyOrder = async (id) => {
+    const amount = 1;
+    const result = await transferNFT(
+      contractAddress,
+      ordersData[id].maker_address,
+      ordersData[id].nfts.nft_id,
+      amount,
+      marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID]
+    );
 
-    // const result = await buyAsset(OrderState);
-    // if (result) {
-    //   const mContractAddress = await getMarketplaceContractAddress();
-    //   const event = await holdEvent("OrderFinalized", mContractAddress);
-    //   const values = await getValuefromEvent(event);
-    //   dispatch(
-    //     orderFinialized(values[0], ordersData[id].id, ordersData[id].nftId)
-    //   );
-    // }
-    console.log(ordersData[id], id);
-    console.log(profile.id);
-    dispatch(orderFinialized(ordersData[id].id, Number(amount), profile.id));
+    if (result) {
+      dispatch(orderFinialized(ordersData[id].id, Number(amount), profile.id));
+    }
   };
 
   const buyOrderClicked = async (event, id) => {
@@ -137,15 +122,10 @@ export default function CustomizedTables(props) {
       const mContractAddress = await getMarketplaceContractAddress();
       const event = await holdEvent("OrderNewBid", mContractAddress);
       const values = await getValuefromEvent(event);
-      console.log("this is event data", values);
       dispatch(bidPlaced(values[0], ordersData[id].id, ordersData[id].nftId));
     }
   };
 
-  const placeBidClicked = async (eve, id) => {
-    setRowIndex(id);
-    setBidDlgOpen(true);
-  };
   return (
     <TableContainer component={Paper}>
       <Table aria-label="customized table">
@@ -169,9 +149,11 @@ export default function CustomizedTables(props) {
           <MBuyNFTDialog
             open={buyOrderConfirm}
             orderID={buyOrderId}
-            onOK={(index, amount) => buyOrder(index, amount)}
+            onOK={(index) => buyOrder(index)}
             onCancel={confirmDlgClosed}
-          />
+          >
+            Are you sure to buy NFT?
+          </MBuyNFTDialog>
           {ordersData.map((row, index) => {
             let diff = row.endTime - row.startTime;
             const addrLength = String(row.maker_address).length;
