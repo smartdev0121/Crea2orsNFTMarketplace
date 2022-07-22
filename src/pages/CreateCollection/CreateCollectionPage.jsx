@@ -116,7 +116,8 @@ const CreateCollectionPage = (props) => {
   };
 
   const onSubmit = async (values) => {
-    var loading_screen = pleaseWait({
+    let register_wait;
+    let deploy_wait = pleaseWait({
       logo: "/favicon.ico",
       backgroundColor: "#343434",
       loadingHtml: `<div class="spinner">
@@ -125,9 +126,8 @@ const CreateCollectionPage = (props) => {
         <div class="bounce3"></div>
       </div>
       <div>
-        <h4 class="wait-text">Creating Collection ...</h4>
+        <h4 class="wait-text">Deploying Collection...</h4>
       </div>`,
-      transitionSupport: false,
     });
     const metadata = {
       name: values.collectionName,
@@ -148,10 +148,31 @@ const CreateCollectionPage = (props) => {
         metadata
       );
 
+      deploy_wait.finish();
+
+      register_wait = pleaseWait({
+        logo: "/favicon.ico",
+        backgroundColor: "#343434",
+        loadingHtml: `<div class="spinner">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
+        </div>
+        <div>
+          <h4 class="wait-text">Registering Collection...</h4>
+        </div>`,
+      });
+
+      await register_wait.updateLoadingHtml(
+        " <div class='spinner'><div class='bounce1'></div>          <div class='bounce2'></div>          <div class='bounce3'></div>        </div>        <div>          <h4 class='wait-text'>WHy??? ...</h4>        </div>"
+      );
+
       const result = await addCollection2Manager(
         marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
         contractAddress
       );
+
+      register_wait.finish();
 
       // const resultCr2Setup = await setupCR2Token(
       //   marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
@@ -169,12 +190,14 @@ const CreateCollectionPage = (props) => {
         )
       );
       showNotify(`Collection is successfully created: ${contractAddress}`);
-      loading_screen.finish();
+      deploy_wait.finish();
+      register_wait.finish();
       dispatch(hideSpinner("DEPLOY_CONTRACT"));
     } catch (err) {
       console.log(err);
       showNotify(`Unfortunately, network connection problem occured`, "error");
-      loading_screen.finish();
+      deploy_wait.finish();
+      register_wait.finish();
     }
   };
 

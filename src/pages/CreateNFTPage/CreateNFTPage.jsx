@@ -155,7 +155,8 @@ export default function CreateNFTPage(props) {
             fileUri,
             values?.price ? values.price : -1,
             signature,
-            curWalletAddress
+            curWalletAddress,
+            contractAddress
           )
         );
         console.log(
@@ -181,7 +182,6 @@ export default function CreateNFTPage(props) {
       loading_screen.finish();
       setResult(undefined);
       setFile(null);
-      dispatch(getContractUri(contractAddress));
     } catch (err) {
       showNotify(
         "You can't mint your nft by some issue, confirm input values and try again!",

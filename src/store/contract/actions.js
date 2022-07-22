@@ -75,7 +75,8 @@ export const saveNFT =
     fileUri,
     price,
     signature,
-    curWalletAddress
+    curWalletAddress,
+    contractAddress
   ) =>
   async (dispatch) => {
     return api
@@ -91,12 +92,15 @@ export const saveNFT =
       .then((res) => {
         if (res.name) {
           showNotify(`${res.name} is stored successfully!`);
+          dispatch(getContractUri(contractAddress));
+          return;
         }
         if (res.over) {
           showNotify(
             `You can't create more than ${res.over} in this collection`,
             "warning"
           );
+          return;
         }
       })
       .catch((err) => {
