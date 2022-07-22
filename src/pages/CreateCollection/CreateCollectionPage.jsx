@@ -153,10 +153,10 @@ const CreateCollectionPage = (props) => {
         contractAddress
       );
 
-      const resultCr2Setup = await setupCR2Token(
-        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
-        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
-      );
+      // const resultCr2Setup = await setupCR2Token(
+      //   marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+      //   currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
+      // );
 
       const events = await holdEvent("ContractDeployed", contractAddress);
       dispatch(
@@ -281,6 +281,8 @@ const CreateCollectionPage = (props) => {
                           name="vidUrl"
                           component={MTextField}
                           disabled={!vidStatus}
+                          helperText="Youtube url format must be like this:
+                          https://www.youtube.com/embed/VIDEO_ID"
                         />
                       </Stack>
                       <Field
