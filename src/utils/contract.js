@@ -104,7 +104,8 @@ export const deployContract = (contract_type, contract_metadata) =>
 
       const bytecode = await readContractByteCode(contract_type);
       const contract_data = await readContractABI(contract_type);
-
+      console.log(bytecode);
+      console.log(contract_data);
       console.log(
         "CURRENCE",
         currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
