@@ -258,20 +258,25 @@ export const transferNFT = (
       const wallet_address = await getCurrentWalletAddress();
 
       const contract = new web3.eth.Contract(contract_data, managerAddress);
-      console.log(managerAddress);
-      console.log(contract.methods);
-      await contract.methods
-        .transferNFT(
-          contract_address,
-          from_address,
-          wallet_address,
-          id,
-          amount,
-          web3.utils
-            .toBN(BigNumber(price).times(BigNumber(10).pow(CURRENCYDECIMAL)))
-            .toNumber()
-        )
-        .send({ from: wallet_address, to: managerAddress, gas: 300000 });
+
+      const tx = {
+        from: wallet_address,
+        to: contract_address,
+        data: contract.methods
+          .transferNFT(
+            contract_address,
+            from_address,
+            wallet_address,
+            id,
+            amount,
+            web3.utils
+              .toBN(BigNumber(price).times(BigNumber(10).pow(CURRENCYDECIMAL)))
+              .toNumber()
+          )
+          .encodeABI(),
+      };
+
+      await web3.eth.sendTransaction(tx);
 
       return resolve(true);
     } catch (err) {
@@ -295,7 +300,7 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
       const contract_data = await readContractABI(contract_type);
       const wallet_address = await getCurrentWalletAddress();
       const contract = new web3.eth.Contract(contract_data, contract_address);
-      console.log(typeof metadata.mintPrice);
+
       const tx = {
         from: wallet_address,
         to: contract_address,

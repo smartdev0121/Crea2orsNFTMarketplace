@@ -28,11 +28,12 @@ import {
   getTokenBalance,
   allowance,
   approve,
+  setApprovalForAll,
 } from "src/utils/contract";
 import { marketplace_contract_address } from "src/config/contracts";
 import { showNotify } from "src/utils/notify";
 import { CONTRACT_TYPE } from "src/config/global";
-import { pleaseWait } from "please-wait";
+import progressDisplay from "src/utils/pleaseWait";
 import "dotenv/config";
 
 export default function CustomizedTables(props) {
@@ -78,26 +79,15 @@ export default function CustomizedTables(props) {
   };
 
   const buyOrder = async (id) => {
-    var loading_screen = pleaseWait({
-      logo: "/favicon.ico",
-      backgroundColor: "#343434",
-      loadingHtml: `<div class="spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
-      </div>
-      <div>
-        <h4 class="wait-text">Buying NFT ...</h4>
-      </div>`,
-      transitionSupport: false,
-    });
+    let cr2Approving = progressDisplay(
+      `Approving ${ordersData[id].price}CREA2`
+    );
+
     const amount = 1;
 
     const balance = await getTokenBalance(
       currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
     );
-
-    console.log("CR2 balance", balance);
 
     if (!balance) {
       showNotify(
@@ -110,12 +100,31 @@ export default function CustomizedTables(props) {
       return;
     }
 
+    const nftApproveResult = await setApprovalForAll(
+      marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+      contractAddress,
+      CONTRACT_TYPE.ERC1155
+    );
+
+    cr2Approving?.finish();
+
+    let nftApproving = progressDisplay("Approving NFT to Manager");
+
     const approveResult = await approve(
       marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
       currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
       ordersData[id].price,
       CONTRACT_TYPE.ERC20
     );
+
+    nftApproving?.finish();
+
+    if (approveResult && nftApproveResult) {
+      showNotify("Approving failed", "error");
+      return;
+    }
+
+    let transferringNFT = progressDisplay("Buying NFT");
 
     try {
       const result = await transferNFT(
@@ -127,22 +136,18 @@ export default function CustomizedTables(props) {
         ordersData[id].price
       );
 
+      transferringNFT?.finish();
+
       if (result) {
         dispatch(
           orderFinialized(ordersData[id].id, Number(amount), profile.id)
         );
       }
-      loading_screen.finish();
     } catch (err) {
-      const allowanceAmount = await allowance(
-        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
-        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID]
-      );
-
-      console.log("Allowance", allowanceAmount);
-
       console.log(err);
-      loading_screen.finish();
+      cr2Approving?.finish();
+      nftApproving?.finish();
+      transferringNFT?.finish();
     }
   };
 
