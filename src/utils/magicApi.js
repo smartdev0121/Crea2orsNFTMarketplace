@@ -4,10 +4,10 @@ import * as axios from "axios";
 import qs from "qs";
 import { getToken, clearInfo } from "./storage";
 
-export const SITE_URL = "https://crea2ors.io/";
-export const API_URL = "https://crea2ors.io/cr2_apis";
-// export const SITE_URL = "http://localhost:3000/";
-// export const API_URL = "http://localhost:8080/cr2_apis";
+// export const SITE_URL = "https://crea2ors.io/";
+// export const API_URL = "https://crea2ors.io/cr2_apis";
+export const SITE_URL = "http://localhost:3000/";
+export const API_URL = "http://localhost:8080/cr2_apis";
 
 const requestConfig = {
   headers: {

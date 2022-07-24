@@ -62,15 +62,16 @@ const CreateCollectionPage = (props) => {
   const [file, setFile] = useState();
   const [vidStatus, setVidStatus] = useState(false);
   const hiddenFileInput = React.useRef(null);
-  const [type, setType] = useState();
+  const [type, setType] = useState(1);
   const isDeploying = useSelector((state) =>
     getSpinner(state, "DEPLOY_CONTRACT")
   );
+  const categories = useSelector((state) => state.contract.categories);
   const dispatch = useDispatch();
   const [result, setResult] = React.useState("");
 
   useEffect(() => {
-    setType(collectionPreview ? categories.indexOf(collectionPreview.type) : 0);
+    setType(collectionPreview ? collectionPreview.type : 1);
     setResult(collectionPreview ? collectionPreview.image : null);
     setFile(collectionPreview ? collectionPreview.file : null);
   }, []);
@@ -107,10 +108,11 @@ const CreateCollectionPage = (props) => {
   const onPreview = () => {
     const newCollectionInfo = {
       ...inputValues,
-      type: categories[type],
+      type: type,
       image: result,
       file: file,
     };
+    console.log("before preview", newCollectionInfo);
     dispatch(submitCollectionPreview(newCollectionInfo));
     props.history.push("/collection-preview");
   };
@@ -129,6 +131,7 @@ const CreateCollectionPage = (props) => {
         <h4 class="wait-text">Deploying Collection...</h4>
       </div>`,
     });
+
     const metadata = {
       name: values.collectionName,
       symbol: values.symbol,
@@ -140,6 +143,7 @@ const CreateCollectionPage = (props) => {
       tokenLimit: values.tokenLimit,
       file: file,
     };
+    console.log("Metadata", metadata);
     try {
       console.log("Before");
       // dispatch(showSpinner("DEPLOY_CONTRACT"));
@@ -148,7 +152,7 @@ const CreateCollectionPage = (props) => {
         metadata
       );
 
-      deploy_wait.finish();
+      deploy_wait?.finish();
 
       register_wait = pleaseWait({
         logo: "/favicon.ico",
@@ -172,7 +176,7 @@ const CreateCollectionPage = (props) => {
         contractAddress
       );
 
-      register_wait.finish();
+      register_wait?.finish();
 
       // const resultCr2Setup = await setupCR2Token(
       //   marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
@@ -190,14 +194,14 @@ const CreateCollectionPage = (props) => {
         )
       );
       showNotify(`Collection is successfully created: ${contractAddress}`);
-      deploy_wait.finish();
-      register_wait.finish();
+      deploy_wait?.finish();
+      register_wait?.finish();
       dispatch(hideSpinner("DEPLOY_CONTRACT"));
     } catch (err) {
       console.log(err);
       showNotify(`Unfortunately, network connection problem occured`, "error");
-      deploy_wait.finish();
-      register_wait.finish();
+      deploy_wait?.finish();
+      register_wait?.finish();
     }
   };
 
@@ -435,11 +439,12 @@ const PreviewBtn = styled(Button)(
   `
 );
 
-export const categories = [
-  "Art",
-  "Music",
-  "Ticket",
-  "Community",
-  "Moments",
-  "Asset",
-];
+// export const categories = [
+//   "All",
+//   "Art",
+//   "Music",
+//   "Ticket",
+//   "Community",
+//   "Moments",
+//   "Asset",
+// ];

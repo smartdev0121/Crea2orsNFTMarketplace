@@ -11,6 +11,6 @@ export const marketplace_contract_address = {
 };
 
 export const currencyTokenAddress = {
-  4: "0x4e67eF81Bfe4856ACa55F3fE5620D125becb656E",
+  4: "0x53130055D61D8083938304fBc06222724d9F52C1",
   32520: "0xcaa395E63Eaf26bb65fF906ccC9F3752594b614B",
 };

@@ -13,21 +13,16 @@ const MSelect = styled(Select)`
 `;
 export default function UnstyledSelectObjectValues(props) {
   const categories = props.values;
-  const [category, setCategory] = React.useState(0);
-
-  React.useEffect(() => {
-    setCategory(props.selectValue);
-  }, [category]);
 
   const onChanged = (e) => {
-    setCategory(e.target.value);
     props.onChangeValue(e.target.value);
   };
+
   return (
-    <MSelect value={category} onChange={onChanged}>
-      {categories.map((value, index) => (
-        <MenuItem value={index} key={value + index}>
-          {value}
+    <MSelect value={props.selectValue} onChange={onChanged}>
+      {categories?.map((value, index) => (
+        <MenuItem value={value.id} key={value.name + index}>
+          {value.name}
         </MenuItem>
       ))}
     </MSelect>

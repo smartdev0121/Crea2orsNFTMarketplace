@@ -9,10 +9,20 @@ export const types = {
   COLLECTIONS_ALL_FETCHED: "COLLECTIONS_ALL_FETCHED",
   USER_NFTS_FETCHED: "USER_NFTS_FETCHED",
   COLLECTION_PREVIEW: "COLLECTION_PREVIEW",
+  CATEGORY_FETCHED: "CATEGORY_FETCHED",
 };
 
-export const getUserNFTs = () => (dispatch) => {
-  showSpinner("USER_NFTS_LOADING");
+export const fetchCategories = () => (dispatch) => {
+  return api
+    .get("/categories")
+    .then((res) => {
+      dispatch({ type: types.CATEGORY_FETCHED, payload: res.categories });
+    })
+    .catch((err) => {});
+};
+
+export const getUserNFTs = () => async (dispatch) => {
+  dispatch(showSpinner("USER_NFTS_LOADING"));
   return api
     .get("/get-user-nfts")
     .then((res) => {
@@ -79,6 +89,7 @@ export const saveNFT =
     contractAddress
   ) =>
   async (dispatch) => {
+    dispatch(showSpinner("SAVING_NFT"));
     return api
       .post("/create-nft", {
         contractId,
@@ -93,6 +104,7 @@ export const saveNFT =
         if (res.name) {
           showNotify(`${res.name} is stored successfully!`);
           dispatch(getContractUri(contractAddress));
+          dispatch(hideSpinner("SAVING_NFT"));
           return;
         }
         if (res.over) {
@@ -100,6 +112,7 @@ export const saveNFT =
             `You can't create more than ${res.over} in this collection`,
             "warning"
           );
+          dispatch(hideSpinner("SAVING_NFT"));
           return;
         }
       })
@@ -108,6 +121,7 @@ export const saveNFT =
           `Can't store your nft information, confirm network connection!`,
           "error"
         );
+        dispatch(hideSpinner("SAVING_NFT"));
         console.log(err);
       });
   };

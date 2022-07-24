@@ -11,6 +11,11 @@ const CollectionView = (props) => {
   const newCollectionInfo = useSelector(
     (state) => state.contract.collectionPreview
   );
+
+  const categories = useSelector((state) => state.contract.categories);
+  console.log(categories);
+  console.log(newCollectionInfo);
+
   const goBack = () => {
     props.history.push("/create-collection");
   };
@@ -26,7 +31,15 @@ const CollectionView = (props) => {
           <div className="image-info-part">
             <h2 className="pretty-text">{newCollectionInfo?.collectionName}</h2>
             <p className="category">
-              {newCollectionInfo?.type + "/" + newCollectionInfo?.subCategory}
+              {console.log(
+                categories.filter((item) => item.id == newCollectionInfo?.type)
+              )}
+
+              {categories.filter(
+                (item) => item.id == newCollectionInfo?.type
+              )[0].name +
+                "/" +
+                newCollectionInfo?.subCategory}
             </p>
             <p>Colleciton Token Limit: {newCollectionInfo?.tokenLimit}</p>
           </div>

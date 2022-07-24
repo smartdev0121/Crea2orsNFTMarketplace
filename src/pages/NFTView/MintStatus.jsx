@@ -88,11 +88,23 @@ const MintStatus = (props) => {
     const approveResult = await approve(
       props.contractAddress,
       currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
-      creator.price,
+      Number(creator.price) + 1,
       CONTRACT_TYPE.ERC20
     );
 
-    approve_wait.finish();
+    const allowancevalue = await allowance(
+      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+      props.contractAddress,
+      CONTRACT_TYPE.ERC20
+    );
+
+    if (allowancevalue < creator.price) {
+      showNotify("You didn't allow price enough to mint to manager");
+      return;
+    }
+    console.log("allowance", allowancevalue);
+
+    approve_wait?.finish();
 
     if (!approveResult) {
       showNotify("You can not approve your balance", "warning");
@@ -130,34 +142,34 @@ const MintStatus = (props) => {
         metaData
       );
 
-      mint_wait.finish();
+      mint_wait?.finish();
 
-      var pay_wait = pleaseWait({
-        logo: "/favicon.ico",
-        backgroundColor: "#343434",
-        loadingHtml: `<div class="spinner">
-          <div class="bounce1"></div>
-          <div class="bounce2"></div>
-          <div class="bounce3"></div>
-        </div>
-        <div>
-          <h4 class="wait-text">Paying ${creator.price} to creator ...</h4>
-        </div>`,
-        transitionSupport: false,
-      });
-      const cr2Result = await transferCustomCrypto(
-        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
-        creator.user.wallet_address,
-        Number(creator.price)
-      );
+      // var pay_wait = pleaseWait({
+      //   logo: "/favicon.ico",
+      //   backgroundColor: "#343434",
+      //   loadingHtml: `<div class="spinner">
+      //     <div class="bounce1"></div>
+      //     <div class="bounce2"></div>
+      //     <div class="bounce3"></div>
+      //   </div>
+      //   <div>
+      //     <h4 class="wait-text">Paying ${creator.price} to creator ...</h4>
+      //   </div>`,
+      //   transitionSupport: false,
+      // });
+      // const cr2Result = await transferCustomCrypto(
+      //   currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+      //   creator.user.wallet_address,
+      //   Number(creator.price)
+      // );
 
-      pay_wait.finish();
-      if (result && cr2Result) {
+      // pay_wait?.finish();
+      if (result) {
         dispatch(nftMinted(creator.id, Number(amount)));
       }
     } catch (err) {
-      mint_wait.finish();
-      pay_wait.finish();
+      mint_wait?.finish();
+      // pay_wait?.finish();
       console.log(err);
     }
   };
