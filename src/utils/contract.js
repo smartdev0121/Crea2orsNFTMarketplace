@@ -261,7 +261,8 @@ export const transferNFT = (
 
       const tx = {
         from: wallet_address,
-        to: contract_address,
+        to: managerAddress,
+        gas: 1000000,
         data: contract.methods
           .transferNFT(
             contract_address,
@@ -304,6 +305,7 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
       const tx = {
         from: wallet_address,
         to: contract_address,
+        gas: 1000000,
         data: contract.methods
           .redeem(
             wallet_address,
@@ -603,6 +605,8 @@ export const setApprovalForAll = (
         .isApprovedForAll(current_address, contract_address)
         .call();
 
+      console.log("Hey", current_address, contract_address, isApproved);
+
       if (!isApproved) {
         const tx = {
           from: current_address,
@@ -616,7 +620,7 @@ export const setApprovalForAll = (
       }
 
       showNotify("Success", "Approved successfully", "success", 3);
-      return resolve({ success: true });
+      return resolve(true);
     } catch (e) {
       showNotify("Failed", "Failed", "failed", 3);
       return reject();
@@ -660,7 +664,7 @@ export const approve = (
 
       await web3.eth.sendTransaction(tx);
 
-      return resolve({ success: true });
+      return resolve(true);
     } catch (e) {
       return reject();
     }

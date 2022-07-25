@@ -6,17 +6,32 @@ import styles from "./Home.module.scss";
 import FeaturedArtist from "./Sections/FeaturedArtist";
 import TopCollection1 from "./Sections/TopCollection1";
 import TopCollection2 from "./Sections/TopCollection2";
+
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHomepageContent } from "src/store/app/actions";
+import {
+  fetchHomepageContent,
+  fetchCollectionByCategory,
+} from "src/store/app/actions";
 
 const HomePage = (props) => {
   const dispatch = useDispatch();
   const [keyword, setKeyword] = useState("All");
+  const [subTypes, setSubTypes] = useState([]);
   const homepageContents = useSelector((state) => state.app.contents);
+  const categories = useSelector((state) => state.contract.categories);
+  const collectionsByCategory = useSelector(
+    (state) => state.app.collectionsByCategory
+  );
 
+  console.log(collectionsByCategory);
   useEffect(() => {
     dispatch(fetchHomepageContent(keyword));
+    dispatch(fetchCollectionByCategory(1));
   }, []);
+
+  useEffect(() => {
+    setSubTypes(categories?.filter((item) => item.parent_id != 0));
+  }, [categories]);
 
   let topCollection = null,
     topLeftCollection = null,
@@ -42,6 +57,22 @@ const HomePage = (props) => {
     }
   }
 
+  const handleClicked = (eve, id) => {
+    if (id == 1) {
+      setSubTypes(categories?.filter((item) => item.parent_id != 0));
+      dispatch(fetchCollectionByCategory(id));
+      return;
+    }
+    setSubTypes(
+      categories?.filter((item) => item.id != 0 && item.parent_id == id)
+    );
+    dispatch(fetchCollectionByCategory(id));
+  };
+
+  const onSubClicked = (eve, id) => {
+    dispatch(fetchCollectionByCategory(id));
+  };
+
   return (
     <main className={styles.homepage}>
       <WelcomeSection
@@ -50,17 +81,18 @@ const HomePage = (props) => {
         topRightCollection={topRightCollection}
         history={props.history}
       />
-      <ButtonBar />
+      <ButtonBar
+        categories={categories?.filter((item) => item.parent_id == 0)}
+        onClicked={(eve, id) => handleClicked(eve, id)}
+      />
 
-      <FeaturedArtist />
+      <FeaturedArtist
+        subCategories={subTypes}
+        onSubClicked={(eve, id) => onSubClicked(eve, id)}
+      />
       <TopCollection1
         key={111}
-        mainCollection1={mainCollection1}
-        history={props.history}
-      />
-      <TopCollection2
-        key={112}
-        mainCollection2={mainCollection2}
+        collectionDatas={collectionsByCategory}
         history={props.history}
       />
     </main>

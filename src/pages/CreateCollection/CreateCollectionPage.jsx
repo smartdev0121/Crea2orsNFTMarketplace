@@ -29,6 +29,7 @@ import { styled } from "@mui/system";
 import MColorButtonView from "src/components/MInput/MColorButtonView";
 import { Form, Field } from "react-final-form";
 import { showSpinner, hideSpinner } from "src/store/app/actions";
+import MImageCropper from "src/components/MImageCropper";
 import MSpinner from "src/components/MSpinner";
 import { getSpinner } from "src/store/app/reducer";
 import { showNotify } from "src/utils/notify";
@@ -59,14 +60,18 @@ const CreateCollectionPage = (props) => {
       image: "",
     }
   );
-  const [file, setFile] = useState();
   const [vidStatus, setVidStatus] = useState(false);
   const hiddenFileInput = React.useRef(null);
   const [type, setType] = useState(1);
+  const [file, setFile] = useState(null);
+  const [resizedImage, setResizedImage] = useState(null);
+  const [confirmedFile, setConfirmedFile] = useState(undefined);
+
   const isDeploying = useSelector((state) =>
     getSpinner(state, "DEPLOY_CONTRACT")
   );
   const categories = useSelector((state) => state.contract.categories);
+  console.log("categories", categories);
   const dispatch = useDispatch();
   const [result, setResult] = React.useState("");
 
@@ -93,8 +98,8 @@ const CreateCollectionPage = (props) => {
   };
 
   const handleFileChange = (e) => {
-    uploader(e);
-    setFile(e.target.files[0]);
+    // uploader(e);
+    e ? setFile(e.target.files[0]) : setFile(null);
   };
 
   const handleImageClick = (e) => {
@@ -109,7 +114,7 @@ const CreateCollectionPage = (props) => {
     const newCollectionInfo = {
       ...inputValues,
       type: type,
-      image: result,
+      image: resizedImage,
       file: file,
     };
     console.log("before preview", newCollectionInfo);
@@ -141,7 +146,7 @@ const CreateCollectionPage = (props) => {
       category: type,
       subCategory: values.subCategory,
       tokenLimit: values.tokenLimit,
-      file: file,
+      file: confirmedFile,
     };
     console.log("Metadata", metadata);
     try {
@@ -211,9 +216,24 @@ const CreateCollectionPage = (props) => {
     setType(value);
   };
 
+  const onDiscard = (file) => {
+    setFile(null);
+  };
+
   return (
     <div className="whole-container">
       {isDeploying && <MSpinner />}
+      <MImageCropper
+        file={file}
+        onConfirm={(croppedFile) => {
+          setResizedImage(window.URL.createObjectURL(croppedFile));
+          setConfirmedFile(croppedFile);
+          return;
+        }}
+        onCompleted={() => setFile(null)}
+        ratio={3}
+        onDiscard={onDiscard}
+      />
       <Container
         maxWidth="md"
         sx={{ paddingTop: "100px", paddingBottom: "20px" }}
@@ -314,7 +334,9 @@ const CreateCollectionPage = (props) => {
                       </Stack>
                       <Field
                         name="type"
-                        values={categories}
+                        values={categories?.filter(
+                          (item) => item.parent_id == 0
+                        )}
                         selectValue={type}
                         label="Category"
                         component={MSelectBox}
@@ -394,7 +416,7 @@ const CreateCollectionPage = (props) => {
                         >
                           <img
                             src={
-                              result ||
+                              resizedImage ||
                               (collectionPreview?.image
                                 ? collectionPreview?.image
                                 : "/images/img_empty.png")

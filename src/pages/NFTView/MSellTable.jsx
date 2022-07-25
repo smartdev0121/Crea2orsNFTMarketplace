@@ -33,7 +33,7 @@ import {
 import { marketplace_contract_address } from "src/config/contracts";
 import { showNotify } from "src/utils/notify";
 import { CONTRACT_TYPE } from "src/config/global";
-import progressDisplay from "src/utils/pleaseWait";
+import { progressDisplay } from "src/utils/pleaseWait";
 import "dotenv/config";
 
 export default function CustomizedTables(props) {
@@ -82,51 +82,45 @@ export default function CustomizedTables(props) {
     let cr2Approving = progressDisplay(
       `Approving ${ordersData[id].price}CREA2`
     );
+    let nftApproving;
+    let transferringNFT;
 
     const amount = 1;
 
     const balance = await getTokenBalance(
       currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
     );
-
+    console.log("balance", balance);
     if (!balance) {
       showNotify(
         "An error occurred while obtaining your CR2 wallet balance",
         "error"
       );
+      cr2Approving.finish();
       return;
     } else if (balance < ordersData[id].price) {
       showNotify("Your CR2 balance is less than the NFT mint price", "warning");
+      cr2Approving.finish();
       return;
     }
-
-    const nftApproveResult = await setApprovalForAll(
-      marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
-      contractAddress,
-      CONTRACT_TYPE.ERC1155
-    );
-
-    cr2Approving?.finish();
-
-    let nftApproving = progressDisplay("Approving NFT to Manager");
-
-    const approveResult = await approve(
-      marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
-      currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
-      ordersData[id].price,
-      CONTRACT_TYPE.ERC20
-    );
-
-    nftApproving?.finish();
-
-    if (approveResult && nftApproveResult) {
-      showNotify("Approving failed", "error");
-      return;
-    }
-
-    let transferringNFT = progressDisplay("Buying NFT");
-
     try {
+      console.log("before approve");
+      const approveResult = await approve(
+        marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
+        ordersData[id].price,
+        CONTRACT_TYPE.ERC20
+      );
+
+      cr2Approving?.finish();
+
+      if (!approveResult) {
+        showNotify("Approving failed", "error");
+        return;
+      }
+
+      transferringNFT = progressDisplay("Buying NFT");
+
       const result = await transferNFT(
         contractAddress,
         ordersData[id].maker_address,

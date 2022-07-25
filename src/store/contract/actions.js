@@ -23,12 +23,14 @@ export const fetchCategories = () => (dispatch) => {
 
 export const getUserNFTs = () => async (dispatch) => {
   dispatch(showSpinner("USER_NFTS_LOADING"));
+  console.log("___________________0000000000");
   return api
     .get("/get-user-nfts")
     .then((res) => {
       if (res.userNfts)
         dispatch({ type: types.USER_NFTS_FETCHED, payload: res.userNfts });
       hideSpinner("USER_NFTS_LOADING");
+      console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
     })
     .catch((err) => {
       console.log(err);

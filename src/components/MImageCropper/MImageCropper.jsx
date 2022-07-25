@@ -46,9 +46,9 @@ function CropperModel(props) {
 
     const croppedCanvas = {
       minWidth: 400,
-      maxWidth: 800,
+      maxWidth: 1000,
       minHeight: 300,
-      maxHeight: 400,
+      maxHeight: 600,
       imageSmoothingQuality: "medium",
       ...props.croppedCanvasProps,
     };
@@ -74,6 +74,7 @@ function CropperModel(props) {
   };
 
   const handleClose = () => {
+    alert();
     setCropper(false);
     setImage(null);
     typeof props.onDiscard === "function" && props.onDiscard(file);

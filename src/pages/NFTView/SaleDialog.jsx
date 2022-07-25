@@ -22,16 +22,15 @@ import { Form, Field } from "react-final-form";
 import { InputAdornment } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { createOrder } from "../../utils/order";
-import { approveToken } from "../../utils/contract";
-import { holdEvent, getValuefromEvent } from "src/utils/order";
+import { setApprovalForAll } from "../../utils/contract";
 import { useDispatch } from "react-redux";
-import { showSpinner, hideSpinner } from "src/store/app/actions";
 import { orderCreated } from "src/store/order/actions";
 import { showNotify } from "../../utils/notify";
 import { useSelector } from "react-redux";
 import { marketplace_contract_address } from "src/config/contracts";
 import { pleaseWait } from "please-wait";
+import { CONTRACT_TYPE } from "src/config/global";
+
 import "dotenv/config";
 
 const TabPanel = (props) => {
@@ -88,12 +87,20 @@ const SaleDialog = (props) => {
         price: values.price,
       };
 
-      const result = await approveToken(
-        props.contractAddress,
+      console.log("NFTContract", props.contractAddress);
+
+      const result = await setApprovalForAll(
         marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
-        props.tokenId,
-        values.quantity
+        props.contractAddress,
+        CONTRACT_TYPE.ERC1155
       );
+
+      // const result = await approveToken(
+      //   props.contractAddress,
+      //   marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
+      //   props.tokenId,
+      //   values.quantity
+      // );
 
       result
         ? dispatch(orderCreated(orderData))
