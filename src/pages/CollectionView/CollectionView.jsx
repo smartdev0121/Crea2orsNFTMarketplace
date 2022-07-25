@@ -5,26 +5,27 @@ import MColorButtonView from "../../components/MInput/MColorButtonView";
 import { MFlexBox } from "src/components/MLayout";
 import { fetchMetaData } from "src/utils/pinata";
 import CollectionInfoTab from "./CollectionInfoTab1";
-import { getContractUri } from "src/store/contract/actions";
+import { fetchCategories, getContractUri } from "src/store/contract/actions";
 import { MTopRadiusImg } from "src/components/MImages";
 import styled from "styled-components";
 import "./CollectionView.scss";
-import { categories } from "../CreateCollection/CreateCollectionPage";
 import { showNotify } from "src/utils/notify";
 import Slider from "./Slider";
 
 const CollectionView = (props) => {
+  const { contractAddress } = props.match.params;
   const newCollectionInfo = useSelector(
     (state) => state.contract.collectionInfo
   );
-  const { contractAddress } = props.match.params;
   const profile = useSelector((state) => state.profile);
-  const dispatch = useDispatch();
+  const categories = useSelector((state) => state.contract.categories);
   const [metaData, setMetaData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
 
   useEffect(async () => {
     dispatch(getContractUri(contractAddress));
+    dispatch(fetchCategories());
   }, []);
 
   useEffect(async () => {
@@ -61,7 +62,11 @@ const CollectionView = (props) => {
             <div className="image-info-part">
               <h2 className="pretty-text">{metaData?.name}</h2>
               <p className="category">
-                {categories[metaData?.category] + "/" + metaData?.subCategory}
+                {console.log("contract ", metaData)}
+                {categories.filter((item) => item.id == metaData?.category)[0]
+                  ?.name +
+                  "/" +
+                  metaData?.subCategory}
               </p>
               <p>Colleciton Token Limit: {metaData?.tokenLimit}</p>
             </div>

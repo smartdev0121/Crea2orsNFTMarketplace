@@ -29,6 +29,7 @@ import { styled } from "@mui/system";
 import MColorButtonView from "src/components/MInput/MColorButtonView";
 import { Form, Field } from "react-final-form";
 import { showSpinner, hideSpinner } from "src/store/app/actions";
+import MImageCropper from "src/components/MImageCropper";
 import MSpinner from "src/components/MSpinner";
 import { getSpinner } from "src/store/app/reducer";
 import { showNotify } from "src/utils/notify";
@@ -59,18 +60,23 @@ const CreateCollectionPage = (props) => {
       image: "",
     }
   );
-  const [file, setFile] = useState();
   const [vidStatus, setVidStatus] = useState(false);
   const hiddenFileInput = React.useRef(null);
-  const [type, setType] = useState();
+  const [type, setType] = useState(1);
+  const [file, setFile] = useState(null);
+  const [resizedImage, setResizedImage] = useState(null);
+  const [confirmedFile, setConfirmedFile] = useState(undefined);
+
   const isDeploying = useSelector((state) =>
     getSpinner(state, "DEPLOY_CONTRACT")
   );
+  const categories = useSelector((state) => state.contract.categories);
+  console.log("categories", categories);
   const dispatch = useDispatch();
   const [result, setResult] = React.useState("");
 
   useEffect(() => {
-    setType(collectionPreview ? categories.indexOf(collectionPreview.type) : 0);
+    setType(collectionPreview ? collectionPreview.type : 1);
     setResult(collectionPreview ? collectionPreview.image : null);
     setFile(collectionPreview ? collectionPreview.file : null);
   }, []);
@@ -92,8 +98,8 @@ const CreateCollectionPage = (props) => {
   };
 
   const handleFileChange = (e) => {
-    uploader(e);
-    setFile(e.target.files[0]);
+    // uploader(e);
+    e ? setFile(e.target.files[0]) : setFile(null);
   };
 
   const handleImageClick = (e) => {
@@ -107,10 +113,11 @@ const CreateCollectionPage = (props) => {
   const onPreview = () => {
     const newCollectionInfo = {
       ...inputValues,
-      type: categories[type],
-      image: result,
+      type: type,
+      image: resizedImage,
       file: file,
     };
+    console.log("before preview", newCollectionInfo);
     dispatch(submitCollectionPreview(newCollectionInfo));
     props.history.push("/collection-preview");
   };
@@ -129,6 +136,7 @@ const CreateCollectionPage = (props) => {
         <h4 class="wait-text">Deploying Collection...</h4>
       </div>`,
     });
+
     const metadata = {
       name: values.collectionName,
       symbol: values.symbol,
@@ -138,8 +146,9 @@ const CreateCollectionPage = (props) => {
       category: type,
       subCategory: values.subCategory,
       tokenLimit: values.tokenLimit,
-      file: file,
+      file: confirmedFile,
     };
+    console.log("Metadata", metadata);
     try {
       console.log("Before");
       // dispatch(showSpinner("DEPLOY_CONTRACT"));
@@ -148,7 +157,7 @@ const CreateCollectionPage = (props) => {
         metadata
       );
 
-      deploy_wait.finish();
+      deploy_wait?.finish();
 
       register_wait = pleaseWait({
         logo: "/favicon.ico",
@@ -172,7 +181,7 @@ const CreateCollectionPage = (props) => {
         contractAddress
       );
 
-      register_wait.finish();
+      register_wait?.finish();
 
       // const resultCr2Setup = await setupCR2Token(
       //   marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
@@ -190,14 +199,14 @@ const CreateCollectionPage = (props) => {
         )
       );
       showNotify(`Collection is successfully created: ${contractAddress}`);
-      deploy_wait.finish();
-      register_wait.finish();
+      deploy_wait?.finish();
+      register_wait?.finish();
       dispatch(hideSpinner("DEPLOY_CONTRACT"));
     } catch (err) {
       console.log(err);
       showNotify(`Unfortunately, network connection problem occured`, "error");
-      deploy_wait.finish();
-      register_wait.finish();
+      deploy_wait?.finish();
+      register_wait?.finish();
     }
   };
 
@@ -207,9 +216,24 @@ const CreateCollectionPage = (props) => {
     setType(value);
   };
 
+  const onDiscard = (file) => {
+    setFile(null);
+  };
+
   return (
     <div className="whole-container">
       {isDeploying && <MSpinner />}
+      <MImageCropper
+        file={file}
+        onConfirm={(croppedFile) => {
+          setResizedImage(window.URL.createObjectURL(croppedFile));
+          setConfirmedFile(croppedFile);
+          return;
+        }}
+        onCompleted={() => setFile(null)}
+        ratio={3}
+        onDiscard={onDiscard}
+      />
       <Container
         maxWidth="md"
         sx={{ paddingTop: "100px", paddingBottom: "20px" }}
@@ -310,7 +334,9 @@ const CreateCollectionPage = (props) => {
                       </Stack>
                       <Field
                         name="type"
-                        values={categories}
+                        values={categories?.filter(
+                          (item) => item.parent_id == 0
+                        )}
                         selectValue={type}
                         label="Category"
                         component={MSelectBox}
@@ -390,7 +416,7 @@ const CreateCollectionPage = (props) => {
                         >
                           <img
                             src={
-                              result ||
+                              resizedImage ||
                               (collectionPreview?.image
                                 ? collectionPreview?.image
                                 : "/images/img_empty.png")
@@ -435,11 +461,12 @@ const PreviewBtn = styled(Button)(
   `
 );
 
-export const categories = [
-  "Art",
-  "Music",
-  "Ticket",
-  "Community",
-  "Moments",
-  "Asset",
-];
+// export const categories = [
+//   "All",
+//   "Art",
+//   "Music",
+//   "Ticket",
+//   "Community",
+//   "Moments",
+//   "Asset",
+// ];

@@ -32,7 +32,7 @@ export default function CreateNFTPage(props) {
   const newCollectionInfo = useSelector(
     (state) => state.contract.collectionInfo
   );
-  console.log(newCollectionInfo);
+  const isLoading = useSelector((state) => getSpinner(state, "SAVING_NFT"));
   const { contractAddress, contractId } = props.match.params;
   const [file, setFile] = React.useState(null);
   const [formInitialValues, setFormInitialValues] = React.useState({});
@@ -118,9 +118,9 @@ export default function CreateNFTPage(props) {
       file: file,
       traits,
     };
-
+    let loading_screen;
     try {
-      var loading_screen = pleaseWait({
+      loading_screen = pleaseWait({
         logo: "/favicon.ico",
         backgroundColor: "#343434",
         loadingHtml: `<div class="spinner">
@@ -146,7 +146,7 @@ export default function CreateNFTPage(props) {
         curWalletAddress
       );
       if (metaDataUri) {
-        showNotify("NFT is minted successfully!");
+        showNotify("NFT is created successfully!");
         dispatch(
           saveNFT(
             contractId,
@@ -159,16 +159,13 @@ export default function CreateNFTPage(props) {
             contractAddress
           )
         );
-        console.log(
-          newCollectionInfo.tokenLimit,
-          newCollectionInfo.nfts.length
-        );
+
         if (newCollectionInfo.tokenLimit <= newCollectionInfo.nfts.length + 1) {
           showNotify(
             "Congratulation!. You created all NFTs of your collection."
           );
           props.history.push("/");
-          loading_screen.finish();
+          loading_screen?.finish();
           setResult(undefined);
           setFile(null);
           return;
@@ -179,22 +176,23 @@ export default function CreateNFTPage(props) {
         showNotify("Error is occured on minting!", "error");
       }
 
-      loading_screen.finish();
+      loading_screen?.finish();
       setResult(undefined);
       setFile(null);
     } catch (err) {
+      console.log(err);
       showNotify(
         "You can't mint your nft by some issue, confirm input values and try again!",
         "error"
       );
-      loading_screen.finish();
+      loading_screen?.finish();
       setResult(undefined);
       setFile(null);
     }
   };
   return (
     <div className="whole-container">
-      {isMinting && <MSpinner />}
+      {isLoading && <MSpinner />}
       <Container
         maxWidth="md"
         sx={{ paddingTop: "100px", paddingBottom: "20px" }}
@@ -268,7 +266,7 @@ export default function CreateNFTPage(props) {
                         <label>Put on marketplace</label>
                         <Switch
                           onChange={onPutonChange}
-                          defaultChecked="true"
+                          defaultChecked={true}
                         ></Switch>
                       </div>
                       <div>

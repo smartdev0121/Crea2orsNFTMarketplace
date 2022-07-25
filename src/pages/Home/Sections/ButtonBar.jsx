@@ -1,37 +1,30 @@
 import React from "react";
 import { Button, Box } from "@mui/material";
-import { FormLabel } from "@mui/material";
 
-const ButtonBar = () => {
+const ButtonBar = ({ categories, onClicked }) => {
   const [checked, setChecked] = React.useState(true);
 
   const handleChange = (event) => {
     setChecked(event.target.checked);
   };
 
-  return (
-    <Box className="section-welcome container">
-      <div className="button-bar">
-        <FormLabel className="category-label">CATEGORIES</FormLabel>
+  const handleClick = (eve, id) => {
+    onClicked(eve, id);
+  };
 
-        <Button className="btn outline category-btn">
-          <img src="/images/home/art.svg"></img>Art
-        </Button>
-        <Button className="btn outline category-btn">
-          <img src="/images/home/music.svg"></img>Music
-        </Button>
-        <Button className="btn outline category-btn">
-          <img src="/images/home/ticket.svg"></img>Ticket
-        </Button>
-        <Button className="btn outline category-btn">
-          <img src="/images/home/community.svg"></img>Community
-        </Button>
-        <Button className="btn outline category-btn">
-          <img src="/images/home/moments.svg"></img>Moments
-        </Button>
-        <Button className="btn outline category-btn">
-          <img src="/images/home/default.svg"></img>Asset
-        </Button>
+  return (
+    <Box className="container">
+      <div className="button-bar">
+        {categories?.map((item, index) => (
+          <Button
+            className="btn outline category-btn"
+            key={item.name + index}
+            onClick={(eve) => handleClick(eve, item.id)}
+          >
+            <img src={item.icon_url}></img>
+            {item.name}
+          </Button>
+        ))}
       </div>
     </Box>
   );

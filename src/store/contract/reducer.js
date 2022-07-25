@@ -23,6 +23,8 @@ export default (appState = initialState, { type, payload }) => {
       return { ...appState, userNfts: [...payload] };
     case types.COLLECTION_PREVIEW:
       return { ...appState, collectionPreview: payload };
+    case types.CATEGORY_FETCHED:
+      return { ...appState, categories: [...payload] };
     default:
       return appState;
   }

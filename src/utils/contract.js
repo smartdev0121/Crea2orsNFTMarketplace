@@ -104,12 +104,7 @@ export const deployContract = (contract_type, contract_metadata) =>
 
       const bytecode = await readContractByteCode(contract_type);
       const contract_data = await readContractABI(contract_type);
-      console.log(bytecode);
-      console.log(contract_data);
-      console.log(
-        "CURRENCE",
-        currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
-      );
+
       const contract = new web3.eth.Contract(contract_data);
       console.log("deploying");
       contract
@@ -263,20 +258,26 @@ export const transferNFT = (
       const wallet_address = await getCurrentWalletAddress();
 
       const contract = new web3.eth.Contract(contract_data, managerAddress);
-      console.log(managerAddress);
-      console.log(contract.methods);
-      await contract.methods
-        .transferNFT(
-          contract_address,
-          from_address,
-          wallet_address,
-          id,
-          amount,
-          web3.utils
-            .toBN(BigNumber(price).times(BigNumber(10).pow(CURRENCYDECIMAL)))
-            .toNumber()
-        )
-        .send({ from: wallet_address, to: managerAddress, gas: 300000 });
+
+      const tx = {
+        from: wallet_address,
+        to: managerAddress,
+        gas: 1000000,
+        data: contract.methods
+          .transferNFT(
+            contract_address,
+            from_address,
+            wallet_address,
+            id,
+            amount,
+            web3.utils
+              .toBN(BigNumber(price).times(BigNumber(10).pow(CURRENCYDECIMAL)))
+              .toNumber()
+          )
+          .encodeABI(),
+      };
+
+      await web3.eth.sendTransaction(tx);
 
       return resolve(true);
     } catch (err) {
@@ -301,42 +302,31 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
       const wallet_address = await getCurrentWalletAddress();
       const contract = new web3.eth.Contract(contract_data, contract_address);
 
-      console.log(
-        typeof wallet_address,
-        wallet_address,
-        metadata.tokenId,
-        metadata.metaUri,
-        metadata.initialSupply,
-        web3.utils
-          .toBN(
-            BigNumber(metadata.mintPrice).times(
-              BigNumber(10).pow(CURRENCYDECIMAL)
-            )
-          )
-          .toNumber(),
-        metadata.mintCount,
-        metadata.royaltyFee,
-        metadata.royaltyAddress
-      );
-
-      await contract.methods
-        .redeem(
-          wallet_address,
-          metadata.tokenId,
-          metadata.metaUri,
-          metadata.initialSupply,
-          web3.utils
-            .toBN(
-              BigNumber(metadata.mintPrice).times(
-                BigNumber(10).pow(CURRENCYDECIMAL)
+      const tx = {
+        from: wallet_address,
+        to: contract_address,
+        gas: 1000000,
+        data: contract.methods
+          .redeem(
+            wallet_address,
+            metadata.tokenId,
+            metadata.metaUri,
+            metadata.initialSupply,
+            web3.utils
+              .toBN(
+                BigNumber(metadata.mintPrice).times(
+                  BigNumber(10).pow(CURRENCYDECIMAL)
+                )
               )
-            )
-            .toNumber(),
-          metadata.mintCount,
-          metadata.royaltyFee,
-          metadata.royaltyAddress
-        )
-        .send({ from: wallet_address, to: contract_address, gas: 300000 });
+              .toNumber(),
+            metadata.mintCount,
+            metadata.royaltyFee,
+            metadata.royaltyAddress
+          )
+          .encodeABI(),
+      };
+
+      await web3.eth.sendTransaction(tx);
 
       return resolve(true);
     } catch (e) {
@@ -615,6 +605,8 @@ export const setApprovalForAll = (
         .isApprovedForAll(current_address, contract_address)
         .call();
 
+      console.log("Hey", current_address, contract_address, isApproved);
+
       if (!isApproved) {
         const tx = {
           from: current_address,
@@ -628,7 +620,7 @@ export const setApprovalForAll = (
       }
 
       showNotify("Success", "Approved successfully", "success", 3);
-      return resolve({ success: true });
+      return resolve(true);
     } catch (e) {
       showNotify("Failed", "Failed", "failed", 3);
       return reject();
@@ -672,7 +664,7 @@ export const approve = (
 
       await web3.eth.sendTransaction(tx);
 
-      return resolve({ success: true });
+      return resolve(true);
     } catch (e) {
       return reject();
     }

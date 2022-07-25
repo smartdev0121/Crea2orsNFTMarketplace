@@ -3,6 +3,7 @@ import { types } from "./actions";
 const initialState = {
   spinners: {},
   contents: [],
+  collectionsByCategory: [],
 };
 
 export default (appState = initialState, { type, payload }) => {
@@ -28,10 +29,14 @@ export default (appState = initialState, { type, payload }) => {
         ...appState,
         contents: [...payload],
       };
+    case types.COLLECTIONS_BY_CATEGORY:
+      return {
+        ...appState,
+        collectionsByCategory: [...payload],
+      };
     default:
       return appState;
   }
 };
 
-export const getSpinner = (state, id = "app") =>
-  state.app.spinners[id] || false;
+export const getSpinner = (state, id = "app") => state.app.spinners.id || false;

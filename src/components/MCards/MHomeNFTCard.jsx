@@ -14,31 +14,32 @@ import { Visibility, Add, ShoppingCart, Diamond } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const MNFTCard = (props) => {
-  const { data, isLoading } = props;
-  console.log("Item", data);
+  const { nft, isLoading } = props;
   const onNftClicked = (index) => {
     props.history.push(`/nft-view/${index}`);
   };
   return (
-    <CardContainer onClick={(eve, index) => onNftClicked(data?.nfts?.id)}>
+    <CardContainer onClick={(eve, index) => onNftClicked(nft?.id)}>
       <Grid container sx={{ height: "300px" }}>
         <Grid item xs={12} sx={{ height: "300px", position: "relative" }}>
           {isLoading ? (
-            <Skeleton animation="wave" width="100%" height="17px" />
+            <Skeleton animation="wave" width="70%" height="17px" />
           ) : (
             <MName>
-              <span>{data?.nfts?.name}</span>
+              <span>{nft?.name}</span>
             </MName>
           )}
           {isLoading ? (
             <Skeleton animation="wave" width="100%" height="300px" />
           ) : (
-            <MImg src={data?.nfts?.file_url}></MImg>
+            <MImg src={nft?.file_url}></MImg>
           )}
-          {!isLoading && (
+          {isLoading ? (
+            <Skeleton animation="wave" width="100%" height="50px" />
+          ) : (
             <MChip
               icon={<Diamond />}
-              label={data?.amount + "/" + data?.nfts?.batch_size}
+              label={nft?.minted_count + "/" + nft?.batch_size}
             />
           )}
         </Grid>

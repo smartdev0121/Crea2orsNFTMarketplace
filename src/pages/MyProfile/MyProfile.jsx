@@ -200,6 +200,7 @@ const MyProfile = (props) => {
             />
             <MImageCropper
               file={file}
+              ratio="2.8"
               onConfirm={(croppedFile) => {
                 setResizedImage(window.URL.createObjectURL(croppedFile));
                 setConfirmedFile(croppedFile);
@@ -213,6 +214,7 @@ const MyProfile = (props) => {
                   );
                   return;
                 }
+                console.log(data);
                 dispatch(profileBackgroundUpdate(data));
               }}
               onCompleted={() => setFile(null)}

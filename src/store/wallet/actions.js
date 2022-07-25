@@ -2,6 +2,7 @@ import * as api from "src/utils/magicApi";
 import { showNotify } from "src/utils/notify";
 import { setToken } from "src/utils/storage";
 import { getProfile } from "../profile/actions";
+import { fetchCategories } from "../contract/actions";
 export const types = {
   CONNECTED_WALLET: "CONNECTED_WALLET",
   REJECT_WALLET: "REJECT_WALLET",
@@ -24,6 +25,7 @@ export const connectedWallet = (walletAddress) => async (dispatch) => {
         payload: "",
       });
       dispatch(getProfile(walletAddress));
+      dispatch(fetchCategories());
     })
     .catch((err) => console.log(err));
 };

@@ -9,7 +9,9 @@ const MViewCollection = ({ name, category, history, contractAddress, id }) => {
     <>
       <div className="view-collection-back"></div>
       <div className="view-collection">
-        <h4 className="category-name">{category || "EMPTY"}</h4>
+        <h4 className="category-name">
+          {category ? category[0]?.name : "EMPTY"}
+        </h4>
         <h4 className="collection-name">
           {name || "Landscape of Canadian mountains"}
         </h4>

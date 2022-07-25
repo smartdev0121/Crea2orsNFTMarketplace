@@ -46,7 +46,7 @@ const NFTView = (props) => {
   const [curUserAmount, setCurUserAmount] = useState(0);
   const isMaking = useSelector((state) => getSpinner(state, "MAKING_ORDER"));
   const [open, setOpen] = React.useState(false);
-  console.log(blob);
+
   useEffect(async () => {
     dispatch(getNFTInformation(nftId));
   }, []);
