@@ -6,6 +6,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserHistory } from "history";
 import { ConnectedRouter } from "connected-react-router";
+import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import "antd/dist/antd.css";
 import "react-multi-carousel/lib/styles.css";
@@ -58,7 +59,9 @@ ReactDOM.render(
       <Provider store={store}>
         <ConnectedRouter history={history}>
           <ThemeProvider theme={darkTheme}>
-            <App />
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
           </ThemeProvider>
         </ConnectedRouter>
       </Provider>
