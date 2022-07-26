@@ -35,6 +35,7 @@ export default function CreateNFTPage(props) {
     (state) => state.contract.collectionInfo
   );
   const isLoading = useSelector((state) => getSpinner(state, "SAVING_NFT"));
+  console.log("LOADING", isLoading);
   const { contractAddress, contractId } = props.match.params;
   const [file, setFile] = React.useState(null);
   const [result, setResult] = React.useState(null);
@@ -99,6 +100,7 @@ export default function CreateNFTPage(props) {
       props.history.push("/");
       return;
     }
+
     let traits = [];
 
     traits = property.map((item) => {
