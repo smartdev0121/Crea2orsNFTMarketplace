@@ -12,6 +12,12 @@ export const connectedWallet = (walletAddress) => async (dispatch) => {
   return api
     .post("/wallet-connected", { walletAddress: walletAddress })
     .then((res) => {
+      if (res?.result == "blocked") {
+        showNotify(
+          "Your account is blocked. Ask for administrator. Email address: lo.egan918@gmail.com"
+        );
+        return;
+      }
       if (res.token) {
         setToken(res.token);
       }

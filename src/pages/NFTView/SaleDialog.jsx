@@ -30,7 +30,7 @@ import { useSelector } from "react-redux";
 import { marketplace_contract_address } from "src/config/contracts";
 import { pleaseWait } from "please-wait";
 import { CONTRACT_TYPE } from "src/config/global";
-
+import { progressDisplay } from "src/utils/pleaseWait";
 import "dotenv/config";
 
 const TabPanel = (props) => {
@@ -65,19 +65,9 @@ const SaleDialog = (props) => {
     }
     const curTime = new Date().getTime();
     try {
-      var loading_screen = pleaseWait({
-        logo: "/favicon.ico",
-        backgroundColor: "#343434",
-        loadingHtml: `<div class="spinner">
-          <div class="bounce1"></div>
-          <div class="bounce2"></div>
-          <div class="bounce3"></div>
-        </div>
-        <div>
-          <h4 class="wait-text">Putting the NFT on marketplace ...</h4>
-        </div>`,
-        transitionSupport: false,
-      });
+      var loading_screen = progressDisplay.apply(
+        "Putting on NFT to marketplace..."
+      );
       const orderData = {
         maker_address: userProfile.walletAddress,
         user_id: userProfile.id,
@@ -87,28 +77,19 @@ const SaleDialog = (props) => {
         price: values.price,
       };
 
-      console.log("NFTContract", props.contractAddress);
-
       const result = await setApprovalForAll(
         marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
         props.contractAddress,
         CONTRACT_TYPE.ERC1155
       );
 
-      // const result = await approveToken(
-      //   props.contractAddress,
-      //   marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
-      //   props.tokenId,
-      //   values.quantity
-      // );
-
       result
         ? dispatch(orderCreated(orderData))
         : showNotify("Error occured in approving tokens", "error");
-      loading_screen.finish();
+      loading_screen?.finish();
     } catch (err) {
       console.log(err);
-      loading_screen.finish();
+      loading_screen?.finish();
     }
     props.onClose();
   };

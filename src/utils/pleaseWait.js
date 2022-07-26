@@ -1,4 +1,3 @@
-import React from "react";
 import { pleaseWait } from "please-wait";
 
 export const progressDisplay = (text) => {

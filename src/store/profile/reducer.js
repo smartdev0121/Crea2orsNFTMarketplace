@@ -1,4 +1,5 @@
 import { types } from "./actions";
+import { showNotify } from "src/utils/notify";
 
 const initialState = null;
 
@@ -22,3 +23,22 @@ export default (appState = initialState, { type, payload }) => {
 };
 
 export const getProfile = (state) => state.profile;
+
+export const blockStatus = (state) => {
+  if (state.profile.verified == -1) {
+    // showNotify(
+    //   "We discovered your suspicious actions. So you are blocked. If you want to unblock your account, please leave a message to lo.egan918@gmail.com"
+    // );
+    return true;
+  }
+  return true;
+};
+export const userStatus = (state) => {
+  if (state.profile.verified == 0) {
+    // showNotify(
+    //   "Your email are not verified yet. Go to the edit profile page and please verify your email."
+    // );
+    return true;
+  }
+  return true;
+};
