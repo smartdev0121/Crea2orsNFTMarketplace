@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CONTRACT_TYPE } from "src/config/global";
-import {
-  marketplace_contract_address,
-  currencyTokenAddress,
-} from "src/config/contracts";
+import { marketplace_contract_address } from "src/config/contracts";
 import {
   deployContract,
   holdEvent,
-  getValuefromEvent,
   addCollection2Manager,
-  setupCR2Token,
 } from "src/utils/contract";
 import {
   Button,
@@ -28,17 +22,15 @@ import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantity
 import { styled } from "@mui/system";
 import MColorButtonView from "src/components/MInput/MColorButtonView";
 import { Form, Field } from "react-final-form";
-import { showSpinner, hideSpinner } from "src/store/app/actions";
 import MImageCropper from "src/components/MImageCropper";
-import MSpinner from "src/components/MSpinner";
-import { getSpinner } from "src/store/app/reducer";
 import { showNotify } from "src/utils/notify";
 import {
   saveCollection,
   submitCollectionPreview,
 } from "../../store/contract/actions";
 import { formValidation } from "./form-validation";
-import { pleaseWait } from "please-wait";
+import { progressDisplay } from "src/utils/pleaseWait";
+import { userStatus } from "src/store/profile/reducer";
 import "./CreateCollectionPage.scss";
 import "dotenv/config";
 
@@ -60,18 +52,16 @@ const CreateCollectionPage = (props) => {
       image: "",
     }
   );
+
   const [vidStatus, setVidStatus] = useState(false);
   const hiddenFileInput = React.useRef(null);
   const [type, setType] = useState(1);
   const [file, setFile] = useState(null);
   const [resizedImage, setResizedImage] = useState(null);
   const [confirmedFile, setConfirmedFile] = useState(undefined);
+  const status = useSelector((state) => userStatus(state));
 
-  const isDeploying = useSelector((state) =>
-    getSpinner(state, "DEPLOY_CONTRACT")
-  );
   const categories = useSelector((state) => state.contract.categories);
-  console.log("categories", categories);
   const dispatch = useDispatch();
   const [result, setResult] = React.useState("");
 
@@ -81,24 +71,11 @@ const CreateCollectionPage = (props) => {
     setFile(collectionPreview ? collectionPreview.file : null);
   }, []);
 
-  const useDisplayImage = () => {
-    const uploader = (e) => {
-      const imageFile = e.target.files[0];
-      const reader = new FileReader();
-      reader.addEventListener("load", (e) => {
-        setResult(e.target.result);
-      });
-      reader.readAsDataURL(imageFile);
-    };
-    return { uploader };
-  };
-
   const handleInputChange = (e) => {
     setInputValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleFileChange = (e) => {
-    // uploader(e);
     e ? setFile(e.target.files[0]) : setFile(null);
   };
 
@@ -124,18 +101,7 @@ const CreateCollectionPage = (props) => {
 
   const onSubmit = async (values) => {
     let register_wait;
-    let deploy_wait = pleaseWait({
-      logo: "/favicon.ico",
-      backgroundColor: "#343434",
-      loadingHtml: `<div class="spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
-      </div>
-      <div>
-        <h4 class="wait-text">Deploying Collection...</h4>
-      </div>`,
-    });
+    let deploy_wait = progressDisplay("Deploying collection...");
 
     const metadata = {
       name: values.collectionName,
@@ -148,10 +114,7 @@ const CreateCollectionPage = (props) => {
       tokenLimit: values.tokenLimit,
       file: confirmedFile,
     };
-    console.log("Metadata", metadata);
     try {
-      console.log("Before");
-      // dispatch(showSpinner("DEPLOY_CONTRACT"));
       const { contractAddress, contractUri, imageUri } = await deployContract(
         0,
         metadata
@@ -159,34 +122,18 @@ const CreateCollectionPage = (props) => {
 
       deploy_wait?.finish();
 
-      register_wait = pleaseWait({
-        logo: "/favicon.ico",
-        backgroundColor: "#343434",
-        loadingHtml: `<div class="spinner">
-          <div class="bounce1"></div>
-          <div class="bounce2"></div>
-          <div class="bounce3"></div>
-        </div>
-        <div>
-          <h4 class="wait-text">Registering Collection...</h4>
-        </div>`,
-      });
-
-      await register_wait.updateLoadingHtml(
-        " <div class='spinner'><div class='bounce1'></div>          <div class='bounce2'></div>          <div class='bounce3'></div>        </div>        <div>          <h4 class='wait-text'>WHy??? ...</h4>        </div>"
-      );
+      register_wait = progressDisplay("Registering collection ...");
 
       const result = await addCollection2Manager(
         marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
         contractAddress
       );
 
-      register_wait?.finish();
+      if (!result) {
+        showNotify("Sorry, We can't add your collection", "error");
+      }
 
-      // const resultCr2Setup = await setupCR2Token(
-      //   marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
-      //   currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
-      // );
+      register_wait?.finish();
 
       const events = await holdEvent("ContractDeployed", contractAddress);
       dispatch(
@@ -201,16 +148,13 @@ const CreateCollectionPage = (props) => {
       showNotify(`Collection is successfully created: ${contractAddress}`);
       deploy_wait?.finish();
       register_wait?.finish();
-      dispatch(hideSpinner("DEPLOY_CONTRACT"));
     } catch (err) {
       console.log(err);
-      showNotify(`Unfortunately, network connection problem occured`, "error");
+      showNotify(`Unfortunately, error occurred`, "error");
       deploy_wait?.finish();
       register_wait?.finish();
     }
   };
-
-  const { uploader } = useDisplayImage();
 
   const valueChanged = (value) => {
     setType(value);
@@ -222,7 +166,6 @@ const CreateCollectionPage = (props) => {
 
   return (
     <div className="whole-container">
-      {isDeploying && <MSpinner />}
       <MImageCropper
         file={file}
         onConfirm={(croppedFile) => {
@@ -460,13 +403,3 @@ const PreviewBtn = styled(Button)(
   color: white;
   `
 );
-
-// export const categories = [
-//   "All",
-//   "Art",
-//   "Music",
-//   "Ticket",
-//   "Community",
-//   "Moments",
-//   "Asset",
-// ];

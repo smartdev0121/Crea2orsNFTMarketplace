@@ -50,6 +50,7 @@ import "./MyProfile.scss";
 import "dotenv/config";
 
 const MyProfile = (props) => {
+  const params = props.match.params;
   const hiddenBackImageFile = React.useRef(null);
   const [connectBtnTxt, setConnectBtnTxt] = useState("Connect");
   const [resizedImage, setResizedImage] = useState(null);
@@ -153,9 +154,10 @@ const MyProfile = (props) => {
   };
 
   const onSubmit = (content) => {
-    dispatch(reportPage(content));
+    dispatch(reportPage(content, params.customUrl));
     setReportOpen(false);
   };
+
   return (
     <Container maxWidth="xl" sx={{ marginTop: "100px" }}>
       <section className="profile-info-bar">

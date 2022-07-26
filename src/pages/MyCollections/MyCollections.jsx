@@ -6,15 +6,25 @@ import MColorButtonView from "src/components/MInput/MColorButtonView";
 import MCollectionCard from "src/components/MCards/MCollectionCard";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserCollections } from "src/store/contract/actions";
+import { userStatus } from "src/store/profile/reducer";
+import { showNotify } from "src/utils/notify";
 
 const MyCollections = (props) => {
   const dispatch = useDispatch();
   const myCollections = useSelector((state) => state.contract.myCollections);
+  const status = useSelector((state) => userStatus(state));
+
   useEffect(() => {
     dispatch(getUserCollections());
   }, []);
 
-  const onNewCollection = () => {
+  const onNewCollection = async () => {
+    if (!status) {
+      showNotify(
+        "Your email are not verified yet. Go to the edit profile page and please verify your email."
+      );
+      return;
+    }
     props.history.push("/create-collection");
   };
 

@@ -23,17 +23,12 @@ import { holdEvent, getValuefromEvent } from "src/utils/order";
 import { currencyTokenAddress } from "src/config/contracts";
 import { orderFinialized, bidPlaced } from "src/store/order/actions";
 import MBidDialog from "./MBidDialog";
-import {
-  transferNFT,
-  getTokenBalance,
-  allowance,
-  approve,
-  setApprovalForAll,
-} from "src/utils/contract";
+import { transferNFT, getTokenBalance, approve } from "src/utils/contract";
 import { marketplace_contract_address } from "src/config/contracts";
 import { showNotify } from "src/utils/notify";
 import { CONTRACT_TYPE } from "src/config/global";
 import { progressDisplay } from "src/utils/pleaseWait";
+import { userStatus } from "src/store/profile/reducer";
 import "dotenv/config";
 
 export default function CustomizedTables(props) {
@@ -42,6 +37,8 @@ export default function CustomizedTables(props) {
   const profile = useSelector((state) => state.profile);
   const [confirmStatus, setConfirmStatus] = React.useState(false);
   const contractAddress = props.contractAddress;
+  const status = useSelector((state) => userStatus(state));
+
   const [bidDlgOpen, setBidDlgOpen] = React.useState(false);
   const [rowIndex, setRowIndex] = React.useState(0);
   const [cancelOrderID, setCancelOrderID] = React.useState(undefined);
@@ -52,19 +49,6 @@ export default function CustomizedTables(props) {
   }, []);
 
   const cancelOrder = async (id) => {
-    const OrderState = {
-      Creator: ordersData[id].creatorAddress,
-      NftAddress: contractAddress,
-      TokenId: ordersData[id].contractNftId,
-      Amount: ordersData[id].amount,
-      Price: ordersData[id].price,
-      StartTime: ordersData[id].startTime,
-      EndTime: ordersData[id].endTime,
-      OrderType: ordersData[id].orderType,
-      Buyer: ordersData[id].creatorAddress,
-      BuyerPrice: ordersData[id].price,
-      CurrencyTokenDecimals: 9,
-    };
     dispatch(canceledOrder(ordersData[id].id));
   };
 
@@ -79,6 +63,12 @@ export default function CustomizedTables(props) {
   };
 
   const buyOrder = async (id) => {
+    if (!status) {
+      showNotify(
+        "Your email are not verified yet. Go to the edit profile page and please verify your email."
+      );
+      return;
+    }
     let cr2Approving = progressDisplay(
       `Approving ${ordersData[id].price}CREA2`
     );
@@ -90,21 +80,20 @@ export default function CustomizedTables(props) {
     const balance = await getTokenBalance(
       currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID]
     );
-    console.log("balance", balance);
+
     if (!balance) {
       showNotify(
         "An error occurred while obtaining your CR2 wallet balance",
         "error"
       );
-      cr2Approving.finish();
+      cr2Approving?.finish();
       return;
     } else if (balance < ordersData[id].price) {
       showNotify("Your CR2 balance is less than the NFT mint price", "warning");
-      cr2Approving.finish();
+      cr2Approving?.finish();
       return;
     }
     try {
-      console.log("before approve");
       const approveResult = await approve(
         marketplace_contract_address[process.env.REACT_APP_CUR_CHAIN_ID],
         currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],

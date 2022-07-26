@@ -37,6 +37,9 @@ import { MRoundBox } from "src/components/MLayout";
 import { getSpinner } from "src/store/app/reducer";
 import MSpinner from "src/components/MSpinner";
 import MintStatus from "./MintStatus";
+import { userStatus } from "src/store/profile/reducer";
+import { showNotify } from "src/utils/notify";
+
 const NFTView = (props) => {
   const { nftId } = props.match.params;
   const [blob, setBlob] = useState();
@@ -46,6 +49,7 @@ const NFTView = (props) => {
   const [curUserAmount, setCurUserAmount] = useState(0);
   const isMaking = useSelector((state) => getSpinner(state, "MAKING_ORDER"));
   const [open, setOpen] = React.useState(false);
+  const status = useSelector((state) => userStatus(state));
 
   useEffect(async () => {
     dispatch(getNFTInformation(nftId));
@@ -60,6 +64,12 @@ const NFTView = (props) => {
   }, [nftInfo]);
 
   const handleClickOpen = () => {
+    if (!status) {
+      showNotify(
+        "Your email are not verified yet. Go to the edit profile page and please verify your email."
+      );
+      return;
+    }
     setOpen(true);
   };
 

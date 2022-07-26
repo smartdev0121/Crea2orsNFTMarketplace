@@ -20,14 +20,15 @@ import {
   getTokenBalance,
   approve,
   allowance,
-  transferCustomCrypto,
 } from "src/utils/contract";
 import { CONTRACT_TYPE } from "src/config/global";
 import { useDispatch, useSelector } from "react-redux";
 import { nftMinted } from "src/store/order/actions";
-import { pleaseWait } from "please-wait";
 import { showNotify } from "src/utils/notify";
 import { currencyTokenAddress } from "src/config/contracts";
+import { progressDisplay } from "src/utils/pleaseWait";
+import { userStatus } from "src/store/profile/reducer";
+
 import "dotenv/config";
 
 const MintStatus = (props) => {
@@ -35,6 +36,8 @@ const MintStatus = (props) => {
   const [walAbbr, setWalAbbr] = useState("");
   const [buyOrderConfirm, setBuyOrderConfirm] = React.useState(false);
   const dispatch = useDispatch();
+  const status = useSelector((state) => userStatus(state));
+
   const profile = useSelector((state) => state.profile);
 
   useEffect(() => {
@@ -54,6 +57,12 @@ const MintStatus = (props) => {
   };
 
   const mintNFT = async (index) => {
+    if (!status) {
+      showNotify(
+        "Your email are not verified yet. Go to the edit profile page and please verify your email."
+      );
+      return;
+    }
     const amount = 1;
 
     const balance = await getTokenBalance(
@@ -71,19 +80,9 @@ const MintStatus = (props) => {
       return;
     }
 
-    var approve_wait = pleaseWait({
-      logo: "/favicon.ico",
-      backgroundColor: "#343434",
-      loadingHtml: `<div class="spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
-      </div>
-      <div>
-        <h4 class="wait-text"> Approving ${creator.price} CREA2 to Manager ...</h4>
-      </div>`,
-      transitionSupport: false,
-    });
+    let approve_wait = progressDisplay(
+      ` Approving ${creator.price} CREA2 to Manager ...`
+    );
 
     const approveResult = await approve(
       props.contractAddress,
@@ -111,19 +110,7 @@ const MintStatus = (props) => {
       return;
     }
 
-    var mint_wait = pleaseWait({
-      logo: "/favicon.ico",
-      backgroundColor: "#343434",
-      loadingHtml: `<div class="spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
-      </div>
-      <div>
-        <h4 class="wait-text">Minting NFT ...</h4>
-      </div>`,
-      transitionSupport: false,
-    });
+    var mint_wait = progressDisplay("Minting NFT ...");
 
     try {
       const metaData = {
@@ -144,39 +131,20 @@ const MintStatus = (props) => {
 
       mint_wait?.finish();
 
-      // var pay_wait = pleaseWait({
-      //   logo: "/favicon.ico",
-      //   backgroundColor: "#343434",
-      //   loadingHtml: `<div class="spinner">
-      //     <div class="bounce1"></div>
-      //     <div class="bounce2"></div>
-      //     <div class="bounce3"></div>
-      //   </div>
-      //   <div>
-      //     <h4 class="wait-text">Paying ${creator.price} to creator ...</h4>
-      //   </div>`,
-      //   transitionSupport: false,
-      // });
-      // const cr2Result = await transferCustomCrypto(
-      //   currencyTokenAddress[process.env.REACT_APP_CUR_CHAIN_ID],
-      //   creator.user.wallet_address,
-      //   Number(creator.price)
-      // );
-
-      // pay_wait?.finish();
       if (result) {
         dispatch(nftMinted(creator.id, Number(amount)));
       }
     } catch (err) {
       mint_wait?.finish();
-      // pay_wait?.finish();
       console.log(err);
+      return;
     }
   };
 
   const buyOrderClicked = () => {
     setBuyOrderConfirm(true);
   };
+
   return (
     <>
       {creator && (

@@ -28,9 +28,9 @@ export const updateProfile = (newProfile) => ({
   payload: newProfile,
 });
 
-export const reportPage = (content) => async (disaptch) => {
+export const reportPage = (content, customUrl) => async (disaptch) => {
   return api
-    .post("/reportpage", { content })
+    .post("/reportpage", { content, customUrl })
     .then((res) => {
       if (res.result) {
         showNotify("Successfully reported about this user!");

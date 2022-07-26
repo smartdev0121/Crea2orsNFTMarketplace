@@ -74,7 +74,6 @@ function CropperModel(props) {
   };
 
   const handleClose = () => {
-    alert();
     setCropper(false);
     setImage(null);
     typeof props.onDiscard === "function" && props.onDiscard(file);

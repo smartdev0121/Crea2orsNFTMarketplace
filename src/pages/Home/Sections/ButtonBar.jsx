@@ -3,7 +3,7 @@ import { Button, Box } from "@mui/material";
 
 const ButtonBar = ({ categories, onClicked }) => {
   const [checked, setChecked] = React.useState(true);
-
+  console.log("categories", categories);
   const handleChange = (event) => {
     setChecked(event.target.checked);
   };

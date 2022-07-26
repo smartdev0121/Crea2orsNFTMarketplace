@@ -1,4 +1,4 @@
-import { Box, Skeleton } from "@mui/material";
+import { Box } from "@mui/material";
 import MViewCollection from "../../../components/MViewCollection";
 
 const WelcomeSection = ({

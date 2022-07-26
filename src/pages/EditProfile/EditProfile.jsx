@@ -272,15 +272,15 @@ const EditProfile = (props) => {
                     placeholder="Enter your email address"
                     InputLabelProps={{ shrink: true }}
                     component={MTextField}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          {verified}
-                        </InputAdornment>
-                      ),
-                    }}
+                    // InputProps={{
+                    //   endAdornment: (
+                    //     <InputAdornment position="end">
+                    //       {verified}
+                    //     </InputAdornment>
+                    //   ),
+                    // }}
                   />
-                  <section className="veri-part">
+                  {/* <section className="veri-part">
                     <div>
                       <h3>Verification</h3>
                       <p className="grey-txt">
@@ -295,7 +295,7 @@ const EditProfile = (props) => {
                         {mailSent ? "Resend" : "Get verified"}
                       </Button>
                     </div>
-                  </section>
+                  </section> */}
 
                   <MColorButtonView type="submit" disabled={submitting}>
                     Update Profile

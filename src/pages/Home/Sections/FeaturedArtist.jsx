@@ -27,4 +27,6 @@ export default FeaturedArtist;
 const MBox = styled.div`
   border: 1px solid #333;
   padding: 10px;
+  width: 89%;
+  margin: 0 auto;
 `;

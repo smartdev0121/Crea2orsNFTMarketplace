@@ -27,23 +27,27 @@ const TopCollection1 = ({ collectionDatas, history }) => {
   };
 
   return (
-    <section>
+    <section style={{ width: "90%", margin: "0 auto" }}>
       <InfiniteScroll
         dataLength={displayCollectionDatas?.length}
         hasMore={true}
         next={fetchMoredata}
-        loader={
-          <Skeleton
-            variant="rectangular"
-            width={"100%"}
-            height={118}
-            animation="wave"
-          />
-        }
+        endMessage={<div style={{ alignText: "center" }}>All loaded!</div>}
       >
         {displayCollectionDatas?.map((mainCollection1, index) => (
-          <div className="top-collection" key={"topcollection" + index}>
-            <div className="welcome-image collection-1">
+          <div
+            className="top-collection"
+            key={"topcollection" + index}
+            style={{
+              border: "1px solid #2c2c2c",
+              background: "#202020",
+              borderRadius: "10px",
+            }}
+          >
+            <div
+              className="welcome-image collection-1"
+              style={{ padding: "10px" }}
+            >
               <div className="top-collection pulse" key={2}>
                 <img
                   src={mainCollection1?.image_url || "/images/home/visual.png"}

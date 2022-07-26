@@ -130,7 +130,7 @@ const OtherProfile = (props) => {
   };
 
   const onSubmit = (content) => {
-    dispatch(reportPage(content));
+    dispatch(reportPage(content, params.customUrl));
     setReportOpen(false);
   };
 

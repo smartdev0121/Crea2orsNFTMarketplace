@@ -3,7 +3,7 @@ import MColorButtonView from "./MInput/MColorButtonView";
 
 const MViewCollection = ({ name, category, history, contractAddress, id }) => {
   const onCollectionView = () => {
-    history.push(`/collection-view/${contractAddress}/${id}`);
+    history.push(`/collection-view/${contractAddress}`);
   };
   return (
     <>

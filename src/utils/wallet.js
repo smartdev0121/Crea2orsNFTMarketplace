@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import Web3Modal, { injected } from "web3modal";
+import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import networks from "src/config/network";
 
@@ -23,6 +23,7 @@ web3Modal = new Web3Modal({
   cacheProvider: true, // optional
   providerOptions, // required
 });
+
 export const getCachedProvider = () => {
   return web3Modal.cachedProvider;
 };

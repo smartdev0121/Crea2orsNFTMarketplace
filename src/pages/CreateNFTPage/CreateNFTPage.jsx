@@ -23,7 +23,9 @@ import { createNFT, createVoucher } from "src/utils/contract";
 import { getCurrentWalletAddress } from "../../utils/wallet";
 import styled from "styled-components";
 import { formValidation } from "./form-validation";
-import { pleaseWait } from "please-wait";
+import { progressDisplay } from "src/utils/pleaseWait";
+import { userStatus } from "src/store/profile/reducer";
+
 import "./CreateNFTPage.scss";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -35,15 +37,14 @@ export default function CreateNFTPage(props) {
   const isLoading = useSelector((state) => getSpinner(state, "SAVING_NFT"));
   const { contractAddress, contractId } = props.match.params;
   const [file, setFile] = React.useState(null);
-  const [formInitialValues, setFormInitialValues] = React.useState({});
   const [result, setResult] = React.useState(null);
+  const status = useSelector((state) => userStatus(state));
   const [show, setShow] = React.useState(false);
   const [property, setProperty] = React.useState([0]);
   const [isPut, setIsPut] = React.useState(true);
   const [nftNumber, setNftNumber] = React.useState(1);
   const hiddenFileInput = React.useRef(null);
   const dispatch = useDispatch();
-  const isMinting = useSelector((state) => getSpinner(state, "NFT_MINTING"));
 
   useEffect(async () => {
     dispatch(getContractUri(contractAddress));
@@ -94,6 +95,12 @@ export default function CreateNFTPage(props) {
   };
 
   const onSubmit = async (values) => {
+    if (!status) {
+      showNotify(
+        "Your email are not verified yet. Go to the edit profile page and please verify your email."
+      );
+      return;
+    }
     await sleep(3000);
     if (newCollectionInfo.tokenLimit <= newCollectionInfo.nfts.length) {
       showNotify("Congratulation!. You created all NFTs of your collection.");
@@ -120,19 +127,7 @@ export default function CreateNFTPage(props) {
     };
     let loading_screen;
     try {
-      loading_screen = pleaseWait({
-        logo: "/favicon.ico",
-        backgroundColor: "#343434",
-        loadingHtml: `<div class="spinner">
-          <div class="bounce1"></div>
-          <div class="bounce2"></div>
-          <div class="bounce3"></div>
-        </div>
-        <div>
-          <h4 class="wait-text">Signing NFT metadata for Lazy Mint ...</h4>
-        </div>`,
-        transitionSupport: false,
-      });
+      loading_screen = progressDisplay("Signing NFT metadata...");
 
       const { metaDataUri, fileUri } = await createNFT(metaData);
 
@@ -145,6 +140,7 @@ export default function CreateNFTPage(props) {
         values.batchSize,
         curWalletAddress
       );
+
       if (metaDataUri) {
         showNotify("NFT is created successfully!");
         dispatch(
@@ -170,8 +166,6 @@ export default function CreateNFTPage(props) {
           setFile(null);
           return;
         }
-
-        // window.location.reload(false);
       } else {
         showNotify("Error is occured on minting!", "error");
       }

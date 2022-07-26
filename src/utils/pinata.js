@@ -61,7 +61,7 @@ export const uploadAssetMetaData = async (mt) =>
     // upload image to IPFS
 
     try {
-      let pinataImageResponse, pinataAudioResponse, pinataVideoResponse;
+      let pinataImageResponse;
 
       showNotification("Waiting", "Uploading Attachment Files...", "waiting");
 
