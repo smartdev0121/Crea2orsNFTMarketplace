@@ -11,14 +11,15 @@ export const uploadContractMetadata = async (mt) =>
 
       if (mt.file) {
         showNotification("Waiting", "Uploading Attachment Image...", "waiting");
-
+        console.log("File uploading to IPFS...");
         pinata_image_response = await pinFileToIPFS(mt.file);
         if (!pinata_image_response.success) {
+          console.log("File UPLOAD failed")
           showNotification("Failed", "Uploading Image Failed", "failed", 3);
           return reject();
         }
       }
-
+      console.log("PINATA image URL": pinata_image_response?.pinataUrl);
       showNotification("Waiting", "Uploading Metadata...", "waiting");
 
       let metadata = {
