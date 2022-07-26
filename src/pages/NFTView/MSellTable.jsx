@@ -63,12 +63,6 @@ export default function CustomizedTables(props) {
   };
 
   const buyOrder = async (id) => {
-    if (!status) {
-      showNotify(
-        "Your email are not verified yet. Go to the edit profile page and please verify your email."
-      );
-      return;
-    }
     let cr2Approving = progressDisplay(
       `Approving ${ordersData[id].price}CREA2`
     );

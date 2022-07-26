@@ -64,12 +64,6 @@ const NFTView = (props) => {
   }, [nftInfo]);
 
   const handleClickOpen = () => {
-    if (!status) {
-      showNotify(
-        "Your email are not verified yet. Go to the edit profile page and please verify your email."
-      );
-      return;
-    }
     setOpen(true);
   };
 
