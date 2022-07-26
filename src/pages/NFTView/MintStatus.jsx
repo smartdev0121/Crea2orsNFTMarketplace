@@ -57,12 +57,6 @@ const MintStatus = (props) => {
   };
 
   const mintNFT = async (index) => {
-    if (!status) {
-      showNotify(
-        "Your email are not verified yet. Go to the edit profile page and please verify your email."
-      );
-      return;
-    }
     const amount = 1;
 
     const balance = await getTokenBalance(

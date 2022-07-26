@@ -38,7 +38,6 @@ export default function CreateNFTPage(props) {
   const { contractAddress, contractId } = props.match.params;
   const [file, setFile] = React.useState(null);
   const [result, setResult] = React.useState(null);
-  const status = useSelector((state) => userStatus(state));
   const [show, setShow] = React.useState(false);
   const [property, setProperty] = React.useState([0]);
   const [isPut, setIsPut] = React.useState(true);
@@ -95,13 +94,6 @@ export default function CreateNFTPage(props) {
   };
 
   const onSubmit = async (values) => {
-    if (!status) {
-      showNotify(
-        "Your email are not verified yet. Go to the edit profile page and please verify your email."
-      );
-      return;
-    }
-    await sleep(3000);
     if (newCollectionInfo.tokenLimit <= newCollectionInfo.nfts.length) {
       showNotify("Congratulation!. You created all NFTs of your collection.");
       props.history.push("/");
