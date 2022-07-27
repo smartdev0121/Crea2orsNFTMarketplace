@@ -65,9 +65,7 @@ const SaleDialog = (props) => {
     }
     const curTime = new Date().getTime();
     try {
-      var loading_screen = progressDisplay.apply(
-        "Putting on NFT to marketplace..."
-      );
+      var loading_screen = progressDisplay("Putting on NFT to marketplace...");
       const orderData = {
         maker_address: userProfile.walletAddress,
         user_id: userProfile.id,

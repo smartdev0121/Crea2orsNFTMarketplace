@@ -20,6 +20,8 @@ import {
   getTokenBalance,
   approve,
   allowance,
+  holdEvent,
+  getValuefromEvent,
 } from "src/utils/contract";
 import { CONTRACT_TYPE } from "src/config/global";
 import { useDispatch, useSelector } from "react-redux";
@@ -109,6 +111,7 @@ const MintStatus = (props) => {
     try {
       const metaData = {
         tokenId: creator.nfts.nft_id,
+        bFirst: creator.nfts.nft_id == -1 ? true : false,
         metaUri: creator.nfts.metadata_url,
         mintCount: amount,
         mintPrice: creator.price,
@@ -124,9 +127,20 @@ const MintStatus = (props) => {
       );
 
       mint_wait?.finish();
-
+      console.log("Creator", creator);
       if (result) {
-        dispatch(nftMinted(creator.id, Number(amount)));
+        const event = await holdEvent("LazyMinted", props.contractAddress);
+        const values = await getValuefromEvent(event);
+        console.log("EVENT", values[0]);
+        console.log("EVENT1", creator);
+
+        console.log(
+          "Creator",
+          creator.nft_id,
+          Number(values[0]),
+          Number(amount)
+        );
+        dispatch(nftMinted(creator.nft_id, values[0], Number(amount)));
       }
     } catch (err) {
       mint_wait?.finish();

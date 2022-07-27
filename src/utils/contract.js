@@ -301,7 +301,7 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
       const contract_data = await readContractABI(contract_type);
       const wallet_address = await getCurrentWalletAddress();
       const contract = new web3.eth.Contract(contract_data, contract_address);
-
+      console.log(contract);
       const tx = {
         from: wallet_address,
         to: contract_address,
@@ -309,7 +309,8 @@ export const mintAsset = (contract_type, contract_address, metadata) =>
         data: contract.methods
           .redeem(
             wallet_address,
-            metadata.tokenId,
+            metadata.bFirst,
+            metadata.tokenId == -1 ? 0 : metadata.tokenId,
             metadata.metaUri,
             metadata.initialSupply,
             web3.utils

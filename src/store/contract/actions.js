@@ -92,6 +92,7 @@ export const saveNFT =
   ) =>
   async (dispatch) => {
     dispatch(showSpinner("SAVING_NFT"));
+    console.log("STRAT_SAVING_NFT");
     return api
       .post("/create-nft", {
         contractId,
