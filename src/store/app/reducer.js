@@ -9,6 +9,7 @@ const initialState = {
 export default (appState = initialState, { type, payload }) => {
   switch (type) {
     case types.SHOW_SPINNER:
+      console.log("SHOWING_SPINNER", payload);
       return {
         ...appState,
         spinners: {
@@ -17,6 +18,8 @@ export default (appState = initialState, { type, payload }) => {
         },
       };
     case types.HIDE_SPINNER:
+      console.log("HIDING_SPINNER", payload);
+
       return {
         ...appState,
         spinners: {

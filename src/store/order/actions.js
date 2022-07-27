@@ -1,5 +1,6 @@
 import * as api from "../../utils/magicApi";
 import { showNotify } from "../../utils/notify";
+import { getNFTInformation } from "../contract/actions";
 
 export const types = {
   ORDER_CREATED: "ORDER_CREATED",
@@ -28,11 +29,11 @@ export const orderCreated = (orderData) => async (dispatch) => {
   }
 };
 
-export const nftMinted = (nftId, amount) => async (dispatch) => {
+export const nftMinted = (nftId, contractNftId, amount) => async (dispatch) => {
   return api
-    .post(`/nft-minted`, { nftId, amount })
+    .post(`/nft-minted`, { nftId, contractNftId, amount })
     .then((res) => {
-      dispatch({ type: "NFT_FETCHED", payload: res.nftInfo });
+      dispatch(getNFTInformation(nftId));
       showNotify("Successfully minted!");
     })
     .catch((err) => {
