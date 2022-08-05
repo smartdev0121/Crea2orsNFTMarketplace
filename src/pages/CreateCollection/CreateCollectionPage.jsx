@@ -36,6 +36,7 @@ import "dotenv/config";
 import MScrollToTop from "src/components/MScrollToTop";
 
 const CreateCollectionPage = (props) => {
+  console.log(props);
   const collectionPreview = useSelector(
     (state) => state.contract.collectionPreview
   );
