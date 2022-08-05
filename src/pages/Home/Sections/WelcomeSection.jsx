@@ -1,14 +1,25 @@
 import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
 import MViewCollection from "../../../components/MViewCollection";
 
-const WelcomeSection = ({
-  topCollection,
-  topRightCollection,
-  topLeftCollection,
-  history,
-}) => {
+const WelcomeSection = ({ homepageContent, history }) => {
+  const [topCollection, setTopCollection] = useState(null);
+  const [topRightCollection, setTopRightCollection] = useState(null);
+  const [topLeftCollection, setTopLeftCollection] = useState(null);
+
+  useEffect(() => {
+    console.log(homepageContent);
+    console.log(homepageContent?.filter((item) => item.mode == "Top")[0]);
+    setTopCollection(homepageContent?.filter((item) => item.mode == "Top")[0]);
+    setTopRightCollection(
+      homepageContent?.filter((item) => item.mode == "Top_left")[0]
+    );
+    setTopLeftCollection(
+      homepageContent?.filter((item) => item.mode == "Top_right")[0]
+    );
+  }, [homepageContent]);
   return (
-    <Box className="section-welcome container">
+    <Box className="section-welcome" sx={{ width: "90%", margin: "0 auto" }}>
       <div className="welcome-image">
         <div className="top-collection pulse">
           <img

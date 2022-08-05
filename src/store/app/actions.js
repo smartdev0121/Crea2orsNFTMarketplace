@@ -29,9 +29,9 @@ export const fetchCollectionByCategory = (id) => async (dispatch) => {
     })
     .catch((err) => console.log(err));
 };
-export const fetchHomepageContent = (keyword) => async (dispatch) => {
+export const fetchHomepageContent = () => async (dispatch) => {
   return api
-    .get(`/fetch_homepage/${keyword}`)
+    .get(`/fetch_homepage`)
     .then((res) => {
       dispatch({ type: types.HOMEPAGE_CONTENT_FETCHED, payload: res.contents });
     })

@@ -7,6 +7,11 @@ const CustomInput = styled(TextField)({
   width: "100%",
   flex: "1 1",
   marginBottom: "10px",
+  "input: -webkit-autofill": {
+    color: "white",
+    boxShadow: "0 0 1000px 0 #222 inset",
+    textFillColor: "white",
+  },
   "& p": {
     color: "#aaa",
   },
@@ -48,12 +53,12 @@ const CustomInput = styled(TextField)({
     },
   },
   "& .MuiInputLabel-outlined": {
-    zIndex: "unset",
+    zIndex: "999 !important",
     fontSize: "1.2rem",
     color: "#bbb !important",
   },
   "& .MuiInputLabel-shrink": {
-    zIndex: "unset",
+    zIndex: "999 !important",
     fontSize: "1rem",
     color: "#bbb !important",
   },

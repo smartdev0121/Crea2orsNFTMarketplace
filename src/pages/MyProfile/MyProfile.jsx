@@ -46,6 +46,7 @@ import {
 } from "react-share";
 import ReportDialog from "./ReportDialog";
 import { reportPage } from "src/store/profile/actions";
+import SocialButtonsContainer from "react-social-media-buttons";
 import "./MyProfile.scss";
 import "dotenv/config";
 
@@ -167,16 +168,23 @@ const MyProfile = (props) => {
           onSubmit={onSubmit}
         />
         <div
+          className="profile-background"
           style={{
-            width: "100%",
-            top: "-33px",
-            position: "absolute",
-            height: "200px",
             backgroundImage: `url(${process.env.REACT_APP_BACKEND_URL}${userInfo?.backgroundImageUrl})`,
-            backgroundSize: "cover",
           }}
         >
           <div className="edit-part">
+            {!userInfo?.backgroundImage && (
+              <p
+                style={{
+                  textAlign: "center",
+                  color: "#c5c5c5 !important",
+                  fontSize: "1.2rem",
+                }}
+              >
+                We recommend that you use image with a ratio of 2.8
+              </p>
+            )}
             <Tooltip title="Edit Background">
               <IconButton onClick={onBackgroundEdit}>
                 <Edit
@@ -224,162 +232,192 @@ const MyProfile = (props) => {
           </div>
         </div>
 
-        <Tooltip title="Edit Profile">
-          <Button className="profile-image" onClick={onImageClicked}>
-            <img
-              src={
-                (userInfo?.avatar_url &&
-                  process.env.REACT_APP_BACKEND_URL + userInfo?.avatar_url) ||
-                "/images/profile-images/profile-empty.png"
-              }
-            />
-          </Button>
-        </Tooltip>
+        <div className="profile-detail">
+          <Tooltip title="Edit Profile">
+            <Button className="profile-image" onClick={onImageClicked}>
+              <img
+                src={
+                  (userInfo?.avatar_url &&
+                    process.env.REACT_APP_BACKEND_URL + userInfo?.avatar_url) ||
+                  "/images/profile-images/profile-empty.png"
+                }
+              />
+            </Button>
+          </Tooltip>
 
-        <div className="wallet-address">
-          <MClipboard>
-            {({ copy }) =>
-              active ? (
-                <Button
-                  className="profile-connect-btn"
-                  onClick={() => copy(account)}
+          <div className="wallet-address">
+            <MClipboard>
+              {({ copy }) =>
+                active ? (
+                  <Button
+                    className="profile-connect-btn"
+                    onClick={() => copy(account)}
+                  >
+                    <span className="token-image">
+                      <img src="/images/crypto-icons/brise.png" />
+                    </span>
+                    <span className="indicator connected"></span>
+                    {connectBtnTxt}
+                  </Button>
+                ) : (
+                  <Button
+                    className="profile-connect-btn"
+                    onClick={connectWallet}
+                  >
+                    <span className="indicator not-connected"></span>
+                    {connectBtnTxt}
+                  </Button>
+                )
+              }
+            </MClipboard>
+          </div>
+          <p className="nick_name">@{userInfo?.nickName}</p>
+          <div className="bio-text">
+            <p>{userInfo?.bio || ""}</p>
+          </div>
+          <div className="personal">
+            <a
+              href={`https://${userInfo?.personalSite}`}
+              target="_blank"
+              style={{ color: "#999" }}
+            >
+              <b>{userInfo?.personalSite || ""}</b>
+            </a>
+          </div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <SocialButtonsContainer
+              links={[
+                userInfo?.facebook_username &&
+                  `https://www.facebook.com/${userInfo?.facebook_username}`,
+                userInfo?.twitter_username &&
+                  `https://twitter.com/${userInfo?.twitter_username}`,
+                userInfo?.instagram_username &&
+                  `https://www.instagram.com/${userInfo?.instagram_username}`,
+              ]}
+              buttonStyle={{
+                width: "46px",
+                height: "46px",
+                margin: "0px 10px",
+                backgroundColor: "#969696",
+                borderRadius: "30%",
+              }}
+              iconStyle={{ color: "#ffffff" }}
+              openNewTab={true}
+            />
+          </div>
+
+          <div className="following-bar">
+            <label>
+              <span className="count">
+                {Object.keys(followInfo?.followers).length}
+              </span>
+              <span className="static-string">followers</span>
+            </label>
+            <label>
+              <span className="count">
+                {Object.keys(followInfo?.followings).length}
+              </span>
+              <span className="static-string">following</span>
+            </label>
+          </div>
+          <div className="edit-profile">
+            <MBorderButton onClick={onEditProfile}>
+              <Settings sx={{ fontSize: "16px" }} />
+              &nbsp;Edit Profile
+            </MBorderButton>
+            <ClickAwayListener onClickAway={handleClickAway1}>
+              <InlineDiv>
+                <IconButton
+                  sx={{ color: "#888", marginLeft: "15px" }}
+                  onClick={handleClick(1)}
                 >
-                  <span className="token-image">
-                    <img src="/images/crypto-icons/brise.png" />
-                  </span>
-                  <span className="indicator connected"></span>
-                  {connectBtnTxt}
-                </Button>
-              ) : (
-                <Button className="profile-connect-btn" onClick={connectWallet}>
-                  <span className="indicator not-connected"></span>
-                  {connectBtnTxt}
-                </Button>
-              )
-            }
-          </MClipboard>
-        </div>
-        <p className="nick_name">@{userInfo?.nickName}</p>
-        <div className="bio-text">
-          <p>{userInfo?.bio || ""}</p>
-        </div>
-        <div className="personal">
-          <a
-            href={`https://${userInfo?.personalSite}`}
-            target="_blank"
-            style={{ color: "#999" }}
-          >
-            <b>{userInfo?.personalSite || ""}</b>
-          </a>
-        </div>
-        <div className="following-bar">
-          <label>
-            <span className="count">
-              {Object.keys(followInfo?.followers).length}
-            </span>
-            <span className="static-string">followers</span>
-          </label>
-          <label>
-            <span className="count">
-              {Object.keys(followInfo?.followings).length}
-            </span>
-            <span className="static-string">following</span>
-          </label>
-        </div>
-        <div className="edit-profile">
-          <MBorderButton onClick={onEditProfile}>
-            <Settings sx={{ fontSize: "16px" }} />
-            &nbsp;Edit Profile
-          </MBorderButton>
-          <ClickAwayListener onClickAway={handleClickAway1}>
-            <InlineDiv>
-              <IconButton
-                sx={{ color: "#888", marginLeft: "15px" }}
-                onClick={handleClick(1)}
-              >
-                <DownloadForOffline />
-              </IconButton>
-              <Popper open={popperOpen} anchorEl={anchorEl} transition>
-                {({ TransitionProps }) => (
-                  <Fade {...TransitionProps} timeoout={350}>
-                    <Paper sx={{ backgroundColor: "#141c38" }}>
-                      <FacebookShareButton
-                        url={
-                          process.env.REACT_APP_FRONT_URL +
-                          "user/" +
-                          userInfo.customUrl
-                        }
-                        quote={""}
-                      >
-                        <FacebookIcon round size={32} />
-                      </FacebookShareButton>
-                      <TwitterShareButton
-                        url={
-                          process.env.REACT_APP_FRONT_URL +
-                          "user/" +
-                          userInfo.customUrl
-                        }
-                      >
-                        <TwitterIcon round size={32} />
-                      </TwitterShareButton>
-                      <TelegramShareButton
-                        url={
-                          process.env.REACT_APP_FRONT_URL +
-                          "user/" +
-                          userInfo.customUrl
-                        }
-                      >
-                        <TelegramIcon round size={32} />
-                      </TelegramShareButton>
-                      <EmailShareButton
-                        url={
-                          process.env.REACT_APP_FRONT_URL +
-                          "user/" +
-                          userInfo.customUrl
-                        }
-                      >
-                        <EmailIcon round size={32} />
-                      </EmailShareButton>
-                      <MClipboard>
-                        {({ copy }) => (
-                          <IconButton
-                            sx={{ color: "#888" }}
-                            onClick={() =>
-                              copy(
-                                process.env.REACT_APP_FRONT_URL +
-                                  "user/" +
-                                  userInfo.customUrl
-                              )
-                            }
-                          >
-                            <ContentCopy />
-                          </IconButton>
-                        )}
-                      </MClipboard>
-                    </Paper>
-                  </Fade>
-                )}
-              </Popper>
-            </InlineDiv>
-          </ClickAwayListener>
-          <ClickAwayListener onClickAway={handleClickAway2}>
-            <InlineDiv>
-              <IconButton sx={{ color: "#888" }} onClick={handleClick(2)}>
-                <MoreHoriz />
-              </IconButton>
-              <Popper anchorEl={anchorEl2} open={popperOpen2} transition>
-                {({ TransitionProps }) => (
-                  <Fade {...TransitionProps} timeoout={350}>
-                    <Paper sx={{ backgroundColor: "#141c38" }}>
-                      <Button sx={{ color: "#888" }} onClick={reportBtnClicked}>
-                        Report page
-                      </Button>
-                    </Paper>
-                  </Fade>
-                )}
-              </Popper>
-            </InlineDiv>
-          </ClickAwayListener>
+                  <DownloadForOffline />
+                </IconButton>
+                <Popper open={popperOpen} anchorEl={anchorEl} transition>
+                  {({ TransitionProps }) => (
+                    <Fade {...TransitionProps} timeoout={350}>
+                      <Paper sx={{ backgroundColor: "#141c38" }}>
+                        <FacebookShareButton
+                          url={
+                            process.env.REACT_APP_FRONT_URL +
+                            "user/" +
+                            userInfo.customUrl
+                          }
+                          quote={""}
+                        >
+                          <FacebookIcon round size={32} />
+                        </FacebookShareButton>
+                        <TwitterShareButton
+                          url={
+                            process.env.REACT_APP_FRONT_URL +
+                            "user/" +
+                            userInfo.customUrl
+                          }
+                        >
+                          <TwitterIcon round size={32} />
+                        </TwitterShareButton>
+                        <TelegramShareButton
+                          url={
+                            process.env.REACT_APP_FRONT_URL +
+                            "user/" +
+                            userInfo.customUrl
+                          }
+                        >
+                          <TelegramIcon round size={32} />
+                        </TelegramShareButton>
+                        <EmailShareButton
+                          url={
+                            process.env.REACT_APP_FRONT_URL +
+                            "user/" +
+                            userInfo.customUrl
+                          }
+                        >
+                          <EmailIcon round size={32} />
+                        </EmailShareButton>
+                        <MClipboard>
+                          {({ copy }) => (
+                            <IconButton
+                              sx={{ color: "#888" }}
+                              onClick={() =>
+                                copy(
+                                  process.env.REACT_APP_FRONT_URL +
+                                    "user/" +
+                                    userInfo.customUrl
+                                )
+                              }
+                            >
+                              <ContentCopy />
+                            </IconButton>
+                          )}
+                        </MClipboard>
+                      </Paper>
+                    </Fade>
+                  )}
+                </Popper>
+              </InlineDiv>
+            </ClickAwayListener>
+            <ClickAwayListener onClickAway={handleClickAway2}>
+              <InlineDiv>
+                <IconButton sx={{ color: "#888" }} onClick={handleClick(2)}>
+                  <MoreHoriz />
+                </IconButton>
+                <Popper anchorEl={anchorEl2} open={popperOpen2} transition>
+                  {({ TransitionProps }) => (
+                    <Fade {...TransitionProps} timeoout={350}>
+                      <Paper sx={{ backgroundColor: "#141c38" }}>
+                        <Button
+                          sx={{ color: "#888" }}
+                          onClick={reportBtnClicked}
+                        >
+                          Report page
+                        </Button>
+                      </Paper>
+                    </Fade>
+                  )}
+                </Popper>
+              </InlineDiv>
+            </ClickAwayListener>
+          </div>
         </div>
       </section>
       <section className="tab-bar">

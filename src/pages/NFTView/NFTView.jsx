@@ -9,6 +9,7 @@ import {
   Box,
   Grid,
   GridItem,
+  Chip,
 } from "@mui/material";
 import {
   Pause,
@@ -16,6 +17,7 @@ import {
   VolumeOff,
   Fullscreen,
   Sell,
+  Face as FaceIcon,
   AudioFile,
   Copyright,
   AllOut,
@@ -45,12 +47,19 @@ const NFTView = (props) => {
   const [blob, setBlob] = useState();
   const dispatch = useDispatch();
   const nftInfo = useSelector((state) => state.contract.nftInfo);
+  console.log(nftInfo);
+  const categories = useSelector((state) => state.contract?.categories);
+  console.log(categories);
   const userInfo = useSelector((state) => state.profile);
   const [curUserAmount, setCurUserAmount] = useState(0);
   const isMaking = useSelector((state) => getSpinner(state, "MAKING_ORDER"));
   const [open, setOpen] = React.useState(false);
   const status = useSelector((state) => userStatus(state));
-
+  console.log(
+    categories?.filter(
+      (item, index) => Number(item.id) === Number(nftInfo.Contract?.category)
+    )
+  );
   useEffect(async () => {
     dispatch(getNFTInformation(nftId));
   }, []);
@@ -114,6 +123,22 @@ const NFTView = (props) => {
           <Grid item xs={7}>
             <div className="side-part">
               <h2>{nftInfo.name}</h2>
+              <Chip
+                icon={<FaceIcon />}
+                sx={{ marginBottom: "1rem" }}
+                label={
+                  categories?.filter(
+                    (item, index) =>
+                      Number(item.id) === Number(nftInfo.Contract?.category)
+                  )[0]?.name +
+                  " / " +
+                  categories?.filter(
+                    (item) =>
+                      Number(item.id) === Number(nftInfo.Contract?.subCategory)
+                  )[0]?.name
+                }
+                variant="outlined"
+              />
               <MTypography>
                 <Person fontSize="small" />
                 {nftInfo.owners?.length} Owners | <AllOut fontSize="small" />{" "}

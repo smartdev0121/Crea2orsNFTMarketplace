@@ -13,18 +13,21 @@ const ButtonBar = ({ categories, onClicked }) => {
   };
 
   return (
-    <Box className="container">
+    <Box>
       <div className="button-bar">
-        {categories?.map((item, index) => (
-          <Button
-            className="btn outline category-btn"
-            key={item.name + index}
-            onClick={(eve) => handleClick(eve, item.id)}
-          >
-            <img src={item.icon_url}></img>
-            {item.name}
-          </Button>
-        ))}
+        {categories?.map((item, index) => {
+          if (item.id == 1) return;
+          return (
+            <Button
+              className="btn outline category-btn"
+              key={item.name + index}
+              onClick={(eve) => handleClick(eve, item.id)}
+            >
+              <img src={item.icon_url}></img>
+              {item.name}
+            </Button>
+          );
+        })}
       </div>
     </Box>
   );

@@ -33,6 +33,7 @@ import { progressDisplay } from "src/utils/pleaseWait";
 import { userStatus } from "src/store/profile/reducer";
 import "./CreateCollectionPage.scss";
 import "dotenv/config";
+import MScrollToTop from "src/components/MScrollToTop";
 
 const CreateCollectionPage = (props) => {
   const collectionPreview = useSelector(
@@ -57,8 +58,6 @@ const CreateCollectionPage = (props) => {
   const hiddenFileInput = React.useRef(null);
   const [type, setType] = useState(1);
   const [file, setFile] = useState(null);
-  const [resizedImage, setResizedImage] = useState(null);
-  const [confirmedFile, setConfirmedFile] = useState(undefined);
   const status = useSelector((state) => userStatus(state));
 
   const categories = useSelector((state) => state.contract.categories);
@@ -71,11 +70,28 @@ const CreateCollectionPage = (props) => {
     setFile(collectionPreview ? collectionPreview.file : null);
   }, []);
 
+  const useDisplayImage = () => {
+    const uploader = (e) => {
+      const imageFile = e.target.files[0];
+
+      const reader = new FileReader();
+      reader.addEventListener("load", (e) => {
+        setResult(e.target.result);
+      });
+      reader.readAsDataURL(imageFile);
+    };
+
+    return { uploader };
+  };
+
+  const { uploader } = useDisplayImage();
+
   const handleInputChange = (e) => {
     setInputValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleFileChange = (e) => {
+    uploader(e);
     e ? setFile(e.target.files[0]) : setFile(null);
   };
 
@@ -91,7 +107,7 @@ const CreateCollectionPage = (props) => {
     const newCollectionInfo = {
       ...inputValues,
       type: type,
-      image: resizedImage,
+      image: result,
       file: file,
     };
     console.log("before preview", newCollectionInfo);
@@ -112,7 +128,7 @@ const CreateCollectionPage = (props) => {
       category: type,
       subCategory: values.subCategory,
       tokenLimit: values.tokenLimit,
-      file: confirmedFile,
+      file: file,
     };
     try {
       const { contractAddress, contractUri, imageUri } = await deployContract(
@@ -166,17 +182,7 @@ const CreateCollectionPage = (props) => {
 
   return (
     <div className="whole-container">
-      <MImageCropper
-        file={file}
-        onConfirm={(croppedFile) => {
-          setResizedImage(window.URL.createObjectURL(croppedFile));
-          setConfirmedFile(croppedFile);
-          return;
-        }}
-        onCompleted={() => setFile(null)}
-        ratio={3}
-        onDiscard={onDiscard}
-      />
+      <MScrollToTop history={props.history} />
       <Container
         maxWidth="md"
         sx={{ paddingTop: "100px", paddingBottom: "20px" }}
@@ -297,7 +303,7 @@ const CreateCollectionPage = (props) => {
                         component={MTextField}
                         onChange={handleInputChange}
                         initialValue={inputValues.subCategory}
-                        placeholder="#Weapon"
+                        placeholder="#Abstract"
                         variant="outlined"
                       />
                       <Stack
@@ -359,7 +365,7 @@ const CreateCollectionPage = (props) => {
                         >
                           <img
                             src={
-                              resizedImage ||
+                              result ||
                               (collectionPreview?.image
                                 ? collectionPreview?.image
                                 : "/images/img_empty.png")

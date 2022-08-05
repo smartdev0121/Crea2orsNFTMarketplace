@@ -10,6 +10,7 @@ import { MTopRadiusImg } from "src/components/MImages";
 import styled from "styled-components";
 import "./CollectionView.scss";
 import { showNotify } from "src/utils/notify";
+import MScrollToTop from "src/components/MScrollToTop";
 import Slider from "./Slider";
 
 const CollectionView = (props) => {
@@ -50,6 +51,7 @@ const CollectionView = (props) => {
 
   return (
     <Container maxWidth="lg" sx={{ marginTop: "100px" }}>
+      <MScrollToTop history={props.history} />
       <MBox>
         {isLoading ? (
           <Skeleton animation="wave" width="100%" height="300px" />

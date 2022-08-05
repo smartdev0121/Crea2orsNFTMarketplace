@@ -9,13 +9,14 @@ import MSpinner from "./components/MSpinner";
 import { getProfile as getProfileReducer } from "./store/profile/reducer";
 import { getSpinner } from "./store/app/reducer";
 import AOS from "aos";
+import MScrollToTop from "./components/MScrollToTop";
 import "aos/dist/aos.css";
 import "please-wait/build/please-wait.css";
 import "./spinner.css";
 import "./App.css";
 import "./styles/styles.css";
 
-const App = () => {
+const App = (props) => {
   const user = useSelector((state) => getProfileReducer(state));
   const isLoading = useSelector((state) => getSpinner(state, "PROFILE_INFO"));
 
