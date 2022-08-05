@@ -43,7 +43,7 @@ import { userStatus } from "src/store/profile/reducer";
 import { showNotify } from "src/utils/notify";
 
 const NFTView = (props) => {
-  const { nftId } = props.match.params;
+  const { nftId } = props?.match?.params;
   const [blob, setBlob] = useState();
   const dispatch = useDispatch();
   const nftInfo = useSelector((state) => state.contract.nftInfo);
