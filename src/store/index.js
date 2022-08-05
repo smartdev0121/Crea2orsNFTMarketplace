@@ -7,7 +7,10 @@ const identify = (v) => v;
 
 const getDevTools = () => {
   if (process.env.NODE_ENV === "development") {
+    console.log("redux tools");
     if (typeof window === "object" && !!window.devToolsExtension) {
+      console.log("redux tools111");
+
       return window.devToolsExtension();
     }
     return identify;

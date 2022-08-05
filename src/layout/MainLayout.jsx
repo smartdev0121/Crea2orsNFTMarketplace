@@ -1,13 +1,10 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import HeaderLogin from "./HeaderLogin";
-import HeaderLogout from "./HeaderLogout";
-
-import MSpin from "src/components/MSpin";
+import MScrollToTop from "src/components/MScrollToTop";
 import Footer from "./Footer";
 import styled from "styled-components";
 
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children, history }) => {
   return (
     <>
       <HeaderLogin />
@@ -20,5 +17,5 @@ const MainLayout = ({ children }) => {
 export default MainLayout;
 
 const MBody = styled.div`
-  min-height: 50vh;
+  min-height: 65vh;
 `;

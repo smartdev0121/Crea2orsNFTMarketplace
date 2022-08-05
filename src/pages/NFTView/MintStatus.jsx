@@ -153,6 +153,12 @@ const MintStatus = (props) => {
     setBuyOrderConfirm(true);
   };
 
+  const handleProfileClicked = () => {
+    window.location.assign(
+      process.env.REACT_APP_FRONT_URL + "user/" + profile.customUrl
+    );
+  };
+
   return (
     <>
       {creator && (
@@ -161,6 +167,7 @@ const MintStatus = (props) => {
             Mint Status(
             <Chip
               sx={{ margin: "10px 0" }}
+              onClick={handleProfileClicked}
               icon={
                 <Avatar
                   sx={{ width: 24, height: 24 }}

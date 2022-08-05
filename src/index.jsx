@@ -16,6 +16,7 @@ import { connectedWallet } from "./store/wallet/actions";
 import { ToastContainer } from "react-toastify";
 import { Web3ReactProvider } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
+import MScrollToTop from "./components/MScrollToTop";
 import "react-toastify/dist/ReactToastify.css";
 import { getCachedProvider, getCurrentWalletAddress } from "./utils/wallet";
 const history = createBrowserHistory({});

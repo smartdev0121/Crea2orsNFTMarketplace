@@ -14117,6 +14117,11 @@ react-slidedown@^2.4.5:
   dependencies:
     tslib "^2.0.0"
 
+react-social-media-buttons@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/react-social-media-buttons/-/react-social-media-buttons-1.0.8.tgz#106f217eb10ce8363210caa47b0d4db4935324fb"
+  integrity sha512-6wyXpGeTjY6BXbAdFU9ozyJAMhTDud/qZLxASN+ydX0VQ8fhX2v9zxN2EIc8uc6DyHDe8bVpzFKAnEcE0MsgHw==
+
 react-spinners@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/react-spinners/-/react-spinners-0.11.0.tgz#186fd150cc9f7ab1436227f70d5d113b47e9e43d"

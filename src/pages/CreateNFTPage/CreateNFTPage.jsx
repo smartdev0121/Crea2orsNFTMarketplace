@@ -27,6 +27,7 @@ import { progressDisplay } from "src/utils/pleaseWait";
 import { userStatus } from "src/store/profile/reducer";
 
 import "./CreateNFTPage.scss";
+import MScrollToTop from "src/components/MScrollToTop";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -181,6 +182,7 @@ export default function CreateNFTPage(props) {
   return (
     <div className="whole-container">
       {isLoading && <MSpinner />}
+      <MScrollToTop history={props.history} />
       <Container
         maxWidth="md"
         sx={{ paddingTop: "100px", paddingBottom: "20px" }}

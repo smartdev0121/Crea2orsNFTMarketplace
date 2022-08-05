@@ -121,7 +121,9 @@ const EditProfile = (props) => {
     data.append("bio", values.bio);
     data.append("customUrl", values.customUrl);
     data.append("personalSite", values.personalSite);
-
+    data.append("facebook_username", values.facebookUsername);
+    data.append("twitter_username", values.twitterUsername);
+    data.append("instagram_username", values.instagramName);
     dispatch(setUserInfo(data, props.history));
   };
 
@@ -214,13 +216,31 @@ const EditProfile = (props) => {
                     variant="standard"
                     component={MTextField}
                   />
-                  {/* <Field
+                  <Field
+                    type="text"
+                    name="facebookUsername"
+                    label="Facebook Username"
+                    placeholder="Enter your name in Facebook"
+                    helperText="Link Facebook account to gain more trust on the marketplace"
+                    InputLabelProps={{ shrink: true }}
+                    initialValue={userInfo?.facebook_username || ""}
+                    multiline={true}
+                    variant="standard"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">@</InputAdornment>
+                      ),
+                    }}
+                    component={MTextField}
+                  />
+                  <Field
                     type="text"
                     name="twitterUsername"
                     label="Twitter Username"
                     placeholder="Enter your name in Twitter"
                     helperText="Link Twitter account to gain more trust on the marketplace"
                     InputLabelProps={{ shrink: true }}
+                    initialValue={userInfo?.twitter_username || ""}
                     multiline={true}
                     variant="standard"
                     InputProps={{
@@ -237,15 +257,21 @@ const EditProfile = (props) => {
                     placeholder="Enter your name in Instagram"
                     helperText="Link Instagram account to gain more trust on the marketplace"
                     InputLabelProps={{ shrink: true }}
+                    initialValue={userInfo?.instagram_username || ""}
                     multiline={true}
                     variant="standard"
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">@</InputAdornment>
                       ),
+                      endAdorment: (
+                        <InputAdornment position="end">
+                          <Button>Verify</Button>
+                        </InputAdornment>
+                      ),
                     }}
                     component={MTextField}
-                  /> */}
+                  />
                   <Field
                     type="text"
                     name="personalSite"
@@ -262,7 +288,7 @@ const EditProfile = (props) => {
                     }}
                     component={MTextField}
                   />
-                  <Field
+                  {/* <Field
                     type="email"
                     name="email"
                     label="Email"
@@ -272,14 +298,14 @@ const EditProfile = (props) => {
                     placeholder="Enter your email address"
                     InputLabelProps={{ shrink: true }}
                     component={MTextField}
-                    // InputProps={{
-                    //   endAdornment: (
-                    //     <InputAdornment position="end">
-                    //       {verified}
-                    //     </InputAdornment>
-                    //   ),
-                    // }}
-                  />
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {verified}
+                        </InputAdornment>
+                      ),
+                    }}
+                  /> */}
                   {/* <section className="veri-part">
                     <div>
                       <h3>Verification</h3>
