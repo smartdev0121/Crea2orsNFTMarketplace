@@ -48,6 +48,7 @@ export const getProfile = (walletAddress) => async (dispatch) => {
   return api
     .get(`/profile/info/${walletAddress}`)
     .then((res) => {
+      console.log(res);
       dispatch({
         type: types.PROFILE_INFO,
         payload: { ...res },

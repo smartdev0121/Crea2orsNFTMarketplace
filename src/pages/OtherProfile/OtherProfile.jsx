@@ -45,7 +45,7 @@ const OtherProfile = (props) => {
   const [connectBtnTxt, setConnectBtnTxt] = useState("Connect");
   const [active, setActive] = useState(false);
   const [value, setValue] = React.useState("1");
-  const params = props.match.params;
+  const params = props?.match?.params;
   const profileStatus = useSelector((state) => state.users.status);
   const otherInfo = useSelector((state) => state.users.otherUserInfo);
   const profile = useSelector((state) => state.profile);

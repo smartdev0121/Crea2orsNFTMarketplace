@@ -30,7 +30,6 @@ import MBorderButton from "src/components/MButtons/MBorderButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import MImageCropper from "src/components/MImageCropper";
 import { profileBackgroundUpdate } from "src/store/users/actions";
-import { getUserInfo } from "../../store/users/actions";
 import { getCurrentWalletAddress } from "src/utils/wallet";
 import { connectedWallet, rejectConnectWallet } from "src/store/wallet/actions";
 import { showNotify } from "src/utils/notify";
@@ -52,7 +51,7 @@ import "dotenv/config";
 
 const MyProfile = (props) => {
   console.log(props);
-  const params = props.match.params;
+  const params = props?.match?.params;
 
   const hiddenBackImageFile = React.useRef(null);
   const [connectBtnTxt, setConnectBtnTxt] = useState("Connect");
@@ -289,12 +288,9 @@ const MyProfile = (props) => {
           <div style={{ display: "flex", justifyContent: "center" }}>
             <SocialButtonsContainer
               links={[
-                userInfo?.facebook_username &&
-                  `https://www.facebook.com/${userInfo?.facebook_username}`,
-                userInfo?.twitter_username &&
-                  `https://twitter.com/${userInfo?.twitter_username}`,
-                userInfo?.instagram_username &&
-                  `https://www.instagram.com/${userInfo?.instagram_username}`,
+                `https://www.facebook.com/${userInfo?.facebook_username}`,
+                `https://twitter.com/${userInfo?.twitter_username}`,
+                `https://www.instagram.com/${userInfo?.instagram_username}`,
               ]}
               buttonStyle={{
                 width: "46px",
