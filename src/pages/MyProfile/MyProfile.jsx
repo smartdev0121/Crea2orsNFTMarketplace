@@ -51,7 +51,9 @@ import "./MyProfile.scss";
 import "dotenv/config";
 
 const MyProfile = (props) => {
+  console.log(props);
   const params = props.match.params;
+
   const hiddenBackImageFile = React.useRef(null);
   const [connectBtnTxt, setConnectBtnTxt] = useState("Connect");
   const [resizedImage, setResizedImage] = useState(null);

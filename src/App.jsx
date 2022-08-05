@@ -9,7 +9,6 @@ import MSpinner from "./components/MSpinner";
 import { getProfile as getProfileReducer } from "./store/profile/reducer";
 import { getSpinner } from "./store/app/reducer";
 import AOS from "aos";
-import MScrollToTop from "./components/MScrollToTop";
 import "aos/dist/aos.css";
 import "please-wait/build/please-wait.css";
 import "./spinner.css";
